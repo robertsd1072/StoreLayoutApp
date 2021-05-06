@@ -1,0 +1,13 @@
+Cosas Para Hacer en Cualquier Momento:
+
+Item Location: D39(1) 1-1-1.90
+1. Load layout to a file and be able to load it back from computer.
+
+2. Bug: setCelltoNull doesn't work quite right with groups further from the origin
+
+3. Bug: something with add to group twice isnt right, cant ungroup
+
+Optimization:
+1. Highlight()
+2. Sorting Highlighted/Grouped Lists -> O(2n + sqrt(n)log(n))
+3. irregular() -> O(2n + sqrt(n)log(n))
