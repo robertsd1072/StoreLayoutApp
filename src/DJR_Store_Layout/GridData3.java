@@ -49,13 +49,14 @@ public class GridData3 {
      */
     private int sizeOfPluses;
     /**
-     * list of groups
+     * list of Isle Groups
      */
-    public Hashtable<String, Group> groupList;
+    public Hashtable<String, IsleGroup> isleGroupList;
     /**
      * LinkedList of highlighted cells in grid
      */
-    private HighlightedList highlightedList;
+    protected HighlightedList highlightedList;
+    protected NullList nullList;
 
     /**
      * Basic constructor
@@ -78,11 +79,12 @@ public class GridData3 {
         plusGrid = new PNode[cols-1][rows-1];
         sizeOfPluses = 0;
         limitOfPluses = 0;
-        groupList = new Hashtable<>();
+        isleGroupList = new Hashtable<>();
         highlightedList = new HighlightedList();
         screenX = x;
         screenY = y;
         cellSize = cS;
+        nullList = new NullList();
     }
 
     /**
@@ -221,10 +223,10 @@ public class GridData3 {
         {
             for (int j=0; j<colSize; j++)
             {
-                grid[j][i].setGrouped(false, null, null, null);
+                grid[j][i].setIsled(false, null, null, null);
             }
         }
-        groupList.clear();
+        isleGroupList.clear();
     }
 
     /**
@@ -237,7 +239,7 @@ public class GridData3 {
     public void highlight(RNode node, double x, double y)
     {
         resetHighlighted();
-        if (!node.isGrouped() && !node.isNulled())
+        if (!node.isIsle() && !node.isNulled())
         {
             node.setHighlighted(true);
         }
@@ -259,7 +261,7 @@ public class GridData3 {
             //West
             try
             {
-                if (!grid[xCoord-i][yCoord].isGrouped() && !grid[xCoord-i][yCoord].isNulled())
+                if (!grid[xCoord-i][yCoord].isIsle() && !grid[xCoord-i][yCoord].isNulled())
                     grid[xCoord-i][yCoord].setHighlighted(true);
             }
             catch (IndexOutOfBoundsException e)
@@ -272,16 +274,16 @@ public class GridData3 {
             //North
             try
             {
-                if (!grid[xCoord][yCoord-i].isGrouped() && !grid[xCoord][yCoord-i].isNulled())
+                if (!grid[xCoord][yCoord-i].isIsle() && !grid[xCoord][yCoord-i].isNulled())
                     grid[xCoord][yCoord-i].setHighlighted(true);
                 for (int j=1; j<a; j++)
                 {
-                    if (!grid[xCoord-j][yCoord-i].isGrouped() && !grid[xCoord-j][yCoord-i].isNulled())
+                    if (!grid[xCoord-j][yCoord-i].isIsle() && !grid[xCoord-j][yCoord-i].isNulled())
                         grid[xCoord-j][yCoord-i].setHighlighted(true);
                 }
                 for (int k=1; k<c; k++)
                 {
-                    if (!grid[xCoord+k][yCoord-i].isGrouped() && !grid[xCoord+k][yCoord-i].isNulled())
+                    if (!grid[xCoord+k][yCoord-i].isIsle() && !grid[xCoord+k][yCoord-i].isNulled())
                         grid[xCoord+k][yCoord-i].setHighlighted(true);
                 }
             }
@@ -295,7 +297,7 @@ public class GridData3 {
             //East
             try
             {
-                if (!grid[xCoord+i][yCoord].isGrouped() && !grid[xCoord+i][yCoord].isNulled())
+                if (!grid[xCoord+i][yCoord].isIsle() && !grid[xCoord+i][yCoord].isNulled())
                     grid[xCoord+i][yCoord].setHighlighted(true);
             }
             catch (IndexOutOfBoundsException e)
@@ -308,16 +310,16 @@ public class GridData3 {
             //South
             try
             {
-                if (!grid[xCoord][yCoord+i].isGrouped() && !grid[xCoord][yCoord+i].isNulled())
+                if (!grid[xCoord][yCoord+i].isIsle() && !grid[xCoord][yCoord+i].isNulled())
                     grid[xCoord][yCoord+i].setHighlighted(true);
                 for (int j=1; j<a; j++)
                 {
-                    if (!grid[xCoord-j][yCoord+i].isGrouped() && !grid[xCoord-j][yCoord+i].isNulled())
+                    if (!grid[xCoord-j][yCoord+i].isIsle() && !grid[xCoord-j][yCoord+i].isNulled())
                         grid[xCoord-j][yCoord+i].setHighlighted(true);
                 }
                 for (int k=1; k<c; k++)
                 {
-                    if (!grid[xCoord+k][yCoord+i].isGrouped() && !grid[xCoord+k][yCoord+i].isNulled())
+                    if (!grid[xCoord+k][yCoord+i].isIsle() && !grid[xCoord+k][yCoord+i].isNulled())
                         grid[xCoord+k][yCoord+i].setHighlighted(true);
                 }
             }
@@ -384,209 +386,74 @@ public class GridData3 {
         }
     }
 
-    /**
-     * Groups highlighted nodes into a group
-     * Doubles as changing group name/color
-     *
-     * @param name group name
-     * @param c group color
-     * @param editGroup boolean for whether or not to edit group
-     * @param editGroupNode editing group node for getting relevant data
-     */
-    public void group(String name, Color c, boolean editGroup, RNode editGroupNode)
+    public void makeIsle(String isleID, String igName, Color c, IsleGroup isleGroup, boolean addToIsleGroup)
     {
-        if (!editGroup)
+        if (!addToIsleGroup)
         {
-            GroupedList list = new GroupedList();
-            Group g = new Group(name, c, cellSize);
+            IsleGroupCellList isleGroupCellList = new IsleGroupCellList();
+            IsleGroup igNew = new IsleGroup(igName, c);
 
-            SortHighlightedReturn shr = sortHighlightedList(highlightedList);
-            highlightedList = shr.hList;
+            IsleCellList isleCellList = new IsleCellList();
+            Isle newIsle = new Isle(isleID, igNew);
 
             HighlightedList.HighlightedNode curr = highlightedList.first;
             for (int i=0; i<highlightedList.size; i++)
             {
-                grid[curr.rNode.xCoord][curr.rNode.yCoord].setGrouped(true, name, c, g);
-                list.add(grid[curr.rNode.xCoord][curr.rNode.yCoord]);
+                grid[curr.rNode.xCoord][curr.rNode.yCoord].setIsled(true, newIsle, c, igNew);
+                isleGroupCellList.add(grid[curr.rNode.xCoord][curr.rNode.yCoord]);
+                isleCellList.add(grid[curr.rNode.xCoord][curr.rNode.yCoord]);
 
                 curr = curr.next;
             }
 
-            g.groupedList = list;
+            igNew.isleGroupCellList = isleGroupCellList;
+            newIsle.setIsleCellList(isleCellList);
 
-            g.maxWidth = shr.xRange+1;
-            g.maxHeight = shr.yRange+1;
-            groupList.put(name, g);
+            igNew.addNewID(isleID, newIsle);
+
+            isleGroupList.put(igName, igNew);
             highlightedList.clear();
-
-            g.irregular = g.isIrregular();
         }
         else
         {
-            Group g = editGroupNode.getGroup();
+            IsleGroupCellList isleGroupCellList = isleGroup.getIsleGroupCellList();
 
-            Group gNew = new Group(name, c, cellSize);
+            IsleCellList isleCellList = new IsleCellList();
+            Isle newIsle = new Isle(isleID, isleGroup);
 
-            GroupedList.GroupedNode curr = g.groupedList.first;
-
-            for (int i=0; i<g.groupedList.size; i++)
+            HighlightedList.HighlightedNode curr = highlightedList.first;
+            for (int i=0; i<highlightedList.size; i++)
             {
-                grid[curr.rNode.xCoord][curr.rNode.yCoord].setGrouped(true, name, c, gNew);
+                grid[curr.rNode.xCoord][curr.rNode.yCoord].setIsled(true, newIsle, c, isleGroup);
+                isleGroupCellList.add(grid[curr.rNode.xCoord][curr.rNode.yCoord]);
+                isleCellList.add(grid[curr.rNode.xCoord][curr.rNode.yCoord]);
+
                 curr = curr.next;
             }
 
-            gNew.groupedList = g.groupedList;
-            gNew.maxWidth = g.maxWidth;
-            gNew.maxHeight = g.maxHeight;
-            gNew.setIsleLayout(g.grid);
-            gNew.setIsleLayoutBool(g.hasIsleLayout());
-            groupList.put(gNew.name, gNew);
-            groupList.remove(g.name, g);
+            newIsle.setIsleCellList(isleCellList);
 
-            gNew.irregular = gNew.isIrregular();
+            isleGroup.addNewID(isleID, newIsle);
+
+            highlightedList.clear();
         }
     }
 
-    /**
-     * Adds highlighted cells to already existing group
-     *
-     * @param name group name
-     * @param c group color
-     */
-    public void addToGroup(String name, Color c)
+    public void removeIsle(Isle i)
     {
-        Group g = groupList.get(name);
+        IsleCellList.IsleCellNode curr = i.isleCellList.first;
 
-        HighlightedList.HighlightedNode curr = highlightedList.first;
-
-        for (int i=0; i<highlightedList.size; i++)
+        while (curr != null)
         {
-            grid[curr.rNode.xCoord][curr.rNode.yCoord].setGrouped(true, name, c, g);
-            g.groupedList.add(grid[curr.rNode.xCoord][curr.rNode.yCoord]);
-
+            grid[curr.rNode.xCoord][curr.rNode.yCoord].setIsled(false, null, null, null);
             curr = curr.next;
         }
 
-        highlightedList.clear();
-
-        if (g.hasIsleLayout())
+        i.getIsleGroup().getIsleIDList().remove(i.getIsleID());
+        if (i.getIsleGroup().getIsleIDList().size() == 0)
         {
-            System.out.println("Resetting isle layout");
-            g.setIsleLayout(null);
-            g.setIsleLayoutBool(false);
+            isleGroupList.remove(i.getIsleGroup().getName());
         }
-
-        SortGroupReturn sgr = sortGroupedList(g.groupedList, g.name);
-
-        g.groupedList = sgr.gList;
-        g.maxWidth = sgr.xRange+1;
-        g.maxHeight = sgr.yRange+1;
-
-        g.irregular = g.isIrregular();
-    }
-
-    /**
-     * Deletes group and resets group nodes
-     *
-     * @param name string of group name to delete
-     */
-    public void ungroup(String name)
-    {
-        Group g = groupList.get(name);
-
-        GroupedList.GroupedNode curr = g.groupedList.first;
-
-        for (int i=0; i<g.groupedList.size; i++)
-        {
-            grid[curr.rNode.xCoord][curr.rNode.yCoord].setGrouped(false, null, null, null);
-            curr = curr.next;
-        }
-
-        g.groupedList.clear();
-        groupList.remove(g.name);
-    }
-
-    /**
-     * Sorts a HighlightedList into a new list going from left to right, lowest to highest
-     * ex: 0,0 -> 0,1 -> 0,2 -> 1,0...
-     *
-     * @param list HighlightedList of interest
-     * @return new SortHighlightedReturn class with necessary values
-     */
-    private SortHighlightedReturn sortHighlightedList(HighlightedList list)
-    {
-        ArrayList<Integer> listOfXCoords = new ArrayList<>();
-        ArrayList<Integer> listOfYCoords = new ArrayList<>();
-
-        HighlightedList.HighlightedNode curr = list.first;
-        for (int i=0; i<list.size; i++)
-        {
-            if (!listOfXCoords.contains(curr.rNode.xCoord))
-                listOfXCoords.add(curr.rNode.xCoord);
-
-            if (!listOfYCoords.contains(curr.rNode.yCoord))
-                listOfYCoords.add(curr.rNode.yCoord);
-
-            curr = curr.next;
-        }
-        Collections.sort(listOfXCoords);
-        Collections.sort(listOfYCoords);
-
-        HighlightedList newList = new HighlightedList();
-        int startX = listOfXCoords.get(0);
-        int startY = listOfYCoords.get(0);
-        for (int i=startX; i<startX+listOfXCoords.size(); i++)
-        {
-            for (int j=startY; j<startY+listOfYCoords.size(); j++)
-            {
-                if (!grid[i][j].isGrouped())
-                    newList.add(grid[i][j]);
-            }
-        }
-
-        return new SortHighlightedReturn(newList, listOfXCoords.get(listOfXCoords.size()-1)-startX, listOfYCoords.get(listOfYCoords.size()-1)-startY);
-    }
-
-    /**
-     * Sorts a GroupedList into a new list going from left to right, lowest to highest
-     * ex: 0,0 -> 0,1 -> 0,2 -> 1,0...
-     *
-     * @param list GroupedList of interest
-     * @param groupName name of group of GroupedList
-     * @return new SortGroupedReturn class with necessary values
-     */
-    private SortGroupReturn sortGroupedList(GroupedList list, String groupName)
-    {
-        ArrayList<Integer> listOfXCoords = new ArrayList<>();
-        ArrayList<Integer> listOfYCoords = new ArrayList<>();
-
-        GroupedList.GroupedNode curr = list.first;
-        for (int i=0; i<list.size; i++)
-        {
-            if (!listOfXCoords.contains(curr.rNode.xCoord))
-                listOfXCoords.add(curr.rNode.xCoord);
-
-            if (!listOfYCoords.contains(curr.rNode.yCoord))
-                listOfYCoords.add(curr.rNode.yCoord);
-
-            curr = curr.next;
-        }
-        Collections.sort(listOfXCoords);
-        Collections.sort(listOfYCoords);
-
-        GroupedList newList = new GroupedList();
-        int startX = listOfXCoords.get(0);
-        int startY = listOfYCoords.get(0);
-        for (int i=startX; i<startX+listOfXCoords.size(); i++)
-        {
-            for (int j=startY; j<startY+listOfYCoords.size(); j++)
-            {
-                if (grid[i][j].isGrouped() && grid[i][j].groupName.equals(groupName))
-                    newList.add(grid[i][j]);
-            }
-        }
-
-        return new SortGroupReturn(newList, listOfXCoords.get(listOfXCoords.size()-1)-startX, listOfYCoords.get(listOfYCoords.size()-1)-startY);
     }
 
     /**
@@ -599,6 +466,7 @@ public class GridData3 {
     public void setCelltoNull(int x, int y)
     {
         grid[x][y].setNulled();
+        nullList.add(grid[x][y]);
         for (int i=1; i>-1; i--)
         {
             for (int j=1; j>-1; j--)
@@ -617,28 +485,22 @@ public class GridData3 {
      */
     public void printGroups()
     {
-        if (groupList.isEmpty())
+        if (isleGroupList.isEmpty())
         {
             System.out.println("There are no groups");
         }
 
-        Set<String> groups = groupList.keySet();
+        Set<String> groups = isleGroupList.keySet();
         for (String key : groups)
         {
-            System.out.println("Group Name: "+groupList.get(key).name+" Color: "+groupList.get(key).color.toString());
-            System.out.println("Group MaxWidth: "+groupList.get(key).maxWidth+" Group MaxHeight: "+groupList.get(key).maxHeight);
-            System.out.println("Group Irregularity: "+groupList.get(key).irregular);
-            System.out.println("Group has Layout: "+groupList.get(key).hasIsleLayout());
-
-            System.out.println("Grouped List:");
-
-            GroupedList.GroupedNode curr = groupList.get(key).groupedList.first;
-
-            for (int j=0; j<groupList.get(key).groupedList.size; j++)
+            System.out.println("Group Name: "+isleGroupList.get(key).name+" Color: "+isleGroupList.get(key).color.toString());
+            Set<String> isleIDs = isleGroupList.get(key).getIsleIDList().keySet();
+            System.out.println("Isle ID's: ");
+            for (String id : isleIDs)
             {
-                System.out.println(curr.rNode.xCoord+","+curr.rNode.yCoord);
-                curr = curr.next;
+                System.out.print(id+", ");
             }
+            System.out.print("\n");
         }
     }
 
@@ -660,6 +522,19 @@ public class GridData3 {
                 System.out.println(curr.rNode.xCoord+","+curr.rNode.yCoord);
                 curr = curr.next;
             }
+        }
+    }
+
+    /**
+     * Prints LinkedList of null cells
+     */
+    public void printNulls()
+    {
+        NullList.NullNode curr = nullList.first;
+        while (curr != null)
+        {
+            System.out.println(curr.rNode.getX()+", "+curr.rNode.getY());
+            curr = curr.next;
         }
     }
 
@@ -700,7 +575,7 @@ public class GridData3 {
 
     public int getNumOfGroups()
     {
-        return groupList.size();
+        return isleGroupList.size();
     }
 
     /**
@@ -711,10 +586,10 @@ public class GridData3 {
         private final Rectangle r;
         private final int xCoord, yCoord;
         private double sXMinCoord, sYMinCoord, sXMaxCoord, sYMaxCoord;
-        private boolean highlighted, grouped, nulled;
-        private Group group;
+        private boolean highlighted, isIsle, nulled;
+        private Isle isle;
+        private IsleGroup isleGroup;
         private Color color;
-        private String groupName;
 
         public RNode(Rectangle rect, int x, int y, double x1, double y1)
         {
@@ -745,15 +620,15 @@ public class GridData3 {
             else
             {
                 r.setFill(Color.TRANSPARENT);
-                r.setStroke(Color.GRAY);
+                r.setStroke(Color.TRANSPARENT);
                 r.setOpacity(0.5);
                 highlighted = hmm;
             }
         }
 
-        public boolean isGrouped()
+        public boolean isIsle()
         {
-            return grouped;
+            return isIsle;
         }
 
         public Color getColor()
@@ -761,19 +636,14 @@ public class GridData3 {
             return color;
         }
 
-        public String getGroupName()
-        {
-            return groupName;
-        }
-
-        public void setGrouped(boolean hmm, String n, Color c, Group g)
+        public void setIsled(boolean hmm, Isle i, Color c, IsleGroup ig)
         {
             if (hmm)
             {
                 color = c;
-                groupName = n;
-                grouped = hmm;
-                group = g;
+                isIsle = hmm;
+                isle = i;
+                isleGroup = ig;
                 setHighlighted(false);
                 r.setFill(c);
                 r.setStroke(c);
@@ -782,8 +652,9 @@ public class GridData3 {
             else
             {
                 color = null;
-                groupName = null;
-                grouped = hmm;
+                isIsle = hmm;
+                isle = null;
+                isleGroup = null;
                 setHighlighted(false);
             }
         }
@@ -792,9 +663,14 @@ public class GridData3 {
             return r;
         }
 
-        public Group getGroup()
+        public IsleGroup getIsleGroup()
         {
-            return group;
+            return isleGroup;
+        }
+
+        public Isle getIsle()
+        {
+            return isle;
         }
 
         public int getX()
@@ -807,7 +683,7 @@ public class GridData3 {
             return yCoord;
         }
 
-        public void setNulled()
+        private void setNulled()
         {
             nulled = true;
 
@@ -846,9 +722,9 @@ public class GridData3 {
     /**
      * Highlighted Node LinkedList class
      */
-    private class HighlightedList
+    protected class HighlightedList
     {
-        private HighlightedNode first;
+        protected HighlightedNode first;
         private HighlightedNode last;
         private int size;
 
@@ -883,7 +759,7 @@ public class GridData3 {
         /**
          * Resets LinkedList
          */
-        private void clear()
+        protected void clear()
         {
             first = null;
             last = null;
@@ -893,10 +769,10 @@ public class GridData3 {
         /**
          * Highlighted Node class for each node in LinkedList
          */
-        private class HighlightedNode
+        protected class HighlightedNode
         {
-            private final RNode rNode;
-            private HighlightedNode next;
+            protected final RNode rNode;
+            protected HighlightedNode next;
 
             private HighlightedNode(RNode node)
             {
@@ -906,26 +782,103 @@ public class GridData3 {
         }
     }
 
+    protected class Isle
+    {
+        private final String isleID;
+        private final IsleGroup isleGroup;
+        private IsleCellList isleCellList;
+
+        public Isle(String id, IsleGroup ig)
+        {
+            isleID = id;
+            isleGroup = ig;
+        }
+
+        public void setIsleCellList(IsleCellList icl)
+        {
+            isleCellList = icl;
+        }
+
+        public String getIsleID()
+        {
+            return isleID;
+        }
+
+        public IsleGroup getIsleGroup()
+        {
+            return isleGroup;
+        }
+
+        public IsleCellList getIsleCellList()
+        {
+            return isleCellList;
+        }
+    }
+
+    protected class IsleCellList
+    {
+        protected IsleCellNode first;
+        protected IsleCellNode last;
+        private int size;
+
+        protected IsleCellList()
+        {
+            first = null;
+            last = null;
+            size = 0;
+        }
+
+        private void add(RNode node)
+        {
+            if (size == 0)
+            {
+                first = new IsleCellNode(node);
+                last = first;
+                size = 1;
+            }
+            else if (size > 0)
+            {
+                last.next = new IsleCellNode(node);
+                last = last.next;
+                size++;
+            }
+        }
+
+        private void clear()
+        {
+            first = null;
+            last = null;
+            size = 0;
+        }
+
+        protected class IsleCellNode
+        {
+            protected final RNode rNode;
+            protected IsleCellNode next;
+
+            private IsleCellNode(RNode node)
+            {
+                rNode = node;
+                next = null;
+            }
+        }
+    }
+
     /**
-     * Group class with all necessary info
+     * Isle Group class with all necessary info
      */
-    public class Group
+    public class IsleGroup
     {
         private final String name;
         private final Color color;
-        private GroupedList groupedList;
-        private int maxWidth, maxHeight;
-        private boolean irregular, isleLayoutBool;
-        private ArrayList<RNode> cellsToRemoveIfIrregular;
-        private final int cellSize;
-        private GridData3 grid;
-        private int lowestX, lowestY;
+        private IsleGroupCellList isleGroupCellList;
+        private Hashtable<String, Isle> isleIDList;
 
-        public Group(String n, Color c, int cS)
+        public IsleGroup(String n, Color c)
         {
             name = n;
             color = c;
-            cellSize = cS;
+            isleIDList = new Hashtable<>();
         }
 
         public String getName()
@@ -938,126 +891,29 @@ public class GridData3 {
             return color;
         }
 
-        public int getMaxWidth()
+        public IsleGroupCellList getIsleGroupCellList()
         {
-            return maxWidth;
+            return isleGroupCellList;
         }
 
-        public int getMaxHeight()
+        public void addNewID(String newID, Isle i)
         {
-            return maxHeight;
+            isleIDList.put(newID, i);
         }
 
-        public void setIsleLayoutBool(boolean hmm)
+        public Hashtable<String, Isle> getIsleIDList()
         {
-            isleLayoutBool = hmm;
-        }
-
-        public boolean hasIsleLayout()
-        {
-            return isleLayoutBool;
-        }
-
-        public void setIsleLayout(GridData3 g)
-        {
-            grid = g;
-        }
-
-        public GridData3 getGrid()
-        {
-            return grid;
-        }
-
-        public ArrayList<RNode> getCellsToRemoveIfIrregular()
-        {
-            return cellsToRemoveIfIrregular;
-        }
-
-        public int getCellSize()
-        {
-            return cellSize;
-        }
-
-        public GroupedList getGroupedList()
-        {
-            return groupedList;
-        }
-
-        public int getLowestX()
-        {
-            return lowestX;
-        }
-
-        public int getLowestY()
-        {
-            return lowestY;
-        }
-
-        /**
-         * @return false if group is perfect square/rectangle
-         *         true is group is not perfect square/rectangle
-         */
-        public boolean isIrregular()
-        {
-            ArrayList<Integer> listOfXCoords = new ArrayList<>();
-            ArrayList<Integer> listOfYCoords = new ArrayList<>();
-
-            GroupedList.GroupedNode curr = this.groupedList.first;
-            for (int i=0; i<this.groupedList.size; i++)
-            {
-                if (!listOfXCoords.contains(curr.rNode.xCoord))
-                    listOfXCoords.add(curr.rNode.xCoord);
-
-                if (!listOfYCoords.contains(curr.rNode.yCoord))
-                    listOfYCoords.add(curr.rNode.yCoord);
-
-                curr = curr.next;
-            }
-            Collections.sort(listOfXCoords);
-            Collections.sort(listOfYCoords);
-
-            ArrayList<RNode> cellsToNull = new ArrayList<>();
-
-            int startX = listOfXCoords.get(0);
-            int startY = listOfYCoords.get(0);
-            lowestX = startX;
-            lowestY = startY;
-            for (int i=startX; i<startX+listOfXCoords.size(); i++)
-            {
-                for (int j=startY; j<startY+listOfYCoords.size(); j++)
-                {
-                    if (!getRNode(i, j).isGrouped())
-                    {
-                        cellsToNull.add(getRNode(i, j));
-                        System.out.println("Added to cellsToNull: "+i+","+j);
-                    }
-                    else if (!getRNode(i, j).groupName.equals(this.name))
-                    {
-                        cellsToNull.add(getRNode(i, j));
-                        System.out.println("Added to cellsToNull: "+i+","+j);
-                    }
-                }
-            }
-            if (cellsToNull.size() > 0)
-            {
-                cellsToRemoveIfIrregular = cellsToNull;
-                return true;
-            }
-            else
-                return false;
+            return isleIDList;
         }
     }
 
-    /**
-     * Grouped Node LinkedList class
-     */
-    protected class GroupedList
+    protected class IsleGroupCellList
     {
-        protected GroupedNode first;
-        private GroupedNode last;
+        protected IsleGroupCellNode first;
+        private IsleGroupCellNode last;
         private int size;
 
-        private GroupedList()
+        private IsleGroupCellList()
         {
             first = null;
             last = null;
@@ -1073,13 +929,13 @@ public class GridData3 {
         {
             if (size == 0)
             {
-                first = new GroupedNode(node);
+                first = new IsleGroupCellNode(node);
                 last = first;
                 size = 1;
             }
             else if (size > 0)
             {
-                last.next = new GroupedNode(node);
+                last.next = new IsleGroupCellNode(node);
                 last = last.next;
                 size++;
             }
@@ -1098,12 +954,12 @@ public class GridData3 {
         /**
          * Grouped Node class for each node in LinkedList
          */
-        protected class GroupedNode
+        protected class IsleGroupCellNode
         {
             protected final RNode rNode;
-            protected GroupedNode next;
+            protected IsleGroupCellNode next;
 
-            private GroupedNode(RNode node)
+            private IsleGroupCellNode(RNode node)
             {
                 rNode = node;
                 next = null;
@@ -1111,35 +967,63 @@ public class GridData3 {
         }
     }
 
-    /**
-     * Class with different data to return from method sortHighlightedList()
-     */
-    private class SortHighlightedReturn
+    protected class NullList
     {
-        private final HighlightedList hList;
-        private final int xRange, yRange;
+        protected NullNode first;
+        private NullNode last;
+        private int size;
 
-        public SortHighlightedReturn(HighlightedList list, int x, int y)
+        private NullList()
         {
-            hList = list;
-            xRange = x;
-            yRange = y;
+            first = null;
+            last = null;
+            size = 0;
         }
-    }
 
-    /**
-     * Class with different data to return from method sortGroupedList()
-     */
-    private class SortGroupReturn
-    {
-        private final GroupedList gList;
-        private final int xRange, yRange;
-
-        public SortGroupReturn(GroupedList list, int x, int y)
+        /**
+         * Adds new rectangle to LinkedList
+         *
+         * @param node new rectangle to add
+         */
+        private void add(RNode node)
         {
-            gList = list;
-            xRange = x;
-            yRange = y;
+            if (size == 0)
+            {
+                first = new NullNode(node);
+                last = first;
+                size = 1;
+            }
+            else if (size > 0)
+            {
+                last.next = new NullNode(node);
+                last = last.next;
+                size++;
+            }
+        }
+
+        /**
+         * Resets LinkedList
+         */
+        protected void clear()
+        {
+            first = null;
+            last = null;
+            size = 0;
+        }
+
+        /**
+         * Highlighted Node class for each node in LinkedList
+         */
+        protected class NullNode
+        {
+            protected final RNode rNode;
+            protected NullNode next;
+
+            private NullNode(RNode node)
+            {
+                rNode = node;
+                next = null;
+            }
         }
     }
 }

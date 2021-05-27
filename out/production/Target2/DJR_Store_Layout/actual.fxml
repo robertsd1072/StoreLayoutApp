@@ -19,6 +19,7 @@
                   <MenuItem fx:id="reset" mnemonicParsing="false" text="Reset" />
                   <MenuItem fx:id="saveLayout" mnemonicParsing="false" text="Save Layout" />
                   <MenuItem fx:id="printGroups" mnemonicParsing="false" text="Print Groups" />
+                  <MenuItem fx:id="printNulls" mnemonicParsing="false" text="Print Nulls" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Edit">

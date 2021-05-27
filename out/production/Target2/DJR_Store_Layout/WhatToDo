@@ -4,6 +4,7 @@ Item Location: D39(1) 1-1-1.90
 1. Load layout to a file and be able to load it back from computer.
 
 2. Bug: setCelltoNull doesn't work quite right with groups further from the origin
+    irregular now dont work
 
 3. Bug: something with add to group twice isnt right, cant ungroup
 
