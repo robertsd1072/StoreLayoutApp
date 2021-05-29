@@ -10,8 +10,6 @@ package DJR_Store_Layout;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Set;
 

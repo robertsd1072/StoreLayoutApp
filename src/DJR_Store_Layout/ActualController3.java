@@ -102,7 +102,7 @@ public class ActualController3 {
         cols = length/2;
         cellSizeInFeet = 2;
 
-        int sizeOfCells = 0;
+        int sizeOfCells;
         if (ratio < 1.9393)
         {
             sizeOfCells = (int) (sY-25)/rows;
@@ -188,7 +188,6 @@ public class ActualController3 {
     {
         int cols1 = 0;
         int rows1 = 0;
-        double cellSize = 0;
         float feet = 0;
         ArrayList<String> isleGroupNames = new ArrayList<>();
         ArrayList<Color> isleGroupColors = new ArrayList<>();
@@ -220,15 +219,6 @@ public class ActualController3 {
             c = scanner.nextLine();
             try
             {
-                cellSize = Double.parseDouble(c);
-            }
-            catch (Exception e)
-            {
-                System.out.println("Fuck");
-            }
-            c = scanner.nextLine();
-            try
-            {
                 feet = Float.parseFloat(c);
             }
             catch (Exception e)
@@ -242,26 +232,26 @@ public class ActualController3 {
                 if (line.compareTo("Nulls") != 0)
                 {
                     isleGroupNames.add(line);
-                    System.out.println("Added "+line+" to isleGroupNames");
+                    //System.out.println("Added "+line+" to isleGroupNames");
                     String c1 = scanner.nextLine();
                     String[] c2 = c1.split(" ");
                     isleGroupColors.add(new Color(Double.parseDouble(c2[0]), Double.parseDouble(c2[1]), Double.parseDouble(c2[2]), 1.0));
-                    System.out.println("Added color to isleGroupColors");
+                    //System.out.println("Added color to isleGroupColors");
 
                     ArrayList<Hashtable<String, String>> islesWithCells = new ArrayList<>();
                     ArrayList<String> isleIDs = new ArrayList<>();
 
                     String nextLine = scanner.nextLine();
                     int numberOfIsles = Integer.parseInt(nextLine);
-                    System.out.println("numberOfIsles: "+numberOfIsles);
+                    //System.out.println("numberOfIsles: "+numberOfIsles);
                     for (int i=0; i<numberOfIsles; i++)
                     {
                         Hashtable<String, String> isle = new Hashtable<>();
 
                         String isleID = scanner.nextLine();
-                        System.out.println("isleID: "+isleID);
+                        //System.out.println("isleID: "+isleID);
                         String cells = scanner.nextLine();
-                        System.out.println("cells: "+cells);
+                        //System.out.println("cells: "+cells);
 
                         isleIDs.add(isleID);
 
@@ -284,9 +274,22 @@ public class ActualController3 {
             System.out.println("File not found");
         }
 
+        float ratio = (float) cols1/rows1;
+        System.out.println("Ratio: "+ratio);
+        int sizeOfCells;
+        if (ratio < 1.9393)
+        {
+            sizeOfCells = (int) (y-25)/rows1;
+        }
+        else
+        {
+            sizeOfCells = (int) x/cols1;
+        }
+        System.out.println("Cell Size: "+sizeOfCells);
+
         cols = cols1;
         rows = rows1;
-        finalSizeOfCells = cellSize;
+        finalSizeOfCells = sizeOfCells;
         cellSizeInFeet = feet;
         sX = x;
         sY = y;
@@ -718,21 +721,21 @@ public class ActualController3 {
         {
             for (int j=0; j<listOfIslesWithCells.get(i).size(); j++)
             {
-                System.out.println("Grouping: "+listOfIsleIDs.get(i).get(j));
+                //System.out.println("Grouping: "+listOfIsleIDs.get(i).get(j));
                 String[] groupCoords = listOfIslesWithCells.get(i).get(j).get(listOfIsleIDs.get(i).get(j)).split(",");
                 for (int k=0; k<groupCoords.length; k=k+2)
                 {
                     g.getRNode(Integer.parseInt(groupCoords[k]), Integer.parseInt(groupCoords[k+1])).setHighlighted(true);
-                    System.out.println("Highlighting: "+Integer.parseInt(groupCoords[k])+","+Integer.parseInt(groupCoords[k+1]));
+                    //System.out.println("Highlighting: "+Integer.parseInt(groupCoords[k])+","+Integer.parseInt(groupCoords[k+1]));
                 }
                 if (g.isleGroupList.containsKey(groupNames.get(i)))
                 {
-                    System.out.println("Adding "+listOfIsleIDs.get(i).get(j)+" to existing isle group");
+                    //System.out.println("Adding "+listOfIsleIDs.get(i).get(j)+" to existing isle group");
                     g.makeIsle(listOfIsleIDs.get(i).get(j), groupNames.get(i), groupColors.get(i), g.isleGroupList.get(groupNames.get(i)), true);
                 }
                 else
                 {
-                    System.out.println("New isle group for "+listOfIsleIDs.get(i).get(j));
+                    //System.out.println("New isle group for "+listOfIsleIDs.get(i).get(j));
                     g.makeIsle(listOfIsleIDs.get(i).get(j), groupNames.get(i), groupColors.get(i), null, false);
                 }
             }
@@ -814,10 +817,9 @@ public class ActualController3 {
             {
                 if (!contextMenuShowing)
                 {
-                    System.out.println(node.getX()+","+node.getY());
+                    System.out.println("Coords: "+node.getX()+","+node.getY());
                     //System.out.println(node.printSCoords());
                     g.resetHighlighted();
-                    System.out.print("Group: ");
                     if (node.isIsle())
                     {
                         System.out.println("Isle ID: "+node.getIsle().getIsleID());
@@ -1025,7 +1027,6 @@ public class ActualController3 {
 
             fileStream.println(cols);
             fileStream.println(rows);
-            fileStream.println(finalSizeOfCells);
             fileStream.println(cellSizeInFeet);
 
             Set<String> groups = g.isleGroupList.keySet();
