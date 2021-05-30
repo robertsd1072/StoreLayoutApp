@@ -18,7 +18,6 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -29,12 +28,10 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javax.swing.*;
 import java.io.*;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 public class ActualController3 {
     /**
@@ -48,13 +45,13 @@ public class ActualController3 {
      * FXML variables
      */
     public HBox hboxWithThePluses, hboxWithTheCells;
-    public MenuItem resize, reset, printGroups, printNulls, saveLayout, setupIsleLayoutMenuItem, addToGroup;
+    public MenuItem resize, reset, printGroups, printNulls, saveLayout;
     public Menu file, m1, m2, m3, m4;
     public MenuBar menuBar;
     public Pane topPthatHelpsPluses, botPthatHelpsPluses, leftPthatHelpsPluses, rightPthatHelpsPluses, topPthatHelpsCells, botPthatHelpsCells, leftPthatHelpsCells, rightPthatHelpsCells;
     public VBox theV;
     public StackPane sP;
-    public ContextMenu rightClick, rightClick2, rightClick3, addToGroupList;
+    public ContextMenu rightClick, rightClick2, rightClick3;
 
     /**
      * Variables involved with backing data structures and control
@@ -63,11 +60,10 @@ public class ActualController3 {
     private int floors, length, width;
     private final int cols, rows;
     private float cellSizeInFeet;
-    private double sX, sY, xRemainderSize1, yRemainderSize1, addToGroupMouseX, addToGroupMouseY;
+    private double sX, sY, xRemainderSize1, yRemainderSize1;
     private final double finalSizeOfCells;
-    private boolean editGroupBool, contextMenuShowing;
-    private boolean setupIsleLayout;
-    private GridData3.RNode editGroupNode, addToGroupNode, setupIslesNode;
+    private boolean contextMenuShowing;
+    private GridData3.RNode editGroupNode;
 
     /**
      * Basic Constructor
@@ -78,12 +74,9 @@ public class ActualController3 {
      * @param w width of floor
      * @param x screen x dimension
      * @param y scrren y dimension
-     * @param setupIsles boolean to check for isle layout setup
-     * @param cellSize cell dimensions based on length, width, screen
-     * @param node used for accessing node data in isle layout setup
      * @param cM rightClick context menu that ?????
      */
-    public ActualController3(int f, int l, int w, double x, double y, boolean setupIsles, float cellSize, GridData3.RNode node, ContextMenu cM)
+    public ActualController3(int f, int l, int w, double x, double y, ContextMenu cM)
     {
         floors = f;
         length = l;
@@ -91,12 +84,8 @@ public class ActualController3 {
         float ratio = (float) l/w;
         sX = x;
         sY = y;
-        setupIsleLayout = setupIsles;
         rightClick3 = cM;
         contextMenuShowing = false;
-
-        if (setupIsles)
-            setupIslesNode = node;
 
         rows = width/2;
         cols = length/2;
@@ -137,7 +126,7 @@ public class ActualController3 {
             throw new RuntimeException(ex);
         }
 
-        actualInitialize(false);
+        actualInitialize();
     }
 
     /*
@@ -365,26 +354,11 @@ public class ActualController3 {
     /**
      * Initializer
      * Setups functionality of some menu buttons
-     *
-     * @param viewingGrid boolean for determining if viewing an already existing isle layout
      */
-    private void actualInitialize(boolean viewingGrid)
+    private void actualInitialize()
     {
         theV.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
         sP.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
-
-        if (!viewingGrid)
-        {
-            resize.setOnAction(actionEvent -> {
-                try {
-                    new SampleController2().launchScene(stage);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-        }
-        else
-            file.getItems().remove(resize);
 
         reset.setOnAction(actionEvent -> g.resetGrid());
 
@@ -414,18 +388,9 @@ public class ActualController3 {
         initOutsidePanes(sX, sY);
         initInsidePanes(finalSizeOfCells);
 
-        if (!viewingGrid)
-        {
-            drawPluses(finalSizeOfCells, hboxWithThePluses);
+        drawPluses(finalSizeOfCells, hboxWithThePluses);
 
-            drawCells(finalSizeOfCells, hboxWithTheCells);
-        }
-        else
-        {
-            loadPluses(finalSizeOfCells, hboxWithThePluses);
-
-            loadCells(hboxWithTheCells);
-        }
+        drawCells(finalSizeOfCells, hboxWithTheCells);
 
         //System.out.println("sp Dimension: "+sP.getWidth()+", "+sP.getHeight());
     }
@@ -515,7 +480,7 @@ public class ActualController3 {
      */
     private void initOutsidePanes(double x, double y)
     {
-        //System.out.println("Initializing Outside Panes w/ x: "+x+" and y: "+y);
+        System.out.println("Initializing Outside Panes w/ x: "+x+" and y: "+y);
         double xRemainderSize = (int) x-(finalSizeOfCells * cols);
         double yRemainderSize = (int) y-(finalSizeOfCells * rows)-25;
 
@@ -539,15 +504,21 @@ public class ActualController3 {
         }
         double yRemainderSize2 = (int) (yRemainderSize/2);
 
+        if (yRemainderSize1 == 18)
+        {
+            yRemainderSize1+=1;
+            yRemainderSize2+=1;
+        }
+
         leftPthatHelpsCells.setPrefWidth(xRemainderSize1);
         rightPthatHelpsCells.setPrefWidth(xRemainderSize2);
         topPthatHelpsCells.setPrefHeight(yRemainderSize1);
         botPthatHelpsCells.setPrefHeight(yRemainderSize2);
 
-        //System.out.println("x rem 1: "+xRemainderSize1);
-        //System.out.println("x rem 2: "+xRemainderSize2);
-        //System.out.println("y rem 1: "+yRemainderSize1);
-        //System.out.println("y rem 2: "+yRemainderSize2);
+        System.out.println("x rem 1: "+xRemainderSize1);
+        System.out.println("x rem 2: "+xRemainderSize2);
+        System.out.println("y rem 1: "+yRemainderSize1);
+        System.out.println("y rem 2: "+yRemainderSize2);
     }
 
     /**
@@ -619,10 +590,21 @@ public class ActualController3 {
      */
     private void initInsidePanes(double x)
     {
-        leftPthatHelpsPluses.setPrefWidth((int) x/2);
-        rightPthatHelpsPluses.setPrefWidth((int) x/2);
-        topPthatHelpsPluses.setPrefHeight((int) x/2);
-        botPthatHelpsPluses.setPrefHeight((int) x/2);
+        int x1 = (int) x;
+        int z = x1/2;
+        if (x1 % 2 == 1)
+        {
+            //rightPthatHelpsPluses.setPrefWidth(z+1);
+            botPthatHelpsPluses.setPrefHeight(z+1);
+        }
+        else
+        {
+            //rightPthatHelpsPluses.setPrefWidth(z);
+            botPthatHelpsPluses.setPrefHeight(z);
+        }
+        rightPthatHelpsPluses.setPrefWidth(z);
+        leftPthatHelpsPluses.setPrefWidth(z);
+        topPthatHelpsPluses.setPrefHeight(z);
     }
 
     /**
@@ -1102,16 +1084,9 @@ public class ActualController3 {
      */
     public void adjust(double x, double y)
     {
-        //hbox1.getChildren().clear();
-        //hbox2.getChildren().clear();
-
         initOutsidePanes(x, y);
 
-        //drawPluses(x1, hbox1);
-
         initInsidePanes(finalSizeOfCells);
-
-        //drawCells(x1, hbox2);
 
         g.adjust(finalSizeOfCells, xRemainderSize1, yRemainderSize1);
     }

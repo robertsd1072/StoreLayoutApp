@@ -337,7 +337,7 @@ public class GridData3 {
      */
     public void adjust(double z, double xR1, double yR1)
     {
-        System.out.println("z: "+z);
+        //System.out.println("z: "+z);
         boxSize = z;
 
         for (int i=0; i<rowSize-1; i++)

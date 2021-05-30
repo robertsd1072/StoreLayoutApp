@@ -93,7 +93,7 @@ public class LoadOrCreateController {
 
         final JFileChooser fc = new JFileChooser();
 
-        File f = new File("C:\\Users\\rober\\IdeaProjects\\Target2\\src\\Saves");
+        File f = new File("C:\\Users\\David\\IdeaProjects\\Target\\src\\Saves");
 
         fc.setCurrentDirectory(f);
 
