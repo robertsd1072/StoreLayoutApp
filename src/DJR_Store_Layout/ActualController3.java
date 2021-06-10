@@ -60,10 +60,11 @@ public class ActualController3 {
     private int floors, length, width;
     private final int cols, rows;
     private float cellSizeInFeet;
-    private double sX, sY, xRemainderSize1, yRemainderSize1;
+    private double sX, sY, xRemainderSize1, yRemainderSize1, mouseX, mouseY;
     private final double finalSizeOfCells;
-    private boolean contextMenuShowing;
+    private boolean contextMenuShowing, moving;
     private GridData3.RNode editGroupNode;
+    private IsleInfo isleInfo;
 
     /**
      * Basic Constructor
@@ -470,6 +471,20 @@ public class ActualController3 {
         MenuItem ungroup = new MenuItem("Delete Isle");
         ungroup.setOnAction(actionEvent -> g.removeIsle(editGroupNode.getIsle()));
         rightClick2.getItems().add(ungroup);
+        MenuItem moveIsle = new MenuItem("Move Isle");
+        moveIsle.setOnAction(actionEvent ->
+        {
+            rightClick2.hide();
+            GridData3.Isle isle = editGroupNode.getIsle();
+            moving = true;
+            isleInfo = new IsleInfo(editGroupNode.getIsle().getIsleID(), editGroupNode.getIsleGroup().getName(), editGroupNode.getColor(), editGroupNode.getIsleGroup());
+            stage.addEventFilter(MouseEvent.MOUSE_MOVED, e ->
+            {
+                if (moving)
+                    g.moveIsle(editGroupNode, isle, e.getSceneX(), e.getSceneX());
+            });
+        });
+        rightClick2.getItems().add(moveIsle);
     }
 
     /**
@@ -747,6 +762,7 @@ public class ActualController3 {
         r.setOpacity(0.5);
         r.setOnMouseEntered(mouseEvent ->
         {
+            g.setMouseCoordsOnGrid(node.getX(), node.getY());
             if (node.isIsle())
             {
                 r.setFill(node.getColor());
@@ -813,6 +829,13 @@ public class ActualController3 {
                         node.setHighlighted(true);
                     }
                 }
+                if (moving)
+                {
+                    System.out.println("Done Moving in AC");
+                    node.setHighlighted(false);
+                    g.makeIsleFromToMoveList(isleInfo.getIsleID(), isleInfo.getIsleGroupName(), isleInfo.getIsleColor(), isleInfo.getIsleGroup());
+                    moving = false;
+                }
                 else
                     contextMenuShowing = false;
             }
@@ -825,6 +848,13 @@ public class ActualController3 {
                 g.highlight(node, mouseEvent.getSceneX(), mouseEvent.getSceneY());
             }
         });
+        /*
+        r.setOnMouseReleased(mouseEvent ->
+        {
+            g.resetHighlighted2();
+            highlighting = false;
+        });
+         */
 
         r.setLayoutX(0);
         r.setLayoutY(0);
@@ -1072,6 +1102,8 @@ public class ActualController3 {
      */
     public void sendMouse(double x, double y)
     {
+        mouseX = x;
+        mouseY = y;
         m1.setText("MouseX: " + x);
         m2.setText("MouseY: " + y);
     }
@@ -1092,7 +1124,7 @@ public class ActualController3 {
     }
 
     /**
-     * Displays screen x dimension for debuggind
+     * Displays screen x dimension for debugging
      *
      * @param x screen x dimension
      */
@@ -1103,7 +1135,7 @@ public class ActualController3 {
     }
 
     /**
-     * Displays screen y dimension for debuggind
+     * Displays screen y dimension for debugging
      *
      * @param y screen y dimension
      */

@@ -10,6 +10,8 @@ package DJR_Store_Layout;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
+
+import javax.swing.*;
 import java.util.Hashtable;
 import java.util.Set;
 
@@ -55,6 +57,13 @@ public class GridData3 {
      */
     protected HighlightedList highlightedList;
     protected NullList nullList;
+    /**
+     * Mouse coords on screen
+     */
+    protected double highlightingXLength, highlightingYLength;
+    protected IsleBeingMovedList toMoveList;
+    protected boolean moving;
+    protected int xCoordOfMouseOnGrid, yCoordOfMouseOnGrid;
 
     /**
      * Basic constructor
@@ -83,6 +92,9 @@ public class GridData3 {
         screenY = y;
         cellSize = cS;
         nullList = new NullList();
+        toMoveList = new IsleBeingMovedList();
+        highlightingXLength = 1;
+        highlightingYLength = 1;
     }
 
     /**
@@ -254,78 +266,219 @@ public class GridData3 {
         double c = (int) (x-xMax)/boxSize+1;
         double d = (int) (y-yMax)/boxSize+1;
 
-        for (int i=1; i<a; i++)
+        if (a>0 && b>0)
         {
-            //West
-            try
+            //Northwest
+            for (int i=0; i<a; i++)
             {
-                if (!grid[xCoord-i][yCoord].isIsle() && !grid[xCoord-i][yCoord].isNulled())
-                    grid[xCoord-i][yCoord].setHighlighted(true);
-            }
-            catch (IndexOutOfBoundsException e)
-            {
-                System.out.println("Tried to locate at invalid index");
-            }
-        }
-        for (int i=1; i<b; i++)
-        {
-            //North
-            try
-            {
-                if (!grid[xCoord][yCoord-i].isIsle() && !grid[xCoord][yCoord-i].isNulled())
-                    grid[xCoord][yCoord-i].setHighlighted(true);
-                for (int j=1; j<a; j++)
+                for (int j=0; j<b; j++)
                 {
-                    if (!grid[xCoord-j][yCoord-i].isIsle() && !grid[xCoord-j][yCoord-i].isNulled())
-                        grid[xCoord-j][yCoord-i].setHighlighted(true);
-                }
-                for (int k=1; k<c; k++)
-                {
-                    if (!grid[xCoord+k][yCoord-i].isIsle() && !grid[xCoord+k][yCoord-i].isNulled())
-                        grid[xCoord+k][yCoord-i].setHighlighted(true);
+                    try
+                    {
+                        if (!grid[xCoord-i][yCoord-j].isIsle() && !grid[xCoord-i][yCoord-j].isNulled())
+                            grid[xCoord-i][yCoord-j].setHighlighted(true);
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                        System.out.println("Tried to locate at invalid index");
+                    }
                 }
             }
-            catch (IndexOutOfBoundsException e)
-            {
-                System.out.println("Tried to locate at invalid index");
-            }
         }
-        for (int i=1; i<c; i++)
+        else if (a>0 && d>0)
         {
-            //East
-            try
+            //Southwest
+            for (int i=0; i<a; i++)
             {
-                if (!grid[xCoord+i][yCoord].isIsle() && !grid[xCoord+i][yCoord].isNulled())
-                    grid[xCoord+i][yCoord].setHighlighted(true);
-            }
-            catch (IndexOutOfBoundsException e)
-            {
-                System.out.println("Tried to locate at invalid index");
-            }
-        }
-        for (int i=1; i<d; i++)
-        {
-            //South
-            try
-            {
-                if (!grid[xCoord][yCoord+i].isIsle() && !grid[xCoord][yCoord+i].isNulled())
-                    grid[xCoord][yCoord+i].setHighlighted(true);
-                for (int j=1; j<a; j++)
+                for (int j=0; j<d; j++)
                 {
-                    if (!grid[xCoord-j][yCoord+i].isIsle() && !grid[xCoord-j][yCoord+i].isNulled())
-                        grid[xCoord-j][yCoord+i].setHighlighted(true);
-                }
-                for (int k=1; k<c; k++)
-                {
-                    if (!grid[xCoord+k][yCoord+i].isIsle() && !grid[xCoord+k][yCoord+i].isNulled())
-                        grid[xCoord+k][yCoord+i].setHighlighted(true);
+                    try
+                    {
+                        if (!grid[xCoord-i][yCoord+j].isIsle() && !grid[xCoord-i][yCoord+j].isNulled())
+                            grid[xCoord-i][yCoord+j].setHighlighted(true);
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                        System.out.println("Tried to locate at invalid index");
+                    }
                 }
             }
-            catch (IndexOutOfBoundsException e)
+        }
+        else if (c>0 && b>0)
+        {
+            //Northeast
+            for (int i=0; i<c; i++)
             {
-                System.out.println("Tried to locate at invalid index");
+                for (int j=0; j<b; j++)
+                {
+                    try
+                    {
+                        if (!grid[xCoord+i][yCoord-j].isIsle() && !grid[xCoord+i][yCoord-j].isNulled())
+                            grid[xCoord+i][yCoord-j].setHighlighted(true);
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                        System.out.println("Tried to locate at invalid index");
+                    }
+                }
             }
         }
+        else if (c>0 && d>0)
+        {
+            //Southeast
+            for (int i=0; i<c; i++)
+            {
+                for (int j=0; j<d; j++)
+                {
+                    try
+                    {
+                        if (!grid[xCoord+i][yCoord+j].isIsle() && !grid[xCoord+i][yCoord+j].isNulled())
+                            grid[xCoord+i][yCoord+j].setHighlighted(true);
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                        System.out.println("Tried to locate at invalid index");
+                    }
+                }
+            }
+        }
+    }
+
+    public void resetHighlighted2()
+    {
+        System.out.println("Reset Highlight 2");
+        highlightingXLength = 1;
+        highlightingYLength = 1;
+    }
+
+    public void highlight2(RNode node, double x, double y)
+    {
+        //System.out.println("Start");
+        //.out.println("X length: "+highlightingXLength);
+        //System.out.println("Y length: "+highlightingYLength);
+
+        if (!node.isIsle() && !node.isNulled())
+        {
+            node.setHighlighted(true);
+        }
+
+        int xCoord = node.xCoord;
+        int yCoord = node.yCoord;
+        double xMin = node.sXMinCoord;
+        double yMin = node.sYMinCoord;
+        double xMax = node.sXMaxCoord;
+        double yMax = node.sYMaxCoord;
+
+        double a = (int) (xMin-x)/boxSize+1;
+        double b = (int) (yMin-y)/boxSize+1;
+        double c = (int) (x-xMax)/boxSize+1;
+        double d = (int) (y-yMax)/boxSize+1;
+
+        if (a>0 && b>0)
+        {
+            if (a > highlightingXLength)
+            {
+                for (int i=(int) highlightingXLength; i<a; i++)
+                {
+                    try
+                    {
+                        if (!grid[xCoord-i][yCoord].isIsle() && !grid[xCoord-i][yCoord].isNulled())
+                            grid[xCoord-i][yCoord].setHighlighted(true);
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                        System.out.println("Tried to locate at invalid index");
+                    }
+                }
+                highlightingXLength = a;
+            }
+            if (b > highlightingYLength)
+            {
+                for (int i=(int) highlightingYLength; i<b; i++)
+                {
+                    try
+                    {
+                        if (!grid[xCoord][yCoord-i].isIsle() && !grid[xCoord][yCoord-i].isNulled())
+                            grid[xCoord][yCoord-i].setHighlighted(true);
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                        System.out.println("Tried to locate at invalid index");
+                    }
+                }
+                highlightingYLength = b;
+            }
+            if (a > highlightingXLength || b > highlightingYLength)
+            {
+
+            }
+            if (a < highlightingXLength)
+            {
+                for (int i=(int) highlightingXLength; i>a; i--)
+                {
+                    try
+                    {
+                        if (!grid[xCoord-i][yCoord].isIsle() && !grid[xCoord-i][yCoord].isNulled())
+                            grid[xCoord-i][yCoord].setHighlighted(false);
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                        System.out.println("Tried to locate at invalid index");
+                    }
+                }
+                highlightingXLength = a;
+            }
+            if (b < highlightingYLength)
+            {
+                for (int i=(int) highlightingYLength; i>b; i--)
+                {
+                    try
+                    {
+                        if (!grid[xCoord][yCoord-i].isIsle() && !grid[xCoord][yCoord-i].isNulled())
+                            grid[xCoord][yCoord-i].setHighlighted(false);
+                    }
+                    catch (IndexOutOfBoundsException e)
+                    {
+                        System.out.println("Tried to locate at invalid index");
+                    }
+                }
+                highlightingYLength = b;
+            }
+            if (a < highlightingXLength && b < highlightingYLength)
+            {
+                for (int i=(int) highlightingXLength; i>a; i--)
+                {
+                    for (int j = (int) highlightingYLength; j>b; j--)
+                    {
+                        try
+                        {
+                            if (!grid[xCoord-i][yCoord-j].isIsle() && !grid[xCoord-i][yCoord-j].isNulled())
+                                grid[xCoord-i][yCoord-j].setHighlighted(false);
+                        }
+                        catch (IndexOutOfBoundsException e)
+                        {
+                            System.out.println("Tried to locate at invalid index");
+                        }
+                    }
+                }
+            }
+        }
+        else if (a>0 && d>0)
+        {
+
+        }
+        else if (c>0 && b>0)
+        {
+
+        }
+        else if (c>0 && d>0)
+        {
+
+        }
+
+        //System.out.println("End");
+        //System.out.println("X length: "+highlightingXLength);
+        //System.out.println("Y length: "+highlightingYLength);
     }
 
     /**
@@ -476,6 +629,79 @@ public class GridData3 {
                 catch (ArrayIndexOutOfBoundsException ignored) {}
             }
         }
+    }
+
+    public void moveIsle(RNode node, Isle cellIsle, double mouseX, double mouseY)
+    {
+        //System.out.println("Orig X: "+node.getX());
+        //System.out.println("Orig Y: "+node.getY());
+
+        Color isleColor = cellIsle.getIsleGroup().getColor();
+
+        if (!moving)
+        {
+            //System.out.println("Ungrouping cells from isle");
+            IsleCellList.IsleCellNode curr = cellIsle.isleCellList.first;
+            while (curr != null)
+            {
+                grid[curr.rNode.xCoord][curr.rNode.yCoord].setIsled(false, null, null, null);
+                toMoveList.add(curr.rNode);
+                grid[curr.rNode.xCoord][curr.rNode.yCoord].setIsleIsBeingMoved(true, isleColor);
+                curr = curr.next;
+            }
+        }
+        moving = true;
+
+        int xDif = xCoordOfMouseOnGrid - node.getX();
+        int yDif = yCoordOfMouseOnGrid - node.getY();
+
+        //System.out.println("xDif: "+xDif);
+        //System.out.println("yDif: "+yDif);
+
+        if (xDif != 0 && yDif != 0)
+        {
+            IsleBeingMovedList.IsleBeingMovedNode curr2 = toMoveList.first;
+            while (curr2 != null)
+            {
+                grid[curr2.rNode.xCoord][curr2.rNode.yCoord].setIsleIsBeingMoved(false, null);
+                curr2 = curr2.next;
+            }
+            toMoveList.clear();
+
+            IsleCellList.IsleCellNode curr = cellIsle.isleCellList.first;
+            while (curr != null)
+            {
+                if (!grid[curr.rNode.xCoord+xDif][curr.rNode.yCoord+yDif].isIsle() && !grid[curr.rNode.xCoord+xDif][curr.rNode.yCoord+yDif].isNulled())
+                {
+                    toMoveList.add(grid[curr.rNode.xCoord+xDif][curr.rNode.yCoord+yDif]);
+                    grid[curr.rNode.xCoord+xDif][curr.rNode.yCoord+yDif].setIsleIsBeingMoved(true, isleColor);
+                    curr = curr.next;
+                }
+            }
+        }
+    }
+
+    public void makeIsleFromToMoveList(String isleID, String igName, Color c, IsleGroup isleGroup)
+    {
+        IsleBeingMovedList.IsleBeingMovedNode curr = toMoveList.first;
+
+        while (curr != null)
+        {
+            grid[curr.rNode.xCoord][curr.rNode.yCoord].setHighlighted(true);
+            curr = curr.next;
+        }
+
+        makeIsle(isleID, igName, c, isleGroup, true);
+        toMoveList.clear();
+
+        moving = false;
+    }
+
+    public void setMouseCoordsOnGrid(int x, int y)
+    {
+        //System.out.println("Set Mouse Coords on Grid");
+        xCoordOfMouseOnGrid = x;
+        yCoordOfMouseOnGrid = y;
     }
 
     /**
@@ -693,6 +919,22 @@ public class GridData3 {
         public boolean isNulled()
         {
             return nulled;
+        }
+
+        public void setIsleIsBeingMoved(boolean hmm, Color c)
+        {
+            if (hmm)
+            {
+                r.setFill(c);
+                r.setStroke(Color.TRANSPARENT);
+                r.setOpacity(0.5);
+            }
+            else
+            {
+                r.setFill(Color.TRANSPARENT);
+                r.setStroke(Color.TRANSPARENT);
+                r.setOpacity(0.5);
+            }
         }
     }
 
@@ -1018,6 +1260,55 @@ public class GridData3 {
             protected NullNode next;
 
             private NullNode(RNode node)
+            {
+                rNode = node;
+                next = null;
+            }
+        }
+    }
+
+    protected class IsleBeingMovedList
+    {
+        protected IsleBeingMovedNode first;
+        protected IsleBeingMovedNode last;
+        private int size;
+
+        private IsleBeingMovedList()
+        {
+            first = null;
+            last = null;
+            size = 0;
+        }
+
+        private void add(RNode node)
+        {
+            if (size == 0)
+            {
+                first = new IsleBeingMovedNode(node);
+                last = first;
+                size = 1;
+            }
+            else if (size > 0)
+            {
+                last.next = new IsleBeingMovedNode(node);
+                last = last.next;
+                size++;
+            }
+        }
+
+        private void clear()
+        {
+            first = null;
+            last = null;
+            size = 0;
+        }
+
+        protected class IsleBeingMovedNode
+        {
+            protected final RNode rNode;
+            protected IsleBeingMovedNode next;
+
+            private IsleBeingMovedNode(RNode node)
             {
                 rNode = node;
                 next = null;

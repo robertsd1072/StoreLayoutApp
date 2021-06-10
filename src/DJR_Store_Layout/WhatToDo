@@ -1,9 +1,15 @@
 Cosas Para Hacer en Cualquier Momento:
 
 Item Location: D39(1) 1-1-1.90
-1. Load layout to a file and be able to load it back from computer.
+- Be able to select and move isles
 
-2. Bug Line 542 of ActualController3: Why do I need to add 1 to each remainder??
+- Select multiple isles at a time and move them
+
+- Do departments for clothes and such
+
+- Actually Setup layout of store.
+
+- Bug Line 542 of ActualController3: Why do I need to add 1 to each remainder??
 
 Optimization:
-1. Highlight()
+- Highlight()
