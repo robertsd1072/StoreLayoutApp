@@ -7,9 +7,8 @@ Item Location: D39(1) 1-1-1.90
 
 - Do departments for clothes and such
 
-- Actually Setup layout of store.
+- Actually Setup layout of store
 
 - Bug Line 542 of ActualController3: Why do I need to add 1 to each remainder??
 
 Optimization:
-- Highlight()

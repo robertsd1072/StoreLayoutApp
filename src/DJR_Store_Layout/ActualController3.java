@@ -1,7 +1,6 @@
 /**
  * ActualController3 class for project DJR_Store_Layout
  * Controls store layout and all accompanying functionality
- * Doubles as controlling class for isle layout setup
  * @author David Roberts
  */
 
@@ -57,14 +56,15 @@ public class ActualController3 {
      * Variables involved with backing data structures and control
      */
     private GridData3 g;
-    private int floors, length, width;
+    private int floors, length, width, highlightingIterations;
     private final int cols, rows;
     private float cellSizeInFeet;
     private double sX, sY, xRemainderSize1, yRemainderSize1, mouseX, mouseY;
     private final double finalSizeOfCells;
-    private boolean contextMenuShowing, moving;
+    private boolean contextMenuShowing, highlighting, moving;
     private GridData3.RNode editGroupNode;
-    private IsleInfo isleInfo;
+    private Isle isleToMove;
+    private SetupIsleInfoController setupInfoStuff;
 
     /**
      * Basic Constructor
@@ -181,6 +181,8 @@ public class ActualController3 {
         float feet = 0;
         ArrayList<String> isleGroupNames = new ArrayList<>();
         ArrayList<Color> isleGroupColors = new ArrayList<>();
+        ArrayList<String> endCapLocations = new ArrayList<>();
+        ArrayList<String> backOrFloorArr = new ArrayList<>();
         ArrayList<ArrayList<String>> listOfIsleIDs = new ArrayList<>();
         ArrayList<ArrayList<Hashtable<String, String>>> listOfIslesWithCells = new ArrayList<>();
         String cellsToNull = null;
@@ -226,6 +228,10 @@ public class ActualController3 {
                     String c1 = scanner.nextLine();
                     String[] c2 = c1.split(" ");
                     isleGroupColors.add(new Color(Double.parseDouble(c2[0]), Double.parseDouble(c2[1]), Double.parseDouble(c2[2]), 1.0));
+                    String endCapLoc = scanner.nextLine();
+                    endCapLocations.add(endCapLoc);
+                    String backOrFloor = scanner.nextLine();
+                    backOrFloorArr.add(backOrFloor);
                     //System.out.println("Added color to isleGroupColors");
 
                     ArrayList<Hashtable<String, String>> islesWithCells = new ArrayList<>();
@@ -297,7 +303,7 @@ public class ActualController3 {
             throw new RuntimeException(ex);
         }
 
-        initializeFromFile(isleGroupNames, isleGroupColors, listOfIslesWithCells, listOfIsleIDs, cellsToNull);
+        initializeFromFile(isleGroupNames, isleGroupColors, endCapLocations, backOrFloorArr, listOfIslesWithCells, listOfIsleIDs, cellsToNull);
     }
 
     /**
@@ -396,7 +402,7 @@ public class ActualController3 {
         //System.out.println("sp Dimension: "+sP.getWidth()+", "+sP.getHeight());
     }
 
-    private void initializeFromFile(ArrayList<String> groupNames, ArrayList<Color> groupColors, ArrayList<ArrayList<Hashtable<String, String>>> listOfIslesWithCells, ArrayList<ArrayList<String>> listOfIsleIDs, String cellsToNull)
+    private void initializeFromFile(ArrayList<String> groupNames, ArrayList<Color> groupColors, ArrayList<String> endCapLocations, ArrayList<String> backOrFloorArr, ArrayList<ArrayList<Hashtable<String, String>>> listOfIslesWithCells, ArrayList<ArrayList<String>> listOfIsleIDs, String cellsToNull)
     {
         theV.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
         sP.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
@@ -431,7 +437,7 @@ public class ActualController3 {
 
         drawPluses(finalSizeOfCells, hboxWithThePluses);
 
-        loadCellsFromFile(finalSizeOfCells, hboxWithTheCells, groupNames, groupColors, listOfIslesWithCells, listOfIsleIDs, cellsToNull);
+        loadCellsFromFile(finalSizeOfCells, hboxWithTheCells, groupNames, groupColors, endCapLocations, backOrFloorArr, listOfIslesWithCells, listOfIsleIDs, cellsToNull);
     }
 
     /**
@@ -445,6 +451,7 @@ public class ActualController3 {
         makeIsle.setOnAction(actionEvent ->
         {
             Stage makeIsleStage = new Stage();
+            makeIsleStage.setTitle("New Isle Menu");
             makeIsleStage.initModality(Modality.APPLICATION_MODAL);
             makeIsleStage.initOwner(stage);
             VBox makeIsleVBox = makeIsleMenu(makeIsleStage, g);
@@ -475,9 +482,9 @@ public class ActualController3 {
         moveIsle.setOnAction(actionEvent ->
         {
             rightClick2.hide();
-            GridData3.Isle isle = editGroupNode.getIsle();
+            Isle isle = editGroupNode.getIsle();
             moving = true;
-            isleInfo = new IsleInfo(editGroupNode.getIsle().getIsleID(), editGroupNode.getIsleGroup().getName(), editGroupNode.getColor(), editGroupNode.getIsleGroup());
+            isleToMove = editGroupNode.getIsle();
             stage.addEventFilter(MouseEvent.MOUSE_MOVED, e ->
             {
                 if (moving)
@@ -485,6 +492,30 @@ public class ActualController3 {
             });
         });
         rightClick2.getItems().add(moveIsle);
+        MenuItem setupInfo = new MenuItem("Setup Isle Info");
+        setupInfo.setOnAction(actionEvent ->
+        {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("setupIsleInfo.fxml"));
+            Scene newScene;
+            try
+            {
+                newScene = new Scene(loader.load());
+            }
+            catch (IOException ex)
+            {
+                System.out.println("Error displaying login window");
+                throw new RuntimeException(ex);
+            }
+            Stage inputStage = new Stage();
+            inputStage.setTitle("Setup Isle Info");
+            inputStage.initOwner(stage);
+            inputStage.setScene(newScene);
+            inputStage.show();
+
+            setupInfoStuff = loader.getController();
+            setupInfoStuff.setImportantInfo(g, editGroupNode.getIsle(), inputStage);
+        });
+        rightClick2.getItems().add(setupInfo);
     }
 
     /**
@@ -570,35 +601,6 @@ public class ActualController3 {
     }
 
     /**
-     * Loads pluses for viewing of isle layout
-     *
-     * @param z size of pluses
-     * @param hbox1 hbox that pluses are added to
-     */
-    private void loadPluses(Double z, HBox hbox1)
-    {
-        for (int i=0; i<cols-1; i++)
-        {
-            VBox vbox = new VBox();
-
-            for (int j=0; j<rows-1; j++)
-            {
-                StackPane sP1 = new StackPane();
-                Line lx = new Line((int) -(z/3), 0, (int) (z/3), 0);
-                lx.setStrokeWidth(1);
-                Line ly = new Line(0, (int) -(z/3), 0, (int) (z/3));
-                ly.setStrokeWidth(1);
-                sP1.getChildren().addAll(lx, ly);
-
-                vbox.getChildren().add(sP1);
-                vbox.setVgrow(sP1, Priority.ALWAYS);
-            }
-            hbox1.getChildren().add(vbox);
-            hbox1.setHgrow(vbox, Priority.ALWAYS);
-        }
-    }
-
-    /**
      * Initializes padding panes on inside of outside panes based on screen coords
      *
      * @param x screen x dimension
@@ -659,30 +661,7 @@ public class ActualController3 {
         }
     }
 
-    /**
-     * Loads cells for viewing of isle layout
-     *
-     * @param hbox2 hbox cells are added to
-     */
-    private void loadCells(HBox hbox2)
-    {
-        for (int i=0; i<cols; i++)
-        {
-            VBox vbox = new VBox();
-
-            for (int j=0; j<rows; j++)
-            {
-                Rectangle r = g.getRNode(i, j).getR();
-
-                vbox.getChildren().add(r);
-                vbox.setVgrow(r, Priority.ALWAYS);
-            }
-            hbox2.getChildren().add(vbox);
-            hbox2.setHgrow(vbox, Priority.ALWAYS);
-        }
-    }
-
-    private void loadCellsFromFile(double z, HBox hbox2, ArrayList<String> groupNames, ArrayList<Color> groupColors, ArrayList<ArrayList<Hashtable<String, String>>> listOfIslesWithCells, ArrayList<ArrayList<String>> listOfIsleIDs, String cellsToNull)
+    private void loadCellsFromFile(double z, HBox hbox2, ArrayList<String> groupNames, ArrayList<Color> groupColors, ArrayList<String> endCapLocations, ArrayList<String> backOrFloorArr, ArrayList<ArrayList<Hashtable<String, String>>> listOfIslesWithCells, ArrayList<ArrayList<String>> listOfIsleIDs, String cellsToNull)
     {
         double startX = xRemainderSize1;
         double startY = yRemainderSize1+25;
@@ -728,12 +707,12 @@ public class ActualController3 {
                 if (g.isleGroupList.containsKey(groupNames.get(i)))
                 {
                     //System.out.println("Adding "+listOfIsleIDs.get(i).get(j)+" to existing isle group");
-                    g.makeIsle(listOfIsleIDs.get(i).get(j), groupNames.get(i), groupColors.get(i), g.isleGroupList.get(groupNames.get(i)), true);
+                    g.makeIsle(listOfIsleIDs.get(i).get(j), groupNames.get(i), groupColors.get(i), g.isleGroupList.get(groupNames.get(i)), true, null, null);
                 }
                 else
                 {
                     //System.out.println("New isle group for "+listOfIsleIDs.get(i).get(j));
-                    g.makeIsle(listOfIsleIDs.get(i).get(j), groupNames.get(i), groupColors.get(i), null, false);
+                    g.makeIsle(listOfIsleIDs.get(i).get(j), groupNames.get(i), groupColors.get(i), null, false, endCapLocations.get(i), backOrFloorArr.get(i));
                 }
             }
         }
@@ -765,14 +744,11 @@ public class ActualController3 {
             g.setMouseCoordsOnGrid(node.getX(), node.getY());
             if (node.isIsle())
             {
-                r.setFill(node.getColor());
                 r.setOpacity(0.5);
             }
             else if (!node.isNulled())
             {
                 r.setFill(Color.GRAY);
-                r.setStroke(Color.GRAY);
-                r.setOpacity(0.5);
             }
         });
         r.setOnMouseExited(mouseEvent ->
@@ -780,7 +756,6 @@ public class ActualController3 {
             if (node.isHighlighted())
             {
                 r.setFill(Color.GRAY);
-                r.setOpacity(1.0);
             }
             else if (node.isIsle())
             {
@@ -790,8 +765,6 @@ public class ActualController3 {
             else if (!node.isNulled())
             {
                 r.setFill(Color.TRANSPARENT);
-                r.setStroke(Color.TRANSPARENT);
-                r.setOpacity(0.5);
             }
         });
         r.setOnMouseClicked(mouseEvent ->
@@ -815,17 +788,17 @@ public class ActualController3 {
             {
                 if (!contextMenuShowing)
                 {
+                    System.out.println();
                     System.out.println("Coords: "+node.getX()+","+node.getY());
                     //System.out.println(node.printSCoords());
                     g.resetHighlighted();
                     if (node.isIsle())
                     {
-                        System.out.println("Isle ID: "+node.getIsle().getIsleID());
-                        System.out.println("Isle Group: "+node.getIsleGroup().getName());
+                        node.getIsle().printInfo();
                     }
                     else
                     {
-                        System.out.println("null");
+                        System.out.println("No Isle/IsleGroup");
                         node.setHighlighted(true);
                     }
                 }
@@ -833,7 +806,7 @@ public class ActualController3 {
                 {
                     System.out.println("Done Moving in AC");
                     node.setHighlighted(false);
-                    g.makeIsleFromToMoveList(isleInfo.getIsleID(), isleInfo.getIsleGroupName(), isleInfo.getIsleColor(), isleInfo.getIsleGroup());
+                    g.makeIsleFromToMoveList(isleToMove.getIsleID(), isleToMove.getIsleGroup().getName(), isleToMove.getIsleGroup().getColor(), isleToMove.getIsleGroup());
                     moving = false;
                 }
                 else
@@ -845,16 +818,37 @@ public class ActualController3 {
             if (mouseEvent.getButton() == MouseButton.PRIMARY && !node.isNulled())
             {
                 contextMenuShowing = false;
-                g.highlight(node, mouseEvent.getSceneX(), mouseEvent.getSceneY());
+                if (!highlighting)
+                {
+                    g.resetHighlighted();
+                    highlighting = true;
+                    //highlightingIterations = 0;
+                    if (!node.isIsle())
+                        node.setHighlighted(true);
+                }
+
+                double x = mouseEvent.getSceneX();
+                double y = mouseEvent.getSceneY();
+                double a = (node.getsXMinCoord()-x)/finalSizeOfCells+1;
+                double b = (node.getsYMinCoord()-y)/finalSizeOfCells+1;
+                double c = (x-node.getsXMaxCoord())/finalSizeOfCells+1;
+                double d = (y-node.getsYMaxCoord())/finalSizeOfCells+1;
+
+                if (Math.ceil(a) != g.getHighlightingXLength() || Math.ceil(b) != g.getHighlightingYLength() || Math.ceil(c) != g.getHighlightingXLength() || Math.ceil(d) != g.getHighlightingYLength())
+                {
+                    //System.out.println("Highlighting");
+                    g.resetHighlighted();
+                    g.highlight(node.getX(), node.getY(), a, b, c, d);
+                    //highlightingIterations++;
+                }
             }
         });
-        /*
         r.setOnMouseReleased(mouseEvent ->
         {
             g.resetHighlighted2();
             highlighting = false;
+            //System.out.println("highlightingIterations: "+highlightingIterations);
         });
-         */
 
         r.setLayoutX(0);
         r.setLayoutY(0);
@@ -868,9 +862,8 @@ public class ActualController3 {
 
         v.setAlignment(Pos.CENTER);
         v.setSpacing(5);
-        Label title = new Label("New Isle Menu");
-        title.setStyle("-fx-font-size: 20;");
         HBox hboxA = new HBox();
+        hboxA.setAlignment(Pos.CENTER);
         Label isle = new Label("Input Isle Letter & Number: ");
         isle.setStyle("-fx-font-size: 16;");
         TextField idT = new TextField();
@@ -936,6 +929,7 @@ public class ActualController3 {
                 s.hide();
 
                 Stage groupSelect = new Stage();
+                groupSelect.setTitle("Select Isle Group Name and Color");
                 groupSelect.initModality(Modality.APPLICATION_MODAL);
                 groupSelect.initOwner(stage);
                 VBox groupSelectVbox = setupGroupCreation(groupSelect, g, isleID);
@@ -944,7 +938,7 @@ public class ActualController3 {
                 groupSelect.show();
             }
         });
-        v.getChildren().addAll(title, addToExisting, makeNew);
+        v.getChildren().addAll(addToExisting, makeNew);
 
         return v;
     }
@@ -962,18 +956,32 @@ public class ActualController3 {
 
         v.setAlignment(Pos.CENTER);
         v.setSpacing(5);
-        Label title = new Label("Select Isle Group Name and Color");
-        title.setStyle("-fx-font-size: 20;");
         HBox hboxA = new HBox();
+        hboxA.setAlignment(Pos.CENTER);
         Label name = new Label("Input Name: ");
         name.setStyle("-fx-font-size: 16;");
         TextField nameT = new TextField();
         hboxA.getChildren().addAll(name, nameT);
         HBox hboxB = new HBox();
+        hboxB.setAlignment(Pos.CENTER);
+        Label endCap = new Label("EndCap side for Even Numbered Isles: ");
+        endCap.setStyle("-fx-font-size: 16;");
+        TextField endCapT = new TextField();
+        hboxB.getChildren().addAll(endCap, endCapT);
+        Label endCapTemplate = new Label("Enter only: \"top\",\"bottom\",\"right\",\"left\"");
+        endCapTemplate.setStyle("-fx-font-size: 10;");
+        HBox hboxC = new HBox();
+        hboxC.setAlignment(Pos.CENTER);
+        Label bOrF = new Label("Isle Group in Back or on Floor: ");
+        bOrF.setStyle("-fx-font-size: 16;");
+        TextField bOrFtext = new TextField();
+        hboxC.getChildren().addAll(bOrF, bOrFtext);
+        HBox hboxD = new HBox();
+        hboxD.setAlignment(Pos.CENTER);
         Label color = new Label("Select Color: ");
         color.setStyle("-fx-font-size: 16;");
         ColorPicker colorP = new ColorPicker();
-        hboxB.getChildren().addAll(color, colorP);
+        hboxD.getChildren().addAll(color, colorP);
         Button submit = new Button("Submit");
         submit.setOnAction(actionEvent ->
         {
@@ -996,10 +1004,10 @@ public class ActualController3 {
             else
             {
                 s.hide();
-                g.makeIsle(isleID, nameT.getText(), colorP.getValue(), null, false);
+                g.makeIsle(isleID, nameT.getText(), colorP.getValue(), null, false, endCapT.getText(), bOrFtext.getText());
             }
         });
-        v.getChildren().addAll(title, hboxA, hboxB, submit);
+        v.getChildren().addAll(hboxA, hboxB, endCapTemplate, hboxC, hboxD, submit);
 
         return v;
     }
@@ -1022,8 +1030,34 @@ public class ActualController3 {
             group.setStyle(string);
             group.setOnAction(actionEvent12 ->
             {
-                g.makeIsle(isleID, g.isleGroupList.get(key).getName(), g.isleGroupList.get(key).getColor(), g.isleGroupList.get(key), true);
-                s.hide();
+                if (g.isleGroupList.get(key).containsIsle(isleID))
+                {
+                    Stage warningStage = new Stage();
+                    warningStage.initModality(Modality.APPLICATION_MODAL);
+                    warningStage.initOwner(stage);
+                    VBox warningVbox = new VBox();
+                    warningVbox.setSpacing(5);
+                    warningVbox.setAlignment(Pos.CENTER);
+                    Label warningLabel1 = new Label("This isleID already exists.");
+                    Label warningLabel2 = new Label("Do you want to add this new isle to the already existing one?");
+                    Label warningLabel3 = new Label("If not, please rename isle.");
+                    Button yes = new Button("Yes");
+                    yes.setOnAction(actionEvent ->
+                    {
+                        warningStage.hide();
+                        s.hide();
+                        g.addNewToExistingIsle(isleID, g.isleGroupList.get(key).getColor(), g.isleGroupList.get(key));
+                    });
+                    warningVbox.getChildren().addAll(warningLabel1, warningLabel2, warningLabel3, yes);
+                    Scene cellSizeScene = new Scene(warningVbox);
+                    warningStage.setScene(cellSizeScene);
+                    warningStage.show();
+                }
+                else
+                {
+                    g.makeIsle(isleID, g.isleGroupList.get(key).getName(), g.isleGroupList.get(key).getColor(), g.isleGroupList.get(key), true, null, null);
+                    s.hide();
+                }
             });
             v.getChildren().add(group);
         }
@@ -1048,24 +1082,26 @@ public class ActualController3 {
                 fileStream.println(isleGroup.getName());
                 Color color = isleGroup.getColor();
                 fileStream.println(color.getRed()+" "+color.getGreen()+" "+color.getBlue());
+                fileStream.println(isleGroup.getEndCapLocationForEvenIsleIDs());
+                fileStream.println(isleGroup.getBackOrFloor());
                 fileStream.println(isleGroup.getIsleIDList().size());
 
                 Set<String> isleIDS = isleGroup.getIsleIDList().keySet();
                 for (String idKey : isleIDS)
                 {
                     fileStream.println(isleGroup.getIsleIDList().get(idKey).getIsleID());
-                    GridData3.IsleCellList isleCellList = isleGroup.getIsleIDList().get(idKey).getIsleCellList();
-                    GridData3.IsleCellList.IsleCellNode curr = isleCellList.first;
+                    Isle.IsleCellList isleCellList = isleGroup.getIsleIDList().get(idKey).getIsleCellList();
+                    Isle.IsleCellList.IsleCellNode curr = isleCellList.getFirst();
                     while (curr != null)
                     {
-                        fileStream.print(curr.rNode.getX()+","+curr.rNode.getY());
+                        fileStream.print(curr.getrNode().getX()+","+curr.getrNode().getY());
 
-                        if (curr.next != null)
+                        if (curr.getNext() != null)
                             fileStream.print(",");
                         else
                             fileStream.print("\n");
 
-                        curr = curr.next;
+                        curr = curr.getNext();
                     }
                 }
             }

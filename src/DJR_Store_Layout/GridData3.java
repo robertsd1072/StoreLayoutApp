@@ -55,12 +55,12 @@ public class GridData3 {
     /**
      * LinkedList of highlighted cells in grid
      */
-    protected HighlightedList highlightedList;
+    protected HighlightedList highlightedList, highlightedListForThread;
     protected NullList nullList;
     /**
      * Mouse coords on screen
      */
-    protected double highlightingXLength, highlightingYLength;
+    protected int highlightingXLength, highlightingYLength;
     protected IsleBeingMovedList toMoveList;
     protected boolean moving;
     protected int xCoordOfMouseOnGrid, yCoordOfMouseOnGrid;
@@ -95,6 +95,7 @@ public class GridData3 {
         toMoveList = new IsleBeingMovedList();
         highlightingXLength = 1;
         highlightingYLength = 1;
+        highlightedListForThread = new HighlightedList();
     }
 
     /**
@@ -211,6 +212,7 @@ public class GridData3 {
             grid[curr.rNode.xCoord][curr.rNode.yCoord].setHighlighted(false);
             curr = curr.next;
         }
+
         highlightedList.clear();
     }
 
@@ -239,36 +241,11 @@ public class GridData3 {
         isleGroupList.clear();
     }
 
-    /**
-     * Highlights section of cells in grid based on starting cell and current mouse(x,y)
-     *
-     * @param node rectangle where highlighting started
-     * @param x mouse x coord
-     * @param y mouse y coord
-     */
-    public void highlight(RNode node, double x, double y)
+    public void highlight(int xCoord, int yCoord, double a, double b, double c, double d)
     {
-        resetHighlighted();
-        if (!node.isIsle() && !node.isNulled())
-        {
-            node.setHighlighted(true);
-        }
-
-        int xCoord = node.xCoord;
-        int yCoord = node.yCoord;
-        double xMin = node.sXMinCoord;
-        double yMin = node.sYMinCoord;
-        double xMax = node.sXMaxCoord;
-        double yMax = node.sYMaxCoord;
-
-        double a = (int) (xMin-x)/boxSize+1;
-        double b = (int) (yMin-y)/boxSize+1;
-        double c = (int) (x-xMax)/boxSize+1;
-        double d = (int) (y-yMax)/boxSize+1;
-
         if (a>0 && b>0)
         {
-            //Northwest
+            //System.out.println("Northwest");
             for (int i=0; i<a; i++)
             {
                 for (int j=0; j<b; j++)
@@ -284,10 +261,12 @@ public class GridData3 {
                     }
                 }
             }
+            highlightingXLength = (int) Math.ceil(a);
+            highlightingYLength = (int) Math.ceil(b);
         }
         else if (a>0 && d>0)
         {
-            //Southwest
+            //System.out.println("Southwest");
             for (int i=0; i<a; i++)
             {
                 for (int j=0; j<d; j++)
@@ -303,10 +282,12 @@ public class GridData3 {
                     }
                 }
             }
+            highlightingXLength = (int) Math.ceil(a);
+            highlightingYLength = (int) Math.ceil(d);
         }
         else if (c>0 && b>0)
         {
-            //Northeast
+            //System.out.println("Northeast");
             for (int i=0; i<c; i++)
             {
                 for (int j=0; j<b; j++)
@@ -322,10 +303,12 @@ public class GridData3 {
                     }
                 }
             }
+            highlightingXLength = (int) Math.ceil(c);
+            highlightingYLength = (int) Math.ceil(b);
         }
         else if (c>0 && d>0)
         {
-            //Southeast
+            //System.out.println("Southeast");
             for (int i=0; i<c; i++)
             {
                 for (int j=0; j<d; j++)
@@ -341,144 +324,16 @@ public class GridData3 {
                     }
                 }
             }
+            highlightingXLength = (int) Math.ceil(c);
+            highlightingYLength = (int) Math.ceil(d);
         }
     }
 
     public void resetHighlighted2()
     {
-        System.out.println("Reset Highlight 2");
+        //System.out.println("Reset Highlight 2");
         highlightingXLength = 1;
         highlightingYLength = 1;
-    }
-
-    public void highlight2(RNode node, double x, double y)
-    {
-        //System.out.println("Start");
-        //.out.println("X length: "+highlightingXLength);
-        //System.out.println("Y length: "+highlightingYLength);
-
-        if (!node.isIsle() && !node.isNulled())
-        {
-            node.setHighlighted(true);
-        }
-
-        int xCoord = node.xCoord;
-        int yCoord = node.yCoord;
-        double xMin = node.sXMinCoord;
-        double yMin = node.sYMinCoord;
-        double xMax = node.sXMaxCoord;
-        double yMax = node.sYMaxCoord;
-
-        double a = (int) (xMin-x)/boxSize+1;
-        double b = (int) (yMin-y)/boxSize+1;
-        double c = (int) (x-xMax)/boxSize+1;
-        double d = (int) (y-yMax)/boxSize+1;
-
-        if (a>0 && b>0)
-        {
-            if (a > highlightingXLength)
-            {
-                for (int i=(int) highlightingXLength; i<a; i++)
-                {
-                    try
-                    {
-                        if (!grid[xCoord-i][yCoord].isIsle() && !grid[xCoord-i][yCoord].isNulled())
-                            grid[xCoord-i][yCoord].setHighlighted(true);
-                    }
-                    catch (IndexOutOfBoundsException e)
-                    {
-                        System.out.println("Tried to locate at invalid index");
-                    }
-                }
-                highlightingXLength = a;
-            }
-            if (b > highlightingYLength)
-            {
-                for (int i=(int) highlightingYLength; i<b; i++)
-                {
-                    try
-                    {
-                        if (!grid[xCoord][yCoord-i].isIsle() && !grid[xCoord][yCoord-i].isNulled())
-                            grid[xCoord][yCoord-i].setHighlighted(true);
-                    }
-                    catch (IndexOutOfBoundsException e)
-                    {
-                        System.out.println("Tried to locate at invalid index");
-                    }
-                }
-                highlightingYLength = b;
-            }
-            if (a > highlightingXLength || b > highlightingYLength)
-            {
-
-            }
-            if (a < highlightingXLength)
-            {
-                for (int i=(int) highlightingXLength; i>a; i--)
-                {
-                    try
-                    {
-                        if (!grid[xCoord-i][yCoord].isIsle() && !grid[xCoord-i][yCoord].isNulled())
-                            grid[xCoord-i][yCoord].setHighlighted(false);
-                    }
-                    catch (IndexOutOfBoundsException e)
-                    {
-                        System.out.println("Tried to locate at invalid index");
-                    }
-                }
-                highlightingXLength = a;
-            }
-            if (b < highlightingYLength)
-            {
-                for (int i=(int) highlightingYLength; i>b; i--)
-                {
-                    try
-                    {
-                        if (!grid[xCoord][yCoord-i].isIsle() && !grid[xCoord][yCoord-i].isNulled())
-                            grid[xCoord][yCoord-i].setHighlighted(false);
-                    }
-                    catch (IndexOutOfBoundsException e)
-                    {
-                        System.out.println("Tried to locate at invalid index");
-                    }
-                }
-                highlightingYLength = b;
-            }
-            if (a < highlightingXLength && b < highlightingYLength)
-            {
-                for (int i=(int) highlightingXLength; i>a; i--)
-                {
-                    for (int j = (int) highlightingYLength; j>b; j--)
-                    {
-                        try
-                        {
-                            if (!grid[xCoord-i][yCoord-j].isIsle() && !grid[xCoord-i][yCoord-j].isNulled())
-                                grid[xCoord-i][yCoord-j].setHighlighted(false);
-                        }
-                        catch (IndexOutOfBoundsException e)
-                        {
-                            System.out.println("Tried to locate at invalid index");
-                        }
-                    }
-                }
-            }
-        }
-        else if (a>0 && d>0)
-        {
-
-        }
-        else if (c>0 && b>0)
-        {
-
-        }
-        else if (c>0 && d>0)
-        {
-
-        }
-
-        //System.out.println("End");
-        //System.out.println("X length: "+highlightingXLength);
-        //System.out.println("Y length: "+highlightingYLength);
     }
 
     /**
@@ -537,14 +392,14 @@ public class GridData3 {
         }
     }
 
-    public void makeIsle(String isleID, String igName, Color c, IsleGroup isleGroup, boolean addToIsleGroup)
+    public void makeIsle(String isleID, String igName, Color c, IsleGroup isleGroup, boolean addToIsleGroup, String endCapLoc, String backOrFloor)
     {
         if (!addToIsleGroup)
         {
             IsleGroupCellList isleGroupCellList = new IsleGroupCellList();
             IsleGroup igNew = new IsleGroup(igName, c);
 
-            IsleCellList isleCellList = new IsleCellList();
+            Isle.IsleCellList isleCellList = new Isle.IsleCellList();
             Isle newIsle = new Isle(isleID, igNew);
 
             HighlightedList.HighlightedNode curr = highlightedList.first;
@@ -561,6 +416,8 @@ public class GridData3 {
             newIsle.setIsleCellList(isleCellList);
 
             igNew.addNewID(isleID, newIsle);
+            igNew.setEndCapLocationForEvenIsleIDs(endCapLoc);
+            igNew.setBackOrFloor(backOrFloor);
 
             isleGroupList.put(igName, igNew);
             highlightedList.clear();
@@ -569,7 +426,7 @@ public class GridData3 {
         {
             IsleGroupCellList isleGroupCellList = isleGroup.getIsleGroupCellList();
 
-            IsleCellList isleCellList = new IsleCellList();
+            Isle.IsleCellList isleCellList = new Isle.IsleCellList();
             Isle newIsle = new Isle(isleID, isleGroup);
 
             HighlightedList.HighlightedNode curr = highlightedList.first;
@@ -590,14 +447,32 @@ public class GridData3 {
         }
     }
 
+    public void addNewToExistingIsle(String isleID, Color c, IsleGroup isleGroup)
+    {
+        IsleGroupCellList isleGroupCellList = isleGroup.getIsleGroupCellList();
+        Isle.IsleCellList isleCellList = isleGroup.getIsleIDList().get(isleID).getIsleCellList();
+
+        HighlightedList.HighlightedNode curr = highlightedList.first;
+        for (int i=0; i<highlightedList.size; i++)
+        {
+            grid[curr.rNode.xCoord][curr.rNode.yCoord].setIsled(true, isleGroup.getIsleIDList().get(isleID), c, isleGroup);
+            isleGroupCellList.add(grid[curr.rNode.xCoord][curr.rNode.yCoord]);
+            isleCellList.add(grid[curr.rNode.xCoord][curr.rNode.yCoord]);
+
+            curr = curr.next;
+        }
+
+        highlightedList.clear();
+    }
+
     public void removeIsle(Isle i)
     {
-        IsleCellList.IsleCellNode curr = i.isleCellList.first;
+        Isle.IsleCellList.IsleCellNode curr = i.getIsleCellList().getFirst();
 
         while (curr != null)
         {
-            grid[curr.rNode.xCoord][curr.rNode.yCoord].setIsled(false, null, null, null);
-            curr = curr.next;
+            grid[curr.getrNode().xCoord][curr.getrNode().yCoord].setIsled(false, null, null, null);
+            curr = curr.getNext();
         }
 
         i.getIsleGroup().getIsleIDList().remove(i.getIsleID());
@@ -641,13 +516,13 @@ public class GridData3 {
         if (!moving)
         {
             //System.out.println("Ungrouping cells from isle");
-            IsleCellList.IsleCellNode curr = cellIsle.isleCellList.first;
+            Isle.IsleCellList.IsleCellNode curr = cellIsle.getIsleCellList().getFirst();
             while (curr != null)
             {
-                grid[curr.rNode.xCoord][curr.rNode.yCoord].setIsled(false, null, null, null);
-                toMoveList.add(curr.rNode);
-                grid[curr.rNode.xCoord][curr.rNode.yCoord].setIsleIsBeingMoved(true, isleColor);
-                curr = curr.next;
+                grid[curr.getrNode().xCoord][curr.getrNode().yCoord].setIsled(false, null, null, null);
+                toMoveList.add(curr.getrNode());
+                grid[curr.getrNode().xCoord][curr.getrNode().yCoord].setIsleIsBeingMoved(true, isleColor);
+                curr = curr.getNext();
             }
         }
         moving = true;
@@ -668,14 +543,14 @@ public class GridData3 {
             }
             toMoveList.clear();
 
-            IsleCellList.IsleCellNode curr = cellIsle.isleCellList.first;
+            Isle.IsleCellList.IsleCellNode curr = cellIsle.getIsleCellList().getFirst();
             while (curr != null)
             {
-                if (!grid[curr.rNode.xCoord+xDif][curr.rNode.yCoord+yDif].isIsle() && !grid[curr.rNode.xCoord+xDif][curr.rNode.yCoord+yDif].isNulled())
+                if (!grid[curr.getrNode().xCoord+xDif][curr.getrNode().yCoord+yDif].isIsle() && !grid[curr.getrNode().xCoord+xDif][curr.getrNode().yCoord+yDif].isNulled())
                 {
-                    toMoveList.add(grid[curr.rNode.xCoord+xDif][curr.rNode.yCoord+yDif]);
-                    grid[curr.rNode.xCoord+xDif][curr.rNode.yCoord+yDif].setIsleIsBeingMoved(true, isleColor);
-                    curr = curr.next;
+                    toMoveList.add(grid[curr.getrNode().xCoord+xDif][curr.getrNode().yCoord+yDif]);
+                    grid[curr.getrNode().xCoord+xDif][curr.getrNode().yCoord+yDif].setIsleIsBeingMoved(true, isleColor);
+                    curr = curr.getNext();
                 }
             }
         }
@@ -691,7 +566,7 @@ public class GridData3 {
             curr = curr.next;
         }
 
-        makeIsle(isleID, igName, c, isleGroup, true);
+        makeIsle(isleID, igName, c, isleGroup, true, null, null);
         toMoveList.clear();
 
         moving = false;
@@ -762,44 +637,19 @@ public class GridData3 {
         }
     }
 
-    public double getBoxSize()
-    {
-        return boxSize;
-    }
-
-    public double getScreenX()
-    {
-        return screenX;
-    }
-
-    public double getScreenY()
-    {
-        return screenY;
-    }
-
-    public int getColSize()
-    {
-        return colSize;
-    }
-
-    public int getRowSize()
-    {
-        return rowSize;
-    }
-
     public RNode getRNode(int x, int y)
     {
         return grid[x][y];
     }
 
-    public int getCellSize()
+    public int getHighlightingXLength()
     {
-        return cellSize;
+        return highlightingXLength;
     }
 
-    public int getNumOfGroups()
+    public int getHighlightingYLength()
     {
-        return isleGroupList.size();
+        return highlightingYLength;
     }
 
     /**
@@ -836,16 +686,12 @@ public class GridData3 {
             if (hmm)
             {
                 r.setFill(Color.GRAY);
-                r.setStroke(Color.GRAY);
-                r.setOpacity(1.0);
                 highlighted = hmm;
                 highlightedList.add(this);
             }
             else
             {
                 r.setFill(Color.TRANSPARENT);
-                r.setStroke(Color.TRANSPARENT);
-                r.setOpacity(0.5);
                 highlighted = hmm;
             }
         }
@@ -880,6 +726,9 @@ public class GridData3 {
                 isle = null;
                 isleGroup = null;
                 setHighlighted(false);
+                r.setFill(Color.TRANSPARENT);
+                r.setStroke(Color.TRANSPARENT);
+                r.setOpacity(0.5);
             }
         }
 
@@ -936,6 +785,26 @@ public class GridData3 {
                 r.setOpacity(0.5);
             }
         }
+
+        public double getsXMinCoord()
+        {
+            return sXMinCoord;
+        }
+
+        public double getsYMinCoord()
+        {
+            return sYMinCoord;
+        }
+
+        public double getsXMaxCoord()
+        {
+            return sXMaxCoord;
+        }
+
+        public double getsYMaxCoord()
+        {
+            return sYMaxCoord;
+        }
     }
 
     /**
@@ -973,6 +842,17 @@ public class GridData3 {
             first = null;
             last = null;
             size = 0;
+        }
+
+        private HighlightedList(HighlightedList old)
+        {
+            HighlightedNode curr = old.first;
+
+            while (curr != null)
+            {
+                this.add(curr.rNode);
+                curr = curr.next;
+            }
         }
 
         /**
@@ -1022,88 +902,6 @@ public class GridData3 {
         }
     }
 
-    protected class Isle
-    {
-        private final String isleID;
-        private final IsleGroup isleGroup;
-        private IsleCellList isleCellList;
-
-        public Isle(String id, IsleGroup ig)
-        {
-            isleID = id;
-            isleGroup = ig;
-        }
-
-        public void setIsleCellList(IsleCellList icl)
-        {
-            isleCellList = icl;
-        }
-
-        public String getIsleID()
-        {
-            return isleID;
-        }
-
-        public IsleGroup getIsleGroup()
-        {
-            return isleGroup;
-        }
-
-        public IsleCellList getIsleCellList()
-        {
-            return isleCellList;
-        }
-    }
-
-    protected class IsleCellList
-    {
-        protected IsleCellNode first;
-        protected IsleCellNode last;
-        private int size;
-
-        protected IsleCellList()
-        {
-            first = null;
-            last = null;
-            size = 0;
-        }
-
-        private void add(RNode node)
-        {
-            if (size == 0)
-            {
-                first = new IsleCellNode(node);
-                last = first;
-                size = 1;
-            }
-            else if (size > 0)
-            {
-                last.next = new IsleCellNode(node);
-                last = last.next;
-                size++;
-            }
-        }
-
-        private void clear()
-        {
-            first = null;
-            last = null;
-            size = 0;
-        }
-
-        protected class IsleCellNode
-        {
-            protected final RNode rNode;
-            protected IsleCellNode next;
-
-            private IsleCellNode(RNode node)
-            {
-                rNode = node;
-                next = null;
-            }
-        }
-    }
-
     /**
      * Isle Group class with all necessary info
      */
@@ -1112,7 +910,9 @@ public class GridData3 {
         private final String name;
         private final Color color;
         private IsleGroupCellList isleGroupCellList;
-        private Hashtable<String, Isle> isleIDList;
+        private final Hashtable<String, Isle> isleIDList;
+        private String endCapLocationForEvenIsleIDs;
+        private String backOrFloor;
 
         public IsleGroup(String n, Color c)
         {
@@ -1144,6 +944,37 @@ public class GridData3 {
         public Hashtable<String, Isle> getIsleIDList()
         {
             return isleIDList;
+        }
+
+        public void setEndCapLocationForEvenIsleIDs(String s)
+        {
+            endCapLocationForEvenIsleIDs = s;
+        }
+
+        public String getEndCapLocationForEvenIsleIDs()
+        {
+            return endCapLocationForEvenIsleIDs;
+        }
+
+        public void setBackOrFloor(String s)
+        {
+            backOrFloor = s;
+        }
+
+        public String getBackOrFloor()
+        {
+            return backOrFloor;
+        }
+
+        public boolean containsIsle(String id)
+        {
+            Set<String> isleIDs = isleIDList.keySet();
+            for (String s : isleIDs)
+            {
+                if (s.compareTo(id) == 0)
+                    return true;
+            }
+            return false;
         }
     }
 

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox fx:id="theV" alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="110.0" prefWidth="400.0" spacing="5.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="DJR_Store_Layout.SetupIsleInfoController">
+   <children>
+      <VBox fx:id="vboxOfTexts" prefHeight="50.0" prefWidth="100.0">
+         <children>
+            <HBox prefHeight="25.0" prefWidth="200.0" VBox.vgrow="NEVER">
+               <children>
+                  <Label text="Isle Section 0       " HBox.hgrow="ALWAYS">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label text="# of Subsections: ">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="text0" />
+               </children>
+            </HBox>
+            <HBox prefHeight="25.0" prefWidth="200.0">
+               <children>
+                  <Label text="Isle Section 1       ">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <Label text="# of Subsections: ">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="text1" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <Button fx:id="addSection" mnemonicParsing="false" onAction="#addSection" text="Add Isle Section" />
+      <Button fx:id="done" mnemonicParsing="false" onAction="#done" text="Done" />
+   </children>
+</VBox>
