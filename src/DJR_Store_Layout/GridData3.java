@@ -255,10 +255,7 @@ public class GridData3 {
                         if (!grid[xCoord-i][yCoord-j].isIsle() && !grid[xCoord-i][yCoord-j].isNulled())
                             grid[xCoord-i][yCoord-j].setHighlighted(true);
                     }
-                    catch (IndexOutOfBoundsException e)
-                    {
-                        System.out.println("Tried to locate at invalid index");
-                    }
+                    catch (IndexOutOfBoundsException ignored) {}
                 }
             }
             highlightingXLength = (int) Math.ceil(a);
@@ -276,10 +273,7 @@ public class GridData3 {
                         if (!grid[xCoord-i][yCoord+j].isIsle() && !grid[xCoord-i][yCoord+j].isNulled())
                             grid[xCoord-i][yCoord+j].setHighlighted(true);
                     }
-                    catch (IndexOutOfBoundsException e)
-                    {
-                        System.out.println("Tried to locate at invalid index");
-                    }
+                    catch (IndexOutOfBoundsException ignored) {}
                 }
             }
             highlightingXLength = (int) Math.ceil(a);
@@ -297,10 +291,7 @@ public class GridData3 {
                         if (!grid[xCoord+i][yCoord-j].isIsle() && !grid[xCoord+i][yCoord-j].isNulled())
                             grid[xCoord+i][yCoord-j].setHighlighted(true);
                     }
-                    catch (IndexOutOfBoundsException e)
-                    {
-                        System.out.println("Tried to locate at invalid index");
-                    }
+                    catch (IndexOutOfBoundsException ignored) {}
                 }
             }
             highlightingXLength = (int) Math.ceil(c);
@@ -318,10 +309,7 @@ public class GridData3 {
                         if (!grid[xCoord+i][yCoord+j].isIsle() && !grid[xCoord+i][yCoord+j].isNulled())
                             grid[xCoord+i][yCoord+j].setHighlighted(true);
                     }
-                    catch (IndexOutOfBoundsException e)
-                    {
-                        System.out.println("Tried to locate at invalid index");
-                    }
+                    catch (IndexOutOfBoundsException ignored) {}
                 }
             }
             highlightingXLength = (int) Math.ceil(c);
@@ -392,7 +380,7 @@ public class GridData3 {
         }
     }
 
-    public void makeIsle(String isleID, String igName, Color c, IsleGroup isleGroup, boolean addToIsleGroup, String endCapLoc, String backOrFloor)
+    public void makeIsle(String isleID, String igName, Color c, IsleGroup isleGroup, boolean addToIsleGroup, String endCapLoc, String backOrFloor, String direction)
     {
         if (!addToIsleGroup)
         {
@@ -400,7 +388,7 @@ public class GridData3 {
             IsleGroup igNew = new IsleGroup(igName, c);
 
             Isle.IsleCellList isleCellList = new Isle.IsleCellList();
-            Isle newIsle = new Isle(isleID, igNew);
+            Isle newIsle = new Isle(isleID, igNew, this);
 
             HighlightedList.HighlightedNode curr = highlightedList.first;
             for (int i=0; i<highlightedList.size; i++)
@@ -418,6 +406,7 @@ public class GridData3 {
             igNew.addNewID(isleID, newIsle);
             igNew.setEndCapLocationForEvenIsleIDs(endCapLoc);
             igNew.setBackOrFloor(backOrFloor);
+            igNew.setDirectionOfIncreasingIsleSections(direction);
 
             isleGroupList.put(igName, igNew);
             highlightedList.clear();
@@ -427,7 +416,7 @@ public class GridData3 {
             IsleGroupCellList isleGroupCellList = isleGroup.getIsleGroupCellList();
 
             Isle.IsleCellList isleCellList = new Isle.IsleCellList();
-            Isle newIsle = new Isle(isleID, isleGroup);
+            Isle newIsle = new Isle(isleID, isleGroup, this);
 
             HighlightedList.HighlightedNode curr = highlightedList.first;
             for (int i=0; i<highlightedList.size; i++)
@@ -506,53 +495,31 @@ public class GridData3 {
         }
     }
 
-    public void moveIsle(RNode node, Isle cellIsle, double mouseX, double mouseY)
+    public void moveIsle(RNode node, Isle cellIsle)
     {
-        //System.out.println("Orig X: "+node.getX());
-        //System.out.println("Orig Y: "+node.getY());
-
-        Color isleColor = cellIsle.getIsleGroup().getColor();
-
-        if (!moving)
-        {
-            //System.out.println("Ungrouping cells from isle");
-            Isle.IsleCellList.IsleCellNode curr = cellIsle.getIsleCellList().getFirst();
-            while (curr != null)
-            {
-                grid[curr.getrNode().xCoord][curr.getrNode().yCoord].setIsled(false, null, null, null);
-                toMoveList.add(curr.getrNode());
-                grid[curr.getrNode().xCoord][curr.getrNode().yCoord].setIsleIsBeingMoved(true, isleColor);
-                curr = curr.getNext();
-            }
-        }
-        moving = true;
-
         int xDif = xCoordOfMouseOnGrid - node.getX();
         int yDif = yCoordOfMouseOnGrid - node.getY();
 
         //System.out.println("xDif: "+xDif);
         //System.out.println("yDif: "+yDif);
 
-        if (xDif != 0 && yDif != 0)
+        IsleBeingMovedList.IsleBeingMovedNode curr2 = toMoveList.first;
+        while (curr2 != null)
         {
-            IsleBeingMovedList.IsleBeingMovedNode curr2 = toMoveList.first;
-            while (curr2 != null)
-            {
-                grid[curr2.rNode.xCoord][curr2.rNode.yCoord].setIsleIsBeingMoved(false, null);
-                curr2 = curr2.next;
-            }
-            toMoveList.clear();
+            grid[curr2.rNode.xCoord][curr2.rNode.yCoord].setIsleIsBeingMoved(false, null);
+            curr2 = curr2.next;
+        }
+        toMoveList.clear();
 
-            Isle.IsleCellList.IsleCellNode curr = cellIsle.getIsleCellList().getFirst();
-            while (curr != null)
+        Isle.IsleCellList.IsleCellNode curr = cellIsle.getIsleCellList().getFirst();
+        while (curr != null)
+        {
+            if (!grid[curr.getrNode().xCoord+xDif][curr.getrNode().yCoord+yDif].isIsle() && !grid[curr.getrNode().xCoord+xDif][curr.getrNode().yCoord+yDif].isNulled())
             {
-                if (!grid[curr.getrNode().xCoord+xDif][curr.getrNode().yCoord+yDif].isIsle() && !grid[curr.getrNode().xCoord+xDif][curr.getrNode().yCoord+yDif].isNulled())
-                {
-                    toMoveList.add(grid[curr.getrNode().xCoord+xDif][curr.getrNode().yCoord+yDif]);
-                    grid[curr.getrNode().xCoord+xDif][curr.getrNode().yCoord+yDif].setIsleIsBeingMoved(true, isleColor);
-                    curr = curr.getNext();
-                }
+                toMoveList.add(grid[curr.getrNode().xCoord+xDif][curr.getrNode().yCoord+yDif]);
+                grid[curr.getrNode().xCoord+xDif][curr.getrNode().yCoord+yDif].setIsleIsBeingMoved(true, cellIsle.getIsleGroup().getColor());
             }
+            curr = curr.getNext();
         }
     }
 
@@ -566,7 +533,7 @@ public class GridData3 {
             curr = curr.next;
         }
 
-        makeIsle(isleID, igName, c, isleGroup, true, null, null);
+        makeIsle(isleID, igName, c, isleGroup, true, null, null, null);
         toMoveList.clear();
 
         moving = false;
@@ -574,7 +541,7 @@ public class GridData3 {
 
     public void setMouseCoordsOnGrid(int x, int y)
     {
-        //System.out.println("Set Mouse Coords on Grid");
+        //System.out.println("Set Mouse Coords on Grid: "+x+","+y);
         xCoordOfMouseOnGrid = x;
         yCoordOfMouseOnGrid = y;
     }
@@ -652,6 +619,34 @@ public class GridData3 {
         return highlightingYLength;
     }
 
+    public IsleBeingMovedList getToMoveList()
+    {
+        return toMoveList;
+    }
+
+    public Isle getIsle(String s, String ig)
+    {
+        Set<String> isleIDS = isleGroupList.get(ig).getIsleIDList().keySet();
+        for (String idKey : isleIDS)
+        {
+            if (idKey.compareTo(s) == 0)
+                return isleGroupList.get(ig).getIsleIDList().get(s);
+        }
+        return null;
+    }
+
+    public boolean isleGroupExists(char c)
+    {
+        Set<String> groups = isleGroupList.keySet();
+
+        for (String key : groups)
+        {
+            if (isleGroupList.get(key).getName().compareTo(c+"") == 0)
+                return true;
+        }
+        return false;
+    }
+
     /**
      * Node class with rectangle and all necessary info
      */
@@ -660,7 +655,7 @@ public class GridData3 {
         private final Rectangle r;
         private final int xCoord, yCoord;
         private double sXMinCoord, sYMinCoord, sXMaxCoord, sYMaxCoord;
-        private boolean highlighted, isIsle, nulled;
+        private boolean highlighted, isIsle, nulled, beingMoved;
         private Isle isle;
         private IsleGroup isleGroup;
         private Color color;
@@ -777,13 +772,20 @@ public class GridData3 {
                 r.setFill(c);
                 r.setStroke(Color.TRANSPARENT);
                 r.setOpacity(0.5);
+                beingMoved = hmm;
             }
             else
             {
                 r.setFill(Color.TRANSPARENT);
                 r.setStroke(Color.TRANSPARENT);
                 r.setOpacity(0.5);
+                beingMoved = hmm;
             }
+        }
+
+        public boolean isBeingMoved()
+        {
+            return beingMoved;
         }
 
         public double getsXMinCoord()
@@ -905,7 +907,7 @@ public class GridData3 {
     /**
      * Isle Group class with all necessary info
      */
-    public class IsleGroup
+    public static class IsleGroup
     {
         private final String name;
         private final Color color;
@@ -913,6 +915,7 @@ public class GridData3 {
         private final Hashtable<String, Isle> isleIDList;
         private String endCapLocationForEvenIsleIDs;
         private String backOrFloor;
+        private String directionOfIncreasingIsleSections;
 
         public IsleGroup(String n, Color c)
         {
@@ -976,15 +979,25 @@ public class GridData3 {
             }
             return false;
         }
+
+        public void setDirectionOfIncreasingIsleSections(String s)
+        {
+            directionOfIncreasingIsleSections = s;
+        }
+
+        public String getDirectionOfIncreasingIsleSections()
+        {
+            return directionOfIncreasingIsleSections;
+        }
     }
 
-    protected class IsleGroupCellList
+    protected static class IsleGroupCellList
     {
         protected IsleGroupCellNode first;
         private IsleGroupCellNode last;
         private int size;
 
-        private IsleGroupCellList()
+        protected IsleGroupCellList()
         {
             first = null;
             last = null;
@@ -996,7 +1009,7 @@ public class GridData3 {
          *
          * @param node new rectangle to add
          */
-        private void add(RNode node)
+        protected void add(RNode node)
         {
             if (size == 0)
             {
@@ -1025,7 +1038,7 @@ public class GridData3 {
         /**
          * Grouped Node class for each node in LinkedList
          */
-        protected class IsleGroupCellNode
+        protected static class IsleGroupCellNode
         {
             protected final RNode rNode;
             protected IsleGroupCellNode next;
@@ -1098,20 +1111,20 @@ public class GridData3 {
         }
     }
 
-    protected class IsleBeingMovedList
+    protected static class IsleBeingMovedList
     {
         protected IsleBeingMovedNode first;
         protected IsleBeingMovedNode last;
         private int size;
 
-        private IsleBeingMovedList()
+        public IsleBeingMovedList()
         {
             first = null;
             last = null;
             size = 0;
         }
 
-        private void add(RNode node)
+        public void add(RNode node)
         {
             if (size == 0)
             {
@@ -1127,7 +1140,7 @@ public class GridData3 {
             }
         }
 
-        private void clear()
+        public void clear()
         {
             first = null;
             last = null;

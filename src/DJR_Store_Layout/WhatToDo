@@ -1,13 +1,17 @@
 Cosas Para Hacer en Cualquier Momento:
 
-Item Location: D39(1) 1-1-1.90
-- Be able to select and move isles
+Item Location:
+D39(1)1-1-1.90
+99B103B04
 
 - Select multiple isles at a time and move them
 
-- Do departments for clothes and such
+- Custom fxml for IsleGroupSetup (like for SetupIsleInfo)
 
-- Actually Setup layout of store
+- Rezise isle
+
+- Hmmmm: For odd numbered Isles, last subsection of last section gives same location as endcap,
+    meaning that one cell at the other end will never be a location (works just fine but still could be improved)
 
 - Bug Line 542 of ActualController3: Why do I need to add 1 to each remainder??
 
