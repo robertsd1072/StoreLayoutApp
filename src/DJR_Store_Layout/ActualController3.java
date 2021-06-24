@@ -496,6 +496,7 @@ public class ActualController3 {
         moveIsle.setOnAction(actionEvent ->
         {
             rightClick2.hide();
+            g.resetHighlighted();
             isleToMove = editGroupNode.getIsle();
             GridData3.IsleBeingMovedList toMoveList = g.getToMoveList();
             if (!moving)
