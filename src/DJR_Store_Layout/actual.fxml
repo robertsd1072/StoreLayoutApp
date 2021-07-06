@@ -16,10 +16,8 @@
           <Menu fx:id="file" mnemonicParsing="false" text="File">
             <items>
               <MenuItem fx:id="resize" mnemonicParsing="false" text="Resize" />
-                  <MenuItem fx:id="reset" mnemonicParsing="false" text="Reset" />
+                  <MenuItem fx:id="back" mnemonicParsing="false" text="Back" />
                   <MenuItem fx:id="saveLayout" mnemonicParsing="false" text="Save Layout" />
-                  <MenuItem fx:id="printGroups" mnemonicParsing="false" text="Print Groups" />
-                  <MenuItem fx:id="printNulls" mnemonicParsing="false" text="Print Nulls" />
                   <MenuItem fx:id="testLocation" mnemonicParsing="false" text="Test Location" />
             </items>
           </Menu>
@@ -40,6 +38,8 @@
             <Menu fx:id="m2" mnemonicParsing="false" text="MouseY:" />
             <Menu fx:id="m3" mnemonicParsing="false" text="ScreenY:" />
             <Menu fx:id="m4" mnemonicParsing="false" text="ScreenY:" />
+            <Menu fx:id="m5" mnemonicParsing="false" text="X Coord:" />
+            <Menu fx:id="m6" mnemonicParsing="false" text="Y Coord:" />
         </menus>
       </MenuBar>
       <BorderPane prefHeight="425.0" prefWidth="800.0" VBox.vgrow="ALWAYS">

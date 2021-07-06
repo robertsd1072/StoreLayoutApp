@@ -141,7 +141,7 @@ public class SampleController2 {
                 Rectangle2D screenBounds = Screen.getPrimary().getBounds();
                 double x = screenBounds.getWidth();
                 double y = screenBounds.getHeight();
-                new ActualController3(floors, length, width, x, y-63, null).launchScene(stage);
+                new ActualController3(floors, length, width, x, y-63).launchScene(stage);
             }
             catch (ArithmeticException e)
             {

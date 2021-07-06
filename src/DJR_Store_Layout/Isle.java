@@ -10,6 +10,8 @@ public class Isle
     private IsleCellList isleCellList;
     private int numberOfIsleSections;
     private ArrayList<Integer> numberOfSubsectionsForEachSection;
+    private String endCapLocation;
+    private String directionOfIncreasingIsleSections;
 
     public Isle(String id, GridData3.IsleGroup ig, GridData3 grid)
     {
@@ -38,21 +40,23 @@ public class Isle
         return isleCellList;
     }
 
-    public void setupIsleInfo(int n, ArrayList<Integer> arr)
+    public void setupIsleInfo(int n, ArrayList<Integer> arr, String endCap, String direction)
     {
         numberOfIsleSections = n;
         numberOfSubsectionsForEachSection = arr;
+        endCapLocation = endCap;
+        directionOfIncreasingIsleSections = direction;
     }
 
     public void printInfo()
     {
         System.out.println("IsleID: "+isleID);
         System.out.println("IsleGroup: "+isleGroup.getName());
-        System.out.println("EndCap Location For Even Isles: "+isleGroup.getEndCapLocationForEvenIsleIDs());
         System.out.println("Back or FLoor: "+isleGroup.getBackOrFloor());
-        System.out.println("Direction: "+isleGroup.getDirectionOfIncreasingIsleSections());
-        if (numberOfIsleSections > 0)
+        if (hasSetupInfo())
         {
+            System.out.println("EndCap Location: "+endCapLocation);
+            System.out.println("Direction: "+directionOfIncreasingIsleSections);
             System.out.println("Number Of Isle Sections: "+numberOfIsleSections);
             for (int i=0; i<numberOfSubsectionsForEachSection.size(); i++)
             {
@@ -68,92 +72,56 @@ public class Isle
         return numberOfIsleSections;
     }
 
-    public String getCoordsGivenLocation(int isleSection, String isleSubsection, String backOrFloor)
+    public String getCoordsGivenLocationInBack(int isleSection, String isleSubsection)
     {
-        if (backOrFloor.compareTo("back") == 0)
-        {
-            System.out.println("Isle in the Back");
-            if (isleSection == 1)
-            {
-                //"A" numeric value is 10 so if subsection is A then whatSubection = 1.
-                //If subsection is B then whatSubsection = 2, and so on.
-                int whatSubsection = Character.getNumericValue(isleSubsection.charAt(0))-9;
+        //"A" numeric value is 10 so if subsection is A then whatSubection = 1.
+        //If subsection is B then whatSubsection = 2, and so on.
+        int whatSubsection = Character.getNumericValue(isleSubsection.charAt(0))-9;
 
-                System.out.println("Returning from Section and Subsection");
-                return getIsleCoordsGivenSectionAndSubsection(1, whatSubsection, isleGroup.getDirectionOfIncreasingIsleSections());
+        System.out.println("Returning from Section and Subsection");
+        return getIsleCoordsGivenSectionAndSubsection(1, whatSubsection);
+    }
+
+    public String getCoordsGivenLocationOnFloor(int isleSection, String isleSubsection)
+    {
+        try
+        {
+            int hmm = Integer.parseInt(isleID.charAt(1)+"");
+            System.out.println("Isle not clothes");
+
+            if (isleSection == 0)
+            {
+                System.out.println("Returning cuz at endcap");
+                if (endCapLocation.compareTo("west") == 0)
+                {
+                    return getIsleCoordsGivenEndcap("west");
+                }
+                if (endCapLocation.compareTo("south") == 0)
+                {
+                    return getIsleCoordsGivenEndcap("south");
+                }
+                if (endCapLocation.compareTo("east") == 0)
+                {
+                    return getIsleCoordsGivenEndcap("east");
+                }
+                if (endCapLocation.compareTo("north") == 0)
+                {
+                    return getIsleCoordsGivenEndcap("north");
+                }
             }
             else
             {
-                throw new RuntimeException("Isle Section for Location Find must be 1 for Isles in the Back: There are no Endcaps for Isles in the Back.");
+                System.out.println("Returning using Section and Subsection");
+                return getIsleCoordsGivenSectionAndSubsection(isleSection, Integer.parseInt(isleSubsection));
             }
         }
-        else
+        catch (NumberFormatException e)
         {
-            System.out.println("Isle on the Floor");
-            try
-            {
-                int hmm = Integer.parseInt(isleID.charAt(1)+"");
-                System.out.println("Isle not clothes");
-
-                if (isleSection == 0)
-                {
-                    System.out.println("Returning from endcap");
-                    String endcap = isleGroup.getEndCapLocationForEvenIsleIDs();
-                    int lastDigit = Integer.parseInt(isleID.charAt(isleID.length()-1)+"");
-                    if (lastDigit % 2 == 0)
-                    {
-                        if (endcap.compareTo("left") == 0)
-                        {
-                            return getIsleCoordsGivenEndcap("leftest");
-                        }
-                        if (endcap.compareTo("bottom") == 0)
-                        {
-                            return getIsleCoordsGivenEndcap("bottom most");
-                        }
-                        if (endcap.compareTo("right") == 0)
-                        {
-                            return getIsleCoordsGivenEndcap("rightest");
-                        }
-                        if (endcap.compareTo("top") == 0)
-                        {
-                            return getIsleCoordsGivenEndcap("top most");
-                        }
-                    }
-                    else if (lastDigit % 2 == 1)
-                    {
-                        if (endcap.compareTo("left") == 0)
-                        {
-                            return getIsleCoordsGivenEndcap("rightest");
-                        }
-                        if (endcap.compareTo("bottom") == 0)
-                        {
-                            return getIsleCoordsGivenEndcap("top most");
-                        }
-                        if (endcap.compareTo("right") == 0)
-                        {
-                            return getIsleCoordsGivenEndcap("leftest");
-                        }
-                        if (endcap.compareTo("top") == 0)
-                        {
-                            return getIsleCoordsGivenEndcap("bottom most");
-                        }
-                    }
-                }
-                else
-                {
-                    System.out.println("Returning from Section and Subsection");
-                    return getIsleCoordsGivenSectionAndSubsection(isleSection, Integer.parseInt(isleSubsection), isleGroup.getDirectionOfIncreasingIsleSections());
-                }
-            }
-            catch (NumberFormatException e)
-            {
-                System.out.println("Isle is clothes");
-                return "closest";
-            }
+            System.out.println("Isle is clothes");
+            return "closest";
         }
 
-        System.out.println("getCoordsGivenLocation not setup yet");
-        return "getCoordsGivenLocation not setup yet";
+        return "getCoordsGivenLocationOnFloor didn't work";
     }
 
     private String getIsleCoordsGivenEndcap(String where)
@@ -161,7 +129,7 @@ public class Isle
         //System.out.println("Endcap where: "+where);
         IsleCellList.IsleCellNode nodeToReturnCoords = null;
 
-        if (where.compareTo("bottom most") == 0)
+        if (where.compareTo("south") == 0)
         {
             int furthestYCoord = 0;
 
@@ -177,7 +145,7 @@ public class Isle
             }
             return nodeToReturnCoords.getrNode().getX()+","+nodeToReturnCoords.getrNode().getY();
         }
-        if (where.compareTo("top most") == 0)
+        if (where.compareTo("north") == 0)
         {
             int nearestYCoord = 10000000;
 
@@ -193,7 +161,7 @@ public class Isle
             }
             return nodeToReturnCoords.getrNode().getX()+","+nodeToReturnCoords.getrNode().getY();
         }
-        if (where.compareTo("leftest") == 0)
+        if (where.compareTo("west") == 0)
         {
             int nearestXCoord = 10000000;
 
@@ -209,7 +177,7 @@ public class Isle
             }
             return nodeToReturnCoords.getrNode().getX()+","+nodeToReturnCoords.getrNode().getY();
         }
-        if (where.compareTo("rightest") == 0)
+        if (where.compareTo("east") == 0)
         {
             int furthestXCoord = 0;
 
@@ -240,53 +208,63 @@ public class Isle
         return numberOfCells;
     }
 
-    private String getIsleCoordsGivenSectionAndSubsection(int whatSection, int whatSubsection, String direction)
+    private String getIsleCoordsGivenSectionAndSubsection(int whatSection, int whatSubsection)
     {
         //If Isle is in the Back or with Only One Section
         if (whatSection == 1 && numberOfIsleSections == 2)
         {
             System.out.println("Just 2 Sections: Simple Version");
-            if (direction.compareTo("left to right") == 0)
+            System.out.println("Direction: "+directionOfIncreasingIsleSections);
+
+            if (directionOfIncreasingIsleSections.compareTo("right") == 0)
             {
-                String s = getIsleCoordsGivenEndcap("leftest");
+                String s = getIsleCoordsGivenEndcap("west");
                 String[] coords = s.split(",");
                 int x = Integer.parseInt(coords[0]);
                 int y = Integer.parseInt(coords[1]);
 
-                int xToReturn = x+(getCellsToSubsection()*whatSubsection);
+                int xToReturn = (int) (x+(getCellsToSubsection()*whatSubsection));
+                if (endCapLocation.compareTo("west") != 0)
+                    xToReturn--;
 
                 return xToReturn+","+y;
             }
-            if (direction.compareTo("bottom to top") == 0)
+            if (directionOfIncreasingIsleSections.compareTo("up") == 0)
             {
-                String s = getIsleCoordsGivenEndcap("bottom most");
+                String s = getIsleCoordsGivenEndcap("south");
                 String[] coords = s.split(",");
                 int x = Integer.parseInt(coords[0]);
                 int y = Integer.parseInt(coords[1]);
 
-                int yToReturn = y-(getCellsToSubsection()*whatSubsection);
+                int yToReturn = (int) (y-(getCellsToSubsection()*whatSubsection));
+                if (endCapLocation.compareTo("south") != 0)
+                    yToReturn++;
 
                 return x+","+yToReturn;
             }
-            if (direction.compareTo("right to left") == 0)
+            if (directionOfIncreasingIsleSections.compareTo("left") == 0)
             {
-                String s = getIsleCoordsGivenEndcap("rightest");
+                String s = getIsleCoordsGivenEndcap("east");
                 String[] coords = s.split(",");
                 int x = Integer.parseInt(coords[0]);
                 int y = Integer.parseInt(coords[1]);
 
-                int xToReturn = x-(getCellsToSubsection()*whatSubsection);
+                int xToReturn = (int) (x-(getCellsToSubsection()*whatSubsection));
+                if (endCapLocation.compareTo("east") != 0)
+                    xToReturn++;
 
                 return xToReturn+","+y;
             }
-            if (direction.compareTo("top to bottom") == 0)
+            if (directionOfIncreasingIsleSections.compareTo("down") == 0)
             {
-                String s = getIsleCoordsGivenEndcap("top most");
+                String s = getIsleCoordsGivenEndcap("north");
                 String[] coords = s.split(",");
                 int x = Integer.parseInt(coords[0]);
                 int y = Integer.parseInt(coords[1]);
 
-                int yToReturn = y+(getCellsToSubsection()*whatSubsection);
+                int yToReturn = (int) (y+(getCellsToSubsection()*whatSubsection));
+                if (endCapLocation.compareTo("north") != 0)
+                    yToReturn--;
 
                 return x+","+yToReturn;
             }
@@ -295,11 +273,12 @@ public class Isle
         else
         {
             System.out.println("Multiple Sections: Complex Version");
-            int cellsToSubsection = getCellsToSubsection();
+            float cellsToSubsection = getCellsToSubsection();
+            System.out.println("Cells to Subsection: "+cellsToSubsection);
 
-            if (direction.compareTo("left to right") == 0)
+            if (directionOfIncreasingIsleSections.compareTo("right") == 0)
             {
-                String s = getIsleCoordsGivenEndcap("leftest");
+                String s = getIsleCoordsGivenEndcap("west");
                 String[] coords = s.split(",");
                 int x = Integer.parseInt(coords[0]);
                 int y = Integer.parseInt(coords[1]);
@@ -308,26 +287,44 @@ public class Isle
                 for (int i=1; i<whatSection+1; i++)
                 {
                     if (i==whatSection)
+                    {
                         xToReturn+=whatSubsection*cellsToSubsection;
+                    }
                     else
+                    {
                         xToReturn+=(numberOfSubsectionsForEachSection.get(i)*cellsToSubsection);
+                    }
                 }
+
+                if (endCapLocation.compareTo("west") != 0)
+                    xToReturn--;
+
                 return xToReturn+","+y;
             }
-            if (direction.compareTo("bottom to top") == 0)
+            if (directionOfIncreasingIsleSections.compareTo("up") == 0)
             {
-                String s = getIsleCoordsGivenEndcap("bottom most");
+                String s = getIsleCoordsGivenEndcap("south");
                 String[] coords = s.split(",");
                 int x = Integer.parseInt(coords[0]);
                 int y = Integer.parseInt(coords[1]);
 
-                int yToReturn = y-(getCellsToSubsection()*whatSubsection);
+                int yToReturn = y;
+                for (int i=1; i<whatSection+1; i++)
+                {
+                    if (i==whatSection)
+                        yToReturn-=whatSubsection*cellsToSubsection;
+                    else
+                        yToReturn-=(numberOfSubsectionsForEachSection.get(i)*cellsToSubsection);
+                }
+
+                if (endCapLocation.compareTo("south") != 0)
+                    yToReturn++;
 
                 return x+","+yToReturn;
             }
-            if (direction.compareTo("right to left") == 0)
+            if (directionOfIncreasingIsleSections.compareTo("left") == 0)
             {
-                String s = getIsleCoordsGivenEndcap("rightest");
+                String s = getIsleCoordsGivenEndcap("east");
                 String[] coords = s.split(",");
                 int x = Integer.parseInt(coords[0]);
                 int y = Integer.parseInt(coords[1]);
@@ -340,16 +337,30 @@ public class Isle
                     else
                         xToReturn-=(numberOfSubsectionsForEachSection.get(i)*cellsToSubsection);
                 }
+
+                if (endCapLocation.compareTo("east") != 0)
+                    xToReturn++;
+
                 return xToReturn+","+y;
             }
-            if (direction.compareTo("top to bottom") == 0)
+            if (directionOfIncreasingIsleSections.compareTo("down") == 0)
             {
-                String s = getIsleCoordsGivenEndcap("top most");
+                String s = getIsleCoordsGivenEndcap("north");
                 String[] coords = s.split(",");
                 int x = Integer.parseInt(coords[0]);
                 int y = Integer.parseInt(coords[1]);
 
-                int yToReturn = y+(getCellsToSubsection()*whatSubsection);
+                int yToReturn = y;
+                for (int i=1; i<whatSection+1; i++)
+                {
+                    if (i==whatSection)
+                        yToReturn+=whatSubsection*cellsToSubsection;
+                    else
+                        yToReturn+=(numberOfSubsectionsForEachSection.get(i)*cellsToSubsection);
+                }
+
+                if (endCapLocation.compareTo("north") != 0)
+                    yToReturn--;
 
                 return x+","+yToReturn;
             }
@@ -357,14 +368,47 @@ public class Isle
         return "Get Subsection Coord didnt work";
     }
 
-    public int getCellsToSubsection()
+    public float getCellsToSubsection()
     {
         int totalNumberOfSubsections = 0;
         //Skip isle section 0 cuz endcap.
         for (int i=1; i<numberOfSubsectionsForEachSection.size(); i++)
             totalNumberOfSubsections+=numberOfSubsectionsForEachSection.get(i);
 
-        return getNumberOfCellsInIsle()/totalNumberOfSubsections;
+        return (float) getNumberOfCellsInIsle()/totalNumberOfSubsections;
+    }
+
+    public String getEndCapLocation()
+    {
+        return endCapLocation;
+    }
+
+    public String getDirectionOfIncreasingIsleSections()
+    {
+        return directionOfIncreasingIsleSections;
+    }
+
+    public boolean hasSetupInfo()
+    {
+        return numberOfIsleSections > 0;
+    }
+
+    public ArrayList<Integer> getNumberOfSubsectionsForEachSection()
+    {
+        return numberOfSubsectionsForEachSection;
+    }
+
+    public boolean inputingValidIsleLocation(int isleSection, String isleSubsection)
+    {
+        int isleSubsec = Integer.parseInt(isleSubsection);
+        try
+        {
+            return isleSection <= numberOfIsleSections && isleSubsec <= numberOfSubsectionsForEachSection.get(isleSection);
+        }
+        catch (IndexOutOfBoundsException e)
+        {
+            return false;
+        }
     }
 
     public static class IsleCellList

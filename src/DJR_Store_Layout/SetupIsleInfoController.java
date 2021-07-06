@@ -18,12 +18,12 @@ public class SetupIsleInfoController
     private Stage stage;
     public VBox theV, vboxOfTexts;
     public Button addSection, done;
-    public TextField text0, text1;
+    public TextField text0, text1, textA, textB;
     private GridData3 g;
     private Isle isle;
     private int numberOfIsleSections;
-    private ArrayList<Integer> numberOfSubsectionsForEachSection;
-    private ArrayList<TextField> textFields;
+    private final ArrayList<Integer> numberOfSubsectionsForEachSection;
+    private final ArrayList<TextField> textFields;
 
     public SetupIsleInfoController()
     {
@@ -35,7 +35,6 @@ public class SetupIsleInfoController
 
     public void initialize()
     {
-
         textFields.add(text0);
         textFields.add(text1);
     }
@@ -45,6 +44,16 @@ public class SetupIsleInfoController
         g = grid;
         isle = i;
         stage = s;
+
+        stage.setOnCloseRequest(windowEvent ->
+        {
+            Isle.IsleCellList.IsleCellNode curr = isle.getIsleCellList().getFirst();
+            while (curr != null)
+            {
+                curr.getrNode().getR().setOpacity(1.0);
+                curr = curr.getNext();
+            }
+        });
     }
 
     public void addSection()
@@ -82,7 +91,7 @@ public class SetupIsleInfoController
                 VBox warningVbox = new VBox();
                 warningVbox.setSpacing(5);
                 warningVbox.setAlignment(Pos.CENTER);
-                Label warningLabel = new Label("Please Enter Valid Numbers for Each Field");
+                Label warningLabel = new Label("Enter Valid Numbers for Each Isle Section Field");
                 Button ok = new Button("Ok");
                 ok.setOnAction(actionEvent -> warningStage.hide());
                 warningVbox.getChildren().addAll(warningLabel, ok);
@@ -91,7 +100,33 @@ public class SetupIsleInfoController
                 warningStage.show();
             }
         }
-        isle.setupIsleInfo(numberOfIsleSections, numberOfSubsectionsForEachSection);
-        stage.hide();
+        if (textA.getText().compareTo("north") != 0 || textA.getText().compareTo("south") != 0 || textA.getText().compareTo("west") != 0 || textA.getText().compareTo("east") != 0
+                || textB.getText().compareTo("north") != 0 || textB.getText().compareTo("south") != 0 || textB.getText().compareTo("west") != 0 || textB.getText().compareTo("east") != 0)
+        {
+            isle.setupIsleInfo(numberOfIsleSections, numberOfSubsectionsForEachSection, textA.getText(), textB.getText());
+            Isle.IsleCellList.IsleCellNode curr = isle.getIsleCellList().getFirst();
+            while (curr != null)
+            {
+                curr.getrNode().getR().setOpacity(1.0);
+                curr = curr.getNext();
+            }
+            stage.hide();
+        }
+        else
+        {
+            Stage warningStage = new Stage();
+            warningStage.initModality(Modality.APPLICATION_MODAL);
+            warningStage.initOwner(stage);
+            VBox warningVbox = new VBox();
+            warningVbox.setSpacing(5);
+            warningVbox.setAlignment(Pos.CENTER);
+            Label warningLabel = new Label("Enter Only: \"top\",\"bottom\",\"right\",\"left\"");
+            Button ok = new Button("Ok");
+            ok.setOnAction(actionEvent -> warningStage.hide());
+            warningVbox.getChildren().addAll(warningLabel, ok);
+            Scene cellSizeScene = new Scene(warningVbox);
+            warningStage.setScene(cellSizeScene);
+            warningStage.show();
+        }
     }
 }
