@@ -74,6 +74,10 @@ public class GridData3 {
      * Cell coordinate corresponding to mouse on screen
      */
     protected int xCoordOfMouseOnGrid, yCoordOfMouseOnGrid;
+    /**
+     * Nodes of start/end points of picking: useful for determining quickest path
+     */
+    protected RNode opuStartEndNode, regStartEndNode;
 
     /**
      * Basic constructor
@@ -272,7 +276,7 @@ public class GridData3 {
                 {
                     try
                     {
-                        if (!grid[xCoord-i][yCoord-j].isIsle() && !grid[xCoord-i][yCoord-j].isNulled())
+                        if (!grid[xCoord-i][yCoord-j].isIsle() && !grid[xCoord-i][yCoord-j].isNulled() && !nodeIsPickPoint(xCoord-i, yCoord-j))
                             grid[xCoord-i][yCoord-j].setHighlighted(true);
                     }
                     catch (IndexOutOfBoundsException ignored) {}
@@ -290,7 +294,7 @@ public class GridData3 {
                 {
                     try
                     {
-                        if (!grid[xCoord-i][yCoord+j].isIsle() && !grid[xCoord-i][yCoord+j].isNulled())
+                        if (!grid[xCoord-i][yCoord+j].isIsle() && !grid[xCoord-i][yCoord+j].isNulled() && !nodeIsPickPoint(xCoord-i, yCoord+j))
                             grid[xCoord-i][yCoord+j].setHighlighted(true);
                     }
                     catch (IndexOutOfBoundsException ignored) {}
@@ -308,7 +312,7 @@ public class GridData3 {
                 {
                     try
                     {
-                        if (!grid[xCoord+i][yCoord-j].isIsle() && !grid[xCoord+i][yCoord-j].isNulled())
+                        if (!grid[xCoord+i][yCoord-j].isIsle() && !grid[xCoord+i][yCoord-j].isNulled() && !nodeIsPickPoint(xCoord+i, yCoord-j))
                             grid[xCoord+i][yCoord-j].setHighlighted(true);
                     }
                     catch (IndexOutOfBoundsException ignored) {}
@@ -326,7 +330,7 @@ public class GridData3 {
                 {
                     try
                     {
-                        if (!grid[xCoord+i][yCoord+j].isIsle() && !grid[xCoord+i][yCoord+j].isNulled())
+                        if (!grid[xCoord+i][yCoord+j].isIsle() && !grid[xCoord+i][yCoord+j].isNulled() && !nodeIsPickPoint(xCoord+i, yCoord+j))
                             grid[xCoord+i][yCoord+j].setHighlighted(true);
                     }
                     catch (IndexOutOfBoundsException ignored) {}
@@ -871,6 +875,63 @@ public class GridData3 {
         highlightedNullList.clear();
     }
 
+    public void setOPUstartEndNode(RNode rNode, boolean hmm)
+    {
+        resetHighlighted();
+        if (hmm)
+        {
+            opuStartEndNode = rNode;
+            rNode.getR().setFill(Color.RED);
+            rNode.getR().setStroke(Color.RED);
+            rNode.getR().setOpacity(1.0);
+        }
+        else
+        {
+            rNode.getR().setFill(Color.TRANSPARENT);
+            rNode.getR().setStroke(Color.TRANSPARENT);
+            rNode.getR().setOpacity(0.5);
+        }
+    }
+
+    public void setRegStartEndNode(RNode rNode, boolean hmm)
+    {
+        resetHighlighted();
+        if (hmm)
+        {
+            regStartEndNode = rNode;
+            rNode.getR().setFill(Color.RED);
+            rNode.getR().setStroke(Color.RED);
+            rNode.getR().setOpacity(1.0);
+        }
+        else
+        {
+            rNode.getR().setFill(Color.TRANSPARENT);
+            rNode.getR().setStroke(Color.TRANSPARENT);
+            rNode.getR().setOpacity(0.5);
+        }
+    }
+
+    public boolean nodeIsPickPoint(int x, int y)
+    {
+        try
+        {
+            int opuX = opuStartEndNode.getX();
+            int opuY = opuStartEndNode.getY();
+
+            if (x == opuX && y == opuY)
+                return true;
+
+            int regX = regStartEndNode.getX();
+            int regY = regStartEndNode.getY();
+
+            if (x == regX && y == regY)
+                return true;
+        }
+        catch (NullPointerException ignored) {}
+
+        return false;
+    }
+
     /**
      * Node class with rectangle and all necessary info
      */
@@ -980,8 +1041,8 @@ public class GridData3 {
             nulled = hmm;
             if (hmm)
             {
-                r.setFill(Color.RED);
-                r.setStroke(Color.RED);
+                r.setFill(Color.BLACK);
+                r.setStroke(Color.BLACK);
                 r.setOpacity(1.0);
             }
             else
@@ -1128,19 +1189,9 @@ public class GridData3 {
             size = 0;
         }
 
-        private void removeNode(HighlightedNode previous, HighlightedNode toRemove)
+        public int size()
         {
-            previous.next = toRemove.next;
-        }
-
-        private void removeFirst()
-        {
-            first = first.next;
-        }
-
-        private void removeLast(HighlightedNode previous)
-        {
-            last = previous;
+            return size;
         }
 
         /**

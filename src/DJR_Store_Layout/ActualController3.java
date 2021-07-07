@@ -41,7 +41,7 @@ public class ActualController3 {
      * FXML variables
      */
     public HBox hboxWithThePluses, hboxWithTheCells;
-    public MenuItem resize, back, saveLayout, testLocation, setupInfoMenu;
+    public MenuItem resize, back, saveLayout, testLocation, setupInfoMenu, setupOPUstartEnd, setupRegularPickStartEnd;
     public Menu file, m1, m2, m3, m4, m5, m6;
     public MenuBar menuBar;
     public Pane topPthatHelpsPluses, botPthatHelpsPluses, leftPthatHelpsPluses, rightPthatHelpsPluses, topPthatHelpsCells, botPthatHelpsCells, leftPthatHelpsCells, rightPthatHelpsCells;
@@ -58,7 +58,7 @@ public class ActualController3 {
     private float cellSizeInFeet;
     private double sX, sY, xRemainderSize1, yRemainderSize1, mouseX, mouseY;
     private final double finalSizeOfCells;
-    private boolean highlighting, moving, showingSetupInfoMenu;
+    private boolean highlighting, moving, showingSetupInfoMenu, showingSetOPUstartEnd, showingSetRegStartEnd;
     private GridData3.RNode editGroupNode;
     private Isle isleToMove;
     private SetupIsleInfoController setupInfoStuff;
@@ -144,6 +144,7 @@ public class ActualController3 {
         ArrayList<ArrayList<Hashtable<String, String>>> listOfIslesWithCells = new ArrayList<>();
         ArrayList<ArrayList<Hashtable<String, InfoToMakeIsleFromFile>>> listOfIslesWithSetupInfo = new ArrayList<>();
         String cellsToNull = null;
+        String[] startAndEndPickPoints = new String[2];
         try
         {
             Scanner scanner = new Scanner(file);
@@ -239,8 +240,36 @@ public class ActualController3 {
                 }
                 else
                 {
-                    if (scanner.hasNext())
-                        cellsToNull = scanner.nextLine();
+                    String string = scanner.nextLine();
+                    try
+                    {
+                        int hmm = Integer.parseInt(string.charAt(0)+"");
+                        cellsToNull = string;
+                    }
+                    catch (NumberFormatException ignored) {}
+
+                    String string1 = scanner.nextLine();
+                    String[] opuStartEnd = string1.split(":");
+                    try
+                    {
+                        startAndEndPickPoints[0] = opuStartEnd[1];
+                    }
+                    catch (ArrayIndexOutOfBoundsException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    String next = scanner.nextLine();
+                    String[] regStartEnd = next.split(":");
+                    try
+                    {
+                        startAndEndPickPoints[1] = regStartEnd[1];
+                    }
+                    catch (ArrayIndexOutOfBoundsException e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    break;
                 }
             }
             scanner.close();
@@ -283,7 +312,7 @@ public class ActualController3 {
             throw new RuntimeException(ex);
         }
 
-        initializeFromFile(isleGroupNames, isleGroupColors, backOrFloorArr, listOfIslesWithCells, listOfIsleIDs, listOfIslesWithSetupInfo, cellsToNull);
+        initializeFromFile(isleGroupNames, isleGroupColors, backOrFloorArr, listOfIslesWithCells, listOfIsleIDs, listOfIslesWithSetupInfo, cellsToNull, startAndEndPickPoints);
     }
 
     /**
@@ -386,10 +415,11 @@ public class ActualController3 {
      * @param listOfIslesWithCells cells making up each isle for each isle group
      * @param listOfIsleIDs isleIDs corresponding to cells
      * @param listOfIslesWithSetupInfo if an isle is setup with location info, stored here
-     * @param cellsToNull cells to fill in or null
+     * @param startAndEndPickPoints index 0 is coords of OPU start/end, index 1 is coords of Regular start/end
      */
-    private void initializeFromFile(ArrayList<String> groupNames, ArrayList<Color> groupColors, ArrayList<String> backOrFloorArr, ArrayList<ArrayList<Hashtable<String, String>>> listOfIslesWithCells,
-                                    ArrayList<ArrayList<String>> listOfIsleIDs, ArrayList<ArrayList<Hashtable<String, InfoToMakeIsleFromFile>>> listOfIslesWithSetupInfo, String cellsToNull)
+    private void initializeFromFile(ArrayList<String> groupNames, ArrayList<Color> groupColors, ArrayList<String> backOrFloorArr, ArrayList<ArrayList<Hashtable<String,
+                                    String>>> listOfIslesWithCells, ArrayList<ArrayList<String>> listOfIsleIDs, ArrayList<ArrayList<Hashtable<String, InfoToMakeIsleFromFile>>> listOfIslesWithSetupInfo,
+                                    String cellsToNull, String[] startAndEndPickPoints)
     {
         theV.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
         sP.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
@@ -432,7 +462,7 @@ public class ActualController3 {
 
         drawPluses(finalSizeOfCells, hboxWithThePluses);
 
-        loadCellsFromFile(finalSizeOfCells, hboxWithTheCells, groupNames, groupColors, backOrFloorArr, listOfIslesWithCells, listOfIsleIDs, listOfIslesWithSetupInfo, cellsToNull);
+        loadCellsFromFile(finalSizeOfCells, hboxWithTheCells, groupNames, groupColors, backOrFloorArr, listOfIslesWithCells, listOfIsleIDs, listOfIslesWithSetupInfo, cellsToNull, startAndEndPickPoints);
     }
 
     /**
@@ -526,6 +556,12 @@ public class ActualController3 {
             setupInfoStuff.setImportantInfo(g, editGroupNode.getIsle(), inputStage);
         });
         showingSetupInfoMenu = false;
+        setupOPUstartEnd = new MenuItem("Set OPU Start/End Point");
+        setupOPUstartEnd.setOnAction(actionEvent -> g.setOPUstartEndNode(g.highlightedList.first.rNode, true));
+        setupRegularPickStartEnd = new MenuItem("Set Regular Pick Start/End");
+        setupRegularPickStartEnd.setOnAction(actionEvent -> g.setRegStartEndNode(g.highlightedList.first.rNode, true));
+        showingSetOPUstartEnd = false;
+        showingSetRegStartEnd = false;
 
         rightClick3 = new ContextMenu();
         MenuItem unnull = new MenuItem("Remove null");
@@ -688,10 +724,12 @@ public class ActualController3 {
      * @param listOfIsleIDs isleIDs corresponding to cells
      * @param listOfIslesWithSetupInfo if an isle is setup with location info, stored here
      * @param cellsToNull cells to fill in or null
+     * @param startAndEndPickPoints index 0 is coords of OPU start/end, index 1 is coords of Regular start/end
      */
     private void loadCellsFromFile(double z, HBox hbox2, ArrayList<String> groupNames, ArrayList<Color> groupColors, ArrayList<String> backOrFloorArr,
                                    ArrayList<ArrayList<Hashtable<String, String>>> listOfIslesWithCells, ArrayList<ArrayList<String>> listOfIsleIDs,
-                                   ArrayList<ArrayList<Hashtable<String, InfoToMakeIsleFromFile>>> listOfIslesWithSetupInfo, String cellsToNull)
+                                   ArrayList<ArrayList<Hashtable<String, InfoToMakeIsleFromFile>>> listOfIslesWithSetupInfo, String cellsToNull,
+                                   String[] startAndEndPickPoints)
     {
         double startX = xRemainderSize1;
         double startY = yRemainderSize1+25;
@@ -769,6 +807,31 @@ public class ActualController3 {
                 g.setCelltoNull(Integer.parseInt(nullCoords[j]), Integer.parseInt(nullCoords[j+1]));
             }
         }
+
+        try
+        {
+            System.out.println("OPU Start/End: "+startAndEndPickPoints[0]);
+            String[] opuCoords = startAndEndPickPoints[0].split(",");
+            int opuX = Integer.parseInt(opuCoords[0]);
+            int opuY = Integer.parseInt(opuCoords[1]);
+            g.setOPUstartEndNode(g.getRNode(opuX, opuY), true);
+        }
+        catch (Exception e)
+        {
+            System.out.println("No start/end location for OPU");
+        }
+        try
+        {
+            String[] regCoords = startAndEndPickPoints[1].split(",");
+            System.out.println("Reg Start/End: "+startAndEndPickPoints[1]);
+            int regX = Integer.parseInt(regCoords[0]);
+            int regY = Integer.parseInt(regCoords[1]);
+            g.setRegStartEndNode(g.getRNode(regX, regY), true);
+        }
+        catch (Exception e)
+        {
+            System.out.println("No start/end location for Regular Pick");
+        }
     }
 
     /**
@@ -799,7 +862,8 @@ public class ActualController3 {
             }
             else if (!node.isNulled() && !node.isBeingMoved())
             {
-                r.setFill(Color.GRAY);
+                if (!g.nodeIsPickPoint(node.getX(), node.getY()))
+                    r.setFill(Color.GRAY);
             }
         });
         r.setOnMouseExited(mouseEvent ->
@@ -815,7 +879,8 @@ public class ActualController3 {
             }
             else if (!node.isNulled())
             {
-                r.setFill(Color.TRANSPARENT);
+                if (!g.nodeIsPickPoint(node.getX(), node.getY()))
+                    r.setFill(Color.TRANSPARENT);
             }
         });
         r.setOnMouseClicked(mouseEvent ->
@@ -824,6 +889,29 @@ public class ActualController3 {
             {
                 if (node.isHighlighted())
                 {
+                    if (g.highlightedList.size() == 1)
+                    {
+                        if (g.opuStartEndNode != null)
+                            rightClick.getItems().remove(setupOPUstartEnd);
+                        if (g.regStartEndNode != null)
+                            rightClick.getItems().remove(setupRegularPickStartEnd);
+
+                        if (!showingSetOPUstartEnd && g.opuStartEndNode == null)
+                            rightClick.getItems().add(setupOPUstartEnd);
+                        showingSetOPUstartEnd = true;
+                        if (!showingSetRegStartEnd && g.regStartEndNode == null)
+                            rightClick.getItems().add(setupRegularPickStartEnd);
+                        showingSetRegStartEnd = true;
+                    }
+                    else
+                    {
+                        if (showingSetOPUstartEnd)
+                            rightClick.getItems().remove(setupOPUstartEnd);
+                        showingSetOPUstartEnd = false;
+                        if (showingSetRegStartEnd)
+                            rightClick.getItems().remove(setupRegularPickStartEnd);
+                        showingSetRegStartEnd = false;
+                    }
                     rightClick.show(r, mouseEvent.getScreenX(), mouseEvent.getScreenY());
                 }
                 else if (node.isIsle())
@@ -871,6 +959,10 @@ public class ActualController3 {
                     {
                         node.getIsle().printInfo();
                     }
+                    if (g.nodeIsPickPoint(node.getX(), node.getY()))
+                    {
+                        System.out.println("Cell is Pick Point");
+                    }
                     else
                     {
                         System.out.println("No Isle/IsleGroup");
@@ -888,7 +980,7 @@ public class ActualController3 {
         });
         r.setOnMouseDragged(mouseEvent ->
         {
-            if (mouseEvent.getButton() == MouseButton.PRIMARY && !node.isNulled())
+            if (mouseEvent.getButton() == MouseButton.PRIMARY && !node.isNulled() && !g.nodeIsPickPoint(node.getX(), node.getY()))
             {
                 if (!highlighting)
                 {
@@ -1241,9 +1333,24 @@ public class ActualController3 {
 
             fileStream.println("Nulls");
             Set<String> nulls = g.nullList.keySet();
-            for (String key : nulls)
-                fileStream.print(key+",");
-            fileStream.print("\n");
+            if (nulls.size() > 0)
+            {
+                for (String key : nulls)
+                    fileStream.print(key+",");
+                fileStream.print("\n");
+            }
+            else
+                fileStream.println("No nulls to null");
+
+            if (g.opuStartEndNode == null)
+                fileStream.println("No OPU start/end");
+            else
+                fileStream.println("OPU start/end:"+g.opuStartEndNode.getX()+","+g.opuStartEndNode.getY());
+
+            if (g.regStartEndNode == null)
+                fileStream.println("No Regular start/end");
+            else
+                fileStream.println("Regular start/end:"+g.regStartEndNode.getX()+","+g.regStartEndNode.getY());
 
             fileStream.close();
         }
