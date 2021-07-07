@@ -1,3 +1,11 @@
+/**
+ * Isle class for retaining all information for an isle
+ * This includes isle info pertaining to: isle sections and isle subsections
+ * Also retrieves cell within isle corresponding to location string of an item
+ *
+ * @author David Roberts
+ */
+
 package DJR_Store_Layout;
 
 import java.util.ArrayList;
@@ -11,8 +19,18 @@ public class Isle
     private int numberOfIsleSections;
     private ArrayList<Integer> numberOfSubsectionsForEachSection;
     private String endCapLocation;
+    /**
+     * Given by up/down/left/right
+     */
     private String directionOfIncreasingIsleSections;
 
+    /**
+     * Basic Constructor
+     *
+     * @param id id of isle
+     * @param ig isle group
+     * @param grid grid data class
+     */
     public Isle(String id, GridData3.IsleGroup ig, GridData3 grid)
     {
         isleID = id;
@@ -40,6 +58,14 @@ public class Isle
         return isleCellList;
     }
 
+    /**
+     * Setups isle info for sections and subsections
+     *
+     * @param n number of isle sections
+     * @param arr number of subsections for each section
+     * @param endCap location
+     * @param direction direction of increasing sections
+     */
     public void setupIsleInfo(int n, ArrayList<Integer> arr, String endCap, String direction)
     {
         numberOfIsleSections = n;
@@ -48,6 +74,9 @@ public class Isle
         directionOfIncreasingIsleSections = direction;
     }
 
+    /**
+     * Prints to debug isle info
+     */
     public void printInfo()
     {
         System.out.println("IsleID: "+isleID);
@@ -72,6 +101,13 @@ public class Isle
         return numberOfIsleSections;
     }
 
+    /**
+     * Finds cell within isle that corresponds to given item location in back
+     *
+     * @param isleSection isle sections
+     * @param isleSubsection isle subsection
+     * @return String of coords for cell
+     */
     public String getCoordsGivenLocationInBack(int isleSection, String isleSubsection)
     {
         //"A" numeric value is 10 so if subsection is A then whatSubection = 1.
@@ -82,6 +118,13 @@ public class Isle
         return getIsleCoordsGivenSectionAndSubsection(1, whatSubsection);
     }
 
+    /**
+     * Finds cell within isle that corresponds to given item location on floor
+     *
+     * @param isleSection isle sections
+     * @param isleSubsection isle subsection
+     * @return String of coords for cell
+     */
     public String getCoordsGivenLocationOnFloor(int isleSection, String isleSubsection)
     {
         try
@@ -124,6 +167,12 @@ public class Isle
         return "getCoordsGivenLocationOnFloor didn't work";
     }
 
+    /**
+     * Finds cell corresponding to isle end cap
+     *
+     * @param where location of endcap: north/east/south/west
+     * @return String of coords for cell
+     */
     private String getIsleCoordsGivenEndcap(String where)
     {
         //System.out.println("Endcap where: "+where);
@@ -196,6 +245,9 @@ public class Isle
         return "Get Endcap Coord didnt work";
     }
 
+    /**
+     * @return total cell count in isle
+     */
     private int getNumberOfCellsInIsle()
     {
         IsleCellList.IsleCellNode curr = isleCellList.first;
@@ -208,6 +260,14 @@ public class Isle
         return numberOfCells;
     }
 
+    /**
+     * Finds cell within isle that corresponds to given item location
+     * This takes into account total subsections of isle and scales accordingly
+     *
+     * @param whatSection section
+     * @param whatSubsection subsection
+     * @return String of coords for cell
+     */
     private String getIsleCoordsGivenSectionAndSubsection(int whatSection, int whatSubsection)
     {
         //If Isle is in the Back or with Only One Section
@@ -368,6 +428,9 @@ public class Isle
         return "Get Subsection Coord didnt work";
     }
 
+    /**
+     * @return ratio of cells coorsponding to one isle subsection
+     */
     public float getCellsToSubsection()
     {
         int totalNumberOfSubsections = 0;
@@ -398,6 +461,13 @@ public class Isle
         return numberOfSubsectionsForEachSection;
     }
 
+    /**
+     * For determining if given item location is valid for isle
+     *
+     * @param isleSection section
+     * @param isleSubsection subsection
+     * @return true if valid, false if invald
+     */
     public boolean inputingValidIsleLocation(int isleSection, String isleSubsection)
     {
         int isleSubsec = Integer.parseInt(isleSubsection);
@@ -411,6 +481,9 @@ public class Isle
         }
     }
 
+    /**
+     * List of cells within isle
+     */
     public static class IsleCellList
     {
         private IsleCellNode first;

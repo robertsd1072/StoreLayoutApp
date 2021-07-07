@@ -65,7 +65,7 @@ public class ActualController3 {
 
     /**
      * Basic Constructor
-     * Calculates dimensions for displaying of grid
+     * Calculates dimensions for displaying of grid when creating new layout
      *
      * @param f floors
      * @param l length of floor
@@ -124,45 +124,9 @@ public class ActualController3 {
         actualInitialize();
     }
 
-    /*
-     * NOT CURRENTLY BEING USED
-     * Constructor used when viewing previously made isle layout
-     *
-     * @param grid existing isle layout data
-     * @param node used for accessing node data in isle layout view
-
-    public ActualController3(GridData3 grid, GridData3.RNode node)
-    {
-        cols = grid.getColSize();
-        rows = grid.getRowSize();
-        sX = grid.getScreenX();
-        sY = grid.getScreenY();
-        finalSizeOfCells = grid.getBoxSize();
-        g = grid;
-        setupIsleLayout = true;
-        setupIslesNode = node;
-        cellSizeInFeet = grid.getCellSize();
-        contextMenuShowing = false;
-
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("actual.fxml"));
-        loader.setController(this);
-        try
-        {
-            parent = loader.load();
-            scene = new Scene(parent, sX, sY);
-        }
-        catch (IOException ex)
-        {
-            System.out.println("Error displaying login window");
-            throw new RuntimeException(ex);
-        }
-
-        actualInitialize(true);
-    }
-    */
-
     /**
      * Constructor used when loading layout from file
+     * Reads file and stores info in data structures then passed onto initializer
      *
      * @param file saved layout
      * @param x screen horizontal dimension
@@ -375,7 +339,7 @@ public class ActualController3 {
 
     /**
      * Initializer
-     * Setups functionality of some menu buttons
+     * Also setups functionality of some menu buttons
      */
     private void actualInitialize()
     {
@@ -413,6 +377,17 @@ public class ActualController3 {
         //System.out.println("sp Dimension: "+sP.getWidth()+", "+sP.getHeight());
     }
 
+    /**
+     * Initializer for loading layout from file
+     *
+     * @param groupNames names of isle groups
+     * @param groupColors colors of isle groups
+     * @param backOrFloorArr list dictating whether the isle group is on the back or on the floor
+     * @param listOfIslesWithCells cells making up each isle for each isle group
+     * @param listOfIsleIDs isleIDs corresponding to cells
+     * @param listOfIslesWithSetupInfo if an isle is setup with location info, stored here
+     * @param cellsToNull cells to fill in or null
+     */
     private void initializeFromFile(ArrayList<String> groupNames, ArrayList<Color> groupColors, ArrayList<String> backOrFloorArr, ArrayList<ArrayList<Hashtable<String, String>>> listOfIslesWithCells,
                                     ArrayList<ArrayList<String>> listOfIsleIDs, ArrayList<ArrayList<Hashtable<String, InfoToMakeIsleFromFile>>> listOfIslesWithSetupInfo, String cellsToNull)
     {
@@ -701,6 +676,19 @@ public class ActualController3 {
         }
     }
 
+    /**
+     * Draws cells, inputting all info from file
+     *
+     * @param z pixel size of each cell
+     * @param hbox2 container to put cells into
+     * @param groupNames names of isle groups
+     * @param groupColors colors of isle groups
+     * @param backOrFloorArr list dictating whether the isle group is on the back or on the floor
+     * @param listOfIslesWithCells cells making up each isle for each isle group
+     * @param listOfIsleIDs isleIDs corresponding to cells
+     * @param listOfIslesWithSetupInfo if an isle is setup with location info, stored here
+     * @param cellsToNull cells to fill in or null
+     */
     private void loadCellsFromFile(double z, HBox hbox2, ArrayList<String> groupNames, ArrayList<Color> groupColors, ArrayList<String> backOrFloorArr,
                                    ArrayList<ArrayList<Hashtable<String, String>>> listOfIslesWithCells, ArrayList<ArrayList<String>> listOfIsleIDs,
                                    ArrayList<ArrayList<Hashtable<String, InfoToMakeIsleFromFile>>> listOfIslesWithSetupInfo, String cellsToNull)
@@ -866,7 +854,11 @@ public class ActualController3 {
             else if (mouseEvent.getButton() == MouseButton.PRIMARY)
             {
                 if (!moving && node.isNulled())
+                {
                     g.resetHighlightedNulls();
+                    node.setHighlightedNull(true);
+                    g.resetHighlighted();
+                }
                 if (!moving && !node.isNulled())
                 {
                     System.out.println();
@@ -892,8 +884,6 @@ public class ActualController3 {
                     g.makeIsleFromToMoveList(isleToMove.getIsleID(), isleToMove.getIsleGroup().getName(), isleToMove.getIsleGroup().getColor(), isleToMove.getIsleGroup());
                     moving = false;
                 }
-                if (node.isNulled())
-                    node.setHighlightedNull(true);
             }
         });
         r.setOnMouseDragged(mouseEvent ->
@@ -964,6 +954,13 @@ public class ActualController3 {
         r.setHeight(z-1);
     }
 
+    /**
+     * Sets up popup window for creating an isle for a highlighted are
+     *
+     * @param s stage
+     * @param g data used to create and implement new group
+     * @return vbox with all necessary elements
+     */
     private VBox makeIsleMenu(Stage s, GridData3 g)
     {
         VBox v = new VBox();
@@ -1122,7 +1119,7 @@ public class ActualController3 {
     }
 
     /**
-     * Setups popup window for group creation for a highlighted area
+     * Sets up popup window for isle group creation
      *
      * @param s stage
      * @param g data used to create and implement new group
@@ -1182,59 +1179,11 @@ public class ActualController3 {
         return v;
     }
 
-    private VBox addToExistingGroupMenu(Stage s, GridData3 g, String isleID)
-    {
-        VBox v = new VBox();
-        v.setPrefWidth(120);
-
-        v.setAlignment(Pos.CENTER);
-
-        Set<String> groups = g.isleGroupList.keySet();
-        for (String key : groups)
-        {
-            Button group = new Button("Group: "+g.isleGroupList.get(key).getName());
-            group.setTextFill(Color.WHITE);
-            String color = g.isleGroupList.get(key).getColor().toString();
-            String[] strings = color.split("x");
-            String string = "-fx-background-color: #"+strings[1]+";";
-            group.setStyle(string);
-            group.setOnAction(actionEvent12 ->
-            {
-                if (g.isleGroupList.get(key).containsIsle(isleID))
-                {
-                    Stage warningStage = new Stage();
-                    warningStage.initModality(Modality.APPLICATION_MODAL);
-                    warningStage.initOwner(stage);
-                    VBox warningVbox = new VBox();
-                    warningVbox.setSpacing(5);
-                    warningVbox.setAlignment(Pos.CENTER);
-                    Label warningLabel1 = new Label("This isleID already exists.");
-                    Label warningLabel2 = new Label("Do you want to add this new isle to the already existing one?");
-                    Label warningLabel3 = new Label("If not, please rename isle.");
-                    Button yes = new Button("Yes");
-                    yes.setOnAction(actionEvent ->
-                    {
-                        warningStage.hide();
-                        s.hide();
-                        g.addNewToExistingIsle(isleID, g.isleGroupList.get(key).getColor(), g.isleGroupList.get(key));
-                    });
-                    warningVbox.getChildren().addAll(warningLabel1, warningLabel2, warningLabel3, yes);
-                    Scene cellSizeScene = new Scene(warningVbox);
-                    warningStage.setScene(cellSizeScene);
-                    warningStage.show();
-                }
-                else
-                {
-                    g.makeIsle(isleID, g.isleGroupList.get(key).getName(), g.isleGroupList.get(key).getColor(), g.isleGroupList.get(key), true, null);
-                    s.hide();
-                }
-            });
-            v.getChildren().add(group);
-        }
-
-        return v;
-    }
-
+    /**
+     * Writes all necessary info to file for saving/loading
+     *
+     * @param file file to write to
+     */
     private void saveFile(File file)
     {
         try
@@ -1306,20 +1255,9 @@ public class ActualController3 {
         System.out.println("Saved new layout to "+file);
     }
 
-    private String getGridCoordsFromMouseCoords(double x, double y)
-    {
-        double lowestXGridScreenCoord = g.getRNode(0, 0).getsXMinCoord();
-        double lowestYGridScreenCoord = g.getRNode(0, 0).getsYMinCoord();
-
-        double xMouseDistance = x - lowestXGridScreenCoord;
-        double yMouseDistance = y - lowestYGridScreenCoord;
-
-        double xGridDistance = xMouseDistance/finalSizeOfCells;
-        double yGridDistance = yMouseDistance/finalSizeOfCells;
-
-        return xGridDistance+","+yGridDistance;
-    }
-
+    /**
+     * Used for testing cell finding given location
+     */
     private VBox testLocationSetup(Stage s, GridData3 g)
     {
         VBox v = new VBox();
@@ -1442,6 +1380,12 @@ public class ActualController3 {
         return v;
     }
 
+    /**
+     * Displays cell coordinates corresponding to mouse on screen
+     *
+     * @param x mouse x coord
+     * @param y mouse y coord
+     */
     private void setMouseCoordsOnScreen(int x, int y)
     {
         m5.setText("X Coord: "+x);

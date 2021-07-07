@@ -1,6 +1,7 @@
 /**
  * GridData3 class for project DJR_Store_Layout
  * Is where all the data is stored and processed and manipulated
+ * BACKEND
  *
  * @author David Roberts
  */
@@ -55,14 +56,23 @@ public class GridData3 {
     /**
      * LinkedList of highlighted cells in grid
      */
-    protected HighlightedList highlightedList, highlightedListForThread, highlightedNullList;
+    protected HighlightedList highlightedList, highlightedNullList;
+    /**
+     * Hastable of null cells
+     */
     protected Hashtable<String, RNode> nullList;
     /**
-     * Mouse coords on screen
+     * Length of highlighted area on x and y axis
      */
     protected int highlightingXLength, highlightingYLength;
+    /**
+     * List of cells for moving an isle
+     */
     protected IsleBeingMovedList toMoveList;
     protected boolean moving;
+    /**
+     * Cell coordinate corresponding to mouse on screen
+     */
     protected int xCoordOfMouseOnGrid, yCoordOfMouseOnGrid;
 
     /**
@@ -241,6 +251,16 @@ public class GridData3 {
         isleGroupList.clear();
     }
 
+    /**
+     * Highlights a square are on the grid
+     *
+     * @param xCoord of cell where highlighting started
+     * @param yCoord of cell where highlighting started
+     * @param a length in number of cells to highlight in the West direction
+     * @param b length in number of cells to highlight in the North direction
+     * @param c length in number of cells to highlight in the East directions
+     * @param d length in number of cells to highlight in the South direction
+     */
     public void highlight(int xCoord, int yCoord, double a, double b, double c, double d)
     {
         if (a>0 && b>0)
@@ -317,6 +337,9 @@ public class GridData3 {
         }
     }
 
+    /**
+     * Resets highlighting length distances to 1
+     */
     public void resetHighlighted2()
     {
         //System.out.println("Reset Highlight 2");
@@ -380,6 +403,16 @@ public class GridData3 {
         }
     }
 
+    /**
+     * Creates new isle given highlighted area
+     *
+     * @param isleID id of isle
+     * @param igName isle group name
+     * @param c color
+     * @param isleGroup isle group
+     * @param addToIsleGroup true: adding to existing isle group, false: creating new isle group
+     * @param backOrFloor if isle is in back or on the floor
+     */
     public void makeIsle(String isleID, String igName, Color c, IsleGroup isleGroup, boolean addToIsleGroup, String backOrFloor)
     {
         if (!addToIsleGroup)
@@ -434,6 +467,13 @@ public class GridData3 {
         }
     }
 
+    /**
+     * Adds new highlighted area to existing isle
+     *
+     * @param isleID id of isle
+     * @param c color
+     * @param isleGroup isle group
+     */
     public void addNewToExistingIsle(String isleID, Color c, IsleGroup isleGroup)
     {
         IsleGroupCellList isleGroupCellList = isleGroup.getIsleGroupCellList();
@@ -452,6 +492,11 @@ public class GridData3 {
         highlightedList.clear();
     }
 
+    /**
+     * Deletes isle from gird
+     *
+     * @param i isle
+     */
     public void removeIsle(Isle i)
     {
         Isle.IsleCellList.IsleCellNode curr = i.getIsleCellList().getFirst();
@@ -471,7 +516,6 @@ public class GridData3 {
 
     /**
      * Sets cell to background color and makes it unselectable
-     * Used in irregular group isle layout setup
      *
      * @param x coord of cell
      * @param y coord of cell
@@ -493,6 +537,12 @@ public class GridData3 {
         }
     }
 
+    /**
+     * Removes cell form null, returning it to interactable status
+     *
+     * @param x cell x coord
+     * @param y cell y coord
+     */
     public void removeCellfromNull(int x, int y)
     {
         grid[x][y].setNulled(false);
@@ -532,6 +582,12 @@ public class GridData3 {
         catch (ArrayIndexOutOfBoundsException ignored) {}
     }
 
+    /**
+     * Moves isle keeping size and all info
+     *
+     * @param node selected node
+     * @param cellIsle isle of interest
+     */
     public void moveIsle(RNode node, Isle cellIsle)
     {
         int xDif = xCoordOfMouseOnGrid - node.getX();
@@ -560,6 +616,14 @@ public class GridData3 {
         }
     }
 
+    /**
+     * Remakes isle after it was moved
+     *
+     * @param isleID id of isle
+     * @param igName name of isle group
+     * @param c color
+     * @param isleGroup isle group
+     */
     public void makeIsleFromToMoveList(String isleID, String igName, Color c, IsleGroup isleGroup)
     {
         IsleBeingMovedList.IsleBeingMovedNode curr = toMoveList.first;
@@ -576,6 +640,12 @@ public class GridData3 {
         moving = false;
     }
 
+    /**
+     * Sets display of cell coordinates on screen
+     *
+     * @param x coord
+     * @param y coord
+     */
     public void setMouseCoordsOnGrid(int x, int y)
     {
         //System.out.println("Set Mouse Coords on Grid: "+x+","+y);
@@ -628,6 +698,11 @@ public class GridData3 {
         }
     }
 
+    /**
+     * @param x coord
+     * @param y coord
+     * @return cell given coords
+     */
     public RNode getRNode(int x, int y)
     {
         return grid[x][y];
@@ -659,6 +734,12 @@ public class GridData3 {
         return null;
     }
 
+    /**
+     * Determines if isle group exists in grid
+     *
+     * @param s name of isle group
+     * @return boolean true if found false if not
+     */
     public boolean isleGroupExists(String s)
     {
         Set<String> groups = isleGroupList.keySet();
@@ -671,6 +752,17 @@ public class GridData3 {
         return false;
     }
 
+    /**
+     * Highlights area of cells that are null
+     * Used for removing cells from null
+     *
+     * @param xCoord of cell where highlighting started
+     * @param yCoord of cell where highlighting started
+     * @param a length in number of cells to highlight in the West direction
+     * @param b length in number of cells to highlight in the North direction
+     * @param c length in number of cells to highlight in the East directions
+     * @param d length in number of cells to highlight in the South direction
+     */
     public void highlightNulls(int xCoord, int yCoord, double a, double b, double c, double d)
     {
         if (a>0 && b>0)
@@ -747,6 +839,9 @@ public class GridData3 {
         }
     }
 
+    /**
+     * Resets currently highlighted nulls
+     */
     public void resetHighlightedNulls()
     {
         HighlightedList.HighlightedNode curr = highlightedNullList.first;
@@ -760,6 +855,9 @@ public class GridData3 {
         highlightedNullList.clear();
     }
 
+    /**
+     * Given highlighted area of nulls, removes them from null
+     */
     public void removeNull()
     {
         HighlightedList.HighlightedNode curr = highlightedNullList.first;
@@ -1126,6 +1224,9 @@ public class GridData3 {
         }
     }
 
+    /**
+     * List of cells in Isle Group class
+     */
     protected static class IsleGroupCellList
     {
         protected IsleGroupCellNode first;
@@ -1186,66 +1287,9 @@ public class GridData3 {
         }
     }
 
-    protected class NullList
-    {
-        protected NullNode first;
-        private NullNode last;
-        private int size;
-
-        private NullList()
-        {
-            first = null;
-            last = null;
-            size = 0;
-        }
-
-        /**
-         * Adds new rectangle to LinkedList
-         *
-         * @param node new rectangle to add
-         */
-        private void add(RNode node)
-        {
-            if (size == 0)
-            {
-                first = new NullNode(node);
-                last = first;
-                size = 1;
-            }
-            else if (size > 0)
-            {
-                last.next = new NullNode(node);
-                last = last.next;
-                size++;
-            }
-        }
-
-        /**
-         * Resets LinkedList
-         */
-        protected void clear()
-        {
-            first = null;
-            last = null;
-            size = 0;
-        }
-
-        /**
-         * Highlighted Node class for each node in LinkedList
-         */
-        protected class NullNode
-        {
-            protected final RNode rNode;
-            protected NullNode next;
-
-            private NullNode(RNode node)
-            {
-                rNode = node;
-                next = null;
-            }
-        }
-    }
-
+    /**
+     * List of cells when moving an isle
+     */
     protected static class IsleBeingMovedList
     {
         protected IsleBeingMovedNode first;

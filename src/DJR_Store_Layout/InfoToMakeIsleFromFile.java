@@ -1,3 +1,11 @@
+/**
+ * Class where info is stored to make isle from file
+ * This could have been done in Isle.java but to change all of my methods involved
+ * in making an isle would be too much work so I just made a new class
+ *
+ * @author David Roberts
+ */
+
 package DJR_Store_Layout;
 
 public class InfoToMakeIsleFromFile
