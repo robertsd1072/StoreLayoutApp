@@ -19,6 +19,8 @@
                   <MenuItem fx:id="back" mnemonicParsing="false" text="Back" />
                   <MenuItem fx:id="saveLayout" mnemonicParsing="false" text="Save Layout" />
                   <MenuItem fx:id="testLocation" mnemonicParsing="false" text="Test Location" />
+                  <MenuItem fx:id="testPath" mnemonicParsing="false" text="Test Path" />
+                  <MenuItem fx:id="testPickingPath" mnemonicParsing="false" text="Text Picking Path" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Edit">

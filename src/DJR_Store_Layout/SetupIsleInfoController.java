@@ -1,8 +1,10 @@
 package DJR_Store_Layout;
 
+import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -18,7 +20,10 @@ public class SetupIsleInfoController
     private Stage stage;
     public VBox theV, vboxOfTexts;
     public Button addSection, done;
-    public TextField text0, text1, textA, textB;
+    public HBox hbox0, hboxEnd;
+    public TextField text0, text1;
+    public ChoiceBox choiceA, choiceB;
+    public Label endLabel;
     private GridData3 g;
     private Isle isle;
     private int numberOfIsleSections;
@@ -37,6 +42,8 @@ public class SetupIsleInfoController
     {
         textFields.add(text0);
         textFields.add(text1);
+        choiceA.setItems(FXCollections.observableArrayList("north", "south", "east", "west"));
+        choiceB.setItems(FXCollections.observableArrayList("up", "down", "left", "right", "diagonal right", "diagonal left"));
     }
 
     public void setImportantInfo(GridData3 grid, Isle i, Stage s)
@@ -44,6 +51,14 @@ public class SetupIsleInfoController
         g = grid;
         isle = i;
         stage = s;
+
+        if (isle.getIsleGroup().getBackOrFloor().compareTo("back") == 0)
+        {
+            vboxOfTexts.getChildren().removeAll(hbox0);
+            vboxOfTexts.setPrefHeight(25);
+            theV.getChildren().removeAll(addSection, hboxEnd, endLabel);
+            stage.setHeight(146);
+        }
 
         stage.setOnCloseRequest(windowEvent ->
         {
@@ -81,7 +96,14 @@ public class SetupIsleInfoController
         {
             try
             {
-                numberOfSubsectionsForEachSection.add(Integer.parseInt(textField.getText()));
+                if (isle.getIsleGroup().getBackOrFloor().compareTo("floor") == 0)
+                    numberOfSubsectionsForEachSection.add(Integer.parseInt(textField.getText()));
+                else
+                {
+                    numberOfSubsectionsForEachSection.add(1);
+                    numberOfSubsectionsForEachSection.add(Integer.parseInt(text1.getText()));
+                    break;
+                }
             }
             catch (Exception e)
             {
@@ -100,33 +122,19 @@ public class SetupIsleInfoController
                 warningStage.show();
             }
         }
-        if (textA.getText().compareTo("north") != 0 || textA.getText().compareTo("south") != 0 || textA.getText().compareTo("west") != 0 || textA.getText().compareTo("east") != 0
-                || textB.getText().compareTo("north") != 0 || textB.getText().compareTo("south") != 0 || textB.getText().compareTo("west") != 0 || textB.getText().compareTo("east") != 0)
-        {
-            isle.setupIsleInfo(numberOfIsleSections, numberOfSubsectionsForEachSection, textA.getText(), textB.getText());
-            Isle.IsleCellList.IsleCellNode curr = isle.getIsleCellList().getFirst();
-            while (curr != null)
-            {
-                curr.getrNode().getR().setOpacity(1.0);
-                curr = curr.getNext();
-            }
-            stage.hide();
-        }
+
+        if (isle.getIsleGroup().getBackOrFloor().compareTo("back") == 0)
+
+            isle.setupIsleInfo(numberOfIsleSections, numberOfSubsectionsForEachSection, "none", choiceB.getValue().toString());
         else
+            isle.setupIsleInfo(numberOfIsleSections, numberOfSubsectionsForEachSection, choiceA.getValue().toString(), choiceB.getValue().toString());
+
+        Isle.IsleCellList.IsleCellNode curr = isle.getIsleCellList().getFirst();
+        while (curr != null)
         {
-            Stage warningStage = new Stage();
-            warningStage.initModality(Modality.APPLICATION_MODAL);
-            warningStage.initOwner(stage);
-            VBox warningVbox = new VBox();
-            warningVbox.setSpacing(5);
-            warningVbox.setAlignment(Pos.CENTER);
-            Label warningLabel = new Label("Enter Only: \"top\",\"bottom\",\"right\",\"left\"");
-            Button ok = new Button("Ok");
-            ok.setOnAction(actionEvent -> warningStage.hide());
-            warningVbox.getChildren().addAll(warningLabel, ok);
-            Scene cellSizeScene = new Scene(warningVbox);
-            warningStage.setScene(cellSizeScene);
-            warningStage.show();
+            curr.getrNode().getR().setOpacity(1.0);
+            curr = curr.getNext();
         }
+        stage.hide();
     }
 }

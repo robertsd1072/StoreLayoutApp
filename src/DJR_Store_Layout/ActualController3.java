@@ -41,7 +41,7 @@ public class ActualController3 {
      * FXML variables
      */
     public HBox hboxWithThePluses, hboxWithTheCells;
-    public MenuItem resize, back, saveLayout, testLocation, setupInfoMenu, setupOPUstartEnd, setupRegularPickStartEnd;
+    public MenuItem resize, back, saveLayout, testLocation, testPath, testPickingPath, setupInfoMenu, setupOPUstartEnd, setupRegularPickStartEnd;
     public Menu file, m1, m2, m3, m4, m5, m6;
     public MenuBar menuBar;
     public Pane topPthatHelpsPluses, botPthatHelpsPluses, leftPthatHelpsPluses, rightPthatHelpsPluses, topPthatHelpsCells, botPthatHelpsCells, leftPthatHelpsCells, rightPthatHelpsCells;
@@ -62,6 +62,8 @@ public class ActualController3 {
     private GridData3.RNode editGroupNode;
     private Isle isleToMove;
     private SetupIsleInfoController setupInfoStuff;
+    private SetupPickingPath setupPath;
+    private GraphOfTheGrid graph;
 
     /**
      * Basic Constructor
@@ -298,6 +300,8 @@ public class ActualController3 {
         cellSizeInFeet = feet;
         sX = x;
         sY = y;
+        System.out.println("Columns: "+cols);
+        System.out.println("Rows: "+rows);
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("actual.fxml"));
         loader.setController(this);
@@ -453,6 +457,41 @@ public class ActualController3 {
             Scene testScene = new Scene(testVBox);
             testStage.setScene(testScene);
             testStage.show();
+        });
+
+        testPath.setOnAction(actionEvent ->
+        {
+            Stage testStage = new Stage();
+            testStage.setTitle("Test Path");
+            testStage.initModality(Modality.APPLICATION_MODAL);
+            testStage.initOwner(stage);
+            VBox testVBox = testPathSetup(testStage, g, graph);
+            Scene testScene = new Scene(testVBox);
+            testStage.setScene(testScene);
+            testStage.show();
+        });
+
+        testPickingPath.setOnAction(actionEvent ->
+        {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("setupPickingPath.fxml"));
+            Scene newScene;
+            try
+            {
+                newScene = new Scene(loader.load());
+            }
+            catch (IOException ex)
+            {
+                System.out.println("Error displaying login window");
+                ex.printStackTrace();
+                throw new RuntimeException(ex);
+            }
+            Stage inputStage = new Stage();
+            inputStage.initOwner(stage);
+            inputStage.setScene(newScene);
+            inputStage.show();
+
+            setupPath = loader.getController();
+            setupPath.setInfo(g, graph, inputStage);
         });
 
         initRightClickMenus();
@@ -832,6 +871,8 @@ public class ActualController3 {
         {
             System.out.println("No start/end location for Regular Pick");
         }
+
+        graph = new GraphOfTheGrid(g);
     }
 
     /**
@@ -853,6 +894,7 @@ public class ActualController3 {
             if (moving)
             {
                 //System.out.println("Moving Isle");
+
                 g.moveIsle(editGroupNode, isleToMove);
                 //System.out.println("Done method call");
             }
@@ -951,29 +993,40 @@ public class ActualController3 {
                 {
                     System.out.println();
                     System.out.println("Coords: "+node.getX()+","+node.getY());
-                    //System.out.println("xMin: "+node.getsXMinCoord());
-                    //System.out.println("yMin: "+node.getsYMinCoord());
                     g.resetHighlighted();
                     g.resetHighlightedNulls();
                     if (node.isIsle())
                     {
                         node.getIsle().printInfo();
                     }
-                    if (g.nodeIsPickPoint(node.getX(), node.getY()))
-                    {
-                        System.out.println("Cell is Pick Point");
-                    }
                     else
                     {
                         System.out.println("No Isle/IsleGroup");
                         node.setHighlighted(true);
+                    }
+                    if (g.nodeIsPickPoint(node.getX(), node.getY()))
+                    {
+                        System.out.println("Cell is Pick Point");
+                    }
+                }
+                if (!moving && !node.isNulled() && !node.isIsle())
+                {
+                    System.out.println("Connects to: ");
+
+                    GraphOfTheGrid.Edge curr = graph.graph.get(node.getX()+","+node.getY());
+                    while (curr != null)
+                    {
+                        System.out.print(curr.w+" ");
+                        if (curr.next == null)
+                            System.out.print("\n");
+                        curr = curr.next;
                     }
                 }
                 if (moving && !node.isNulled())
                 {
                     System.out.println("Remade Isle After Move");
                     node.setHighlighted(false);
-                    g.makeIsleFromToMoveList(isleToMove.getIsleID(), isleToMove.getIsleGroup().getName(), isleToMove.getIsleGroup().getColor(), isleToMove.getIsleGroup());
+                    g.makeIsleFromToMoveList(isleToMove.getIsleID(), isleToMove.getIsleGroup().getName(), isleToMove.getIsleGroup().getColor(), isleToMove.getIsleGroup(), isleToMove);
                     moving = false;
                 }
             }
@@ -982,6 +1035,7 @@ public class ActualController3 {
         {
             if (mouseEvent.getButton() == MouseButton.PRIMARY && !node.isNulled() && !g.nodeIsPickPoint(node.getX(), node.getY()))
             {
+                g.resetHighlightedNulls();
                 if (!highlighting)
                 {
                     g.resetHighlighted();
@@ -1091,75 +1145,6 @@ public class ActualController3 {
 
                 s.hide();
 
-                try
-                {
-                    int hmm = Integer.parseInt(isleID.charAt(0)+"");
-                    //Back isle group
-                    String isleGroup = isleID.charAt(0)+""+isleID.charAt(1)+""+isleID.charAt(2);
-                    if (g.isleGroupList.get(isleGroup).containsIsle(isleID))
-                    {
-                        Stage warningStage = new Stage();
-                        warningStage.initModality(Modality.APPLICATION_MODAL);
-                        warningStage.initOwner(stage);
-                        VBox warningVbox = new VBox();
-                        warningVbox.setSpacing(5);
-                        warningVbox.setAlignment(Pos.CENTER);
-                        Label warningLabel1 = new Label("This isleID already exists.");
-                        Label warningLabel2 = new Label("Do you want to add this new isle to the already existing one?");
-                        Label warningLabel3 = new Label("If not, please rename isle.");
-                        Button yes = new Button("Yes");
-                        yes.setOnAction(actionEvent1 ->
-                        {
-                            warningStage.hide();
-                            s.hide();
-                            g.addNewToExistingIsle(isleID, g.isleGroupList.get(isleGroup).getColor(), g.isleGroupList.get(isleGroup));
-                        });
-                        warningVbox.getChildren().addAll(warningLabel1, warningLabel2, warningLabel3, yes);
-                        Scene cellSizeScene = new Scene(warningVbox);
-                        warningStage.setScene(cellSizeScene);
-                        warningStage.show();
-                    }
-                    else
-                    {
-                        g.makeIsle(isleID, isleGroup, g.isleGroupList.get(isleGroup).getColor(), g.isleGroupList.get(isleGroup), true, null);
-                        s.hide();
-                    }
-                }
-                catch (NumberFormatException e)
-                {
-                    //floor isle group
-                    String isleGroup = isleID.charAt(0)+"";
-                    if (g.isleGroupList.get(isleGroup).containsIsle(isleID))
-                    {
-                        Stage warningStage = new Stage();
-                        warningStage.initModality(Modality.APPLICATION_MODAL);
-                        warningStage.initOwner(stage);
-                        VBox warningVbox = new VBox();
-                        warningVbox.setSpacing(5);
-                        warningVbox.setAlignment(Pos.CENTER);
-                        Label warningLabel1 = new Label("This isleID already exists.");
-                        Label warningLabel2 = new Label("Do you want to add this new isle to the already existing one?");
-                        Label warningLabel3 = new Label("If not, please rename isle.");
-                        Button yes = new Button("Yes");
-                        yes.setOnAction(actionEvent1 ->
-                        {
-                            warningStage.hide();
-                            s.hide();
-                            g.addNewToExistingIsle(isleID, g.isleGroupList.get(isleGroup).getColor(), g.isleGroupList.get(isleGroup));
-                        });
-                        warningVbox.getChildren().addAll(warningLabel1, warningLabel2, warningLabel3, yes);
-                        Scene cellSizeScene = new Scene(warningVbox);
-                        warningStage.setScene(cellSizeScene);
-                        warningStage.show();
-                    }
-                    else
-                    {
-                        g.makeIsle(isleID, isleGroup, g.isleGroupList.get(isleGroup).getColor(), g.isleGroupList.get(isleGroup), true, null);
-                        s.hide();
-                    }
-                }
-
-                /*
                 Stage addToExistingStage = new Stage();
                 addToExistingStage.initModality(Modality.APPLICATION_MODAL);
                 addToExistingStage.initOwner(stage);
@@ -1167,7 +1152,6 @@ public class ActualController3 {
                 Scene groupSelectScene = new Scene(addToExistingVBox);
                 addToExistingStage.setScene(groupSelectScene);
                 addToExistingStage.show();
-                 */
             }
         });
         Button makeNew = new Button("Create New Isle Group");
@@ -1267,6 +1251,67 @@ public class ActualController3 {
             }
         });
         v.getChildren().addAll(hboxA, hboxC, hboxD, submit);
+
+        return v;
+    }
+
+    /**
+     * Sets up popup window for adding new isle to existing isle group
+     *
+     * @param s stage
+     * @param g data used to create and implement new group
+     * @param isleID of new isle
+     * @return vbox with all necessary elements
+     */
+    private VBox addToExistingGroupMenu(Stage s, GridData3 g, String isleID)
+    {
+        VBox v = new VBox();
+        v.setPrefWidth(120);
+
+        v.setAlignment(Pos.CENTER);
+
+        Set<String> groups = g.isleGroupList.keySet();
+        for (String key : groups)
+        {
+            Button group = new Button("Group: "+g.isleGroupList.get(key).getName());
+            group.setTextFill(Color.WHITE);
+            String color = g.isleGroupList.get(key).getColor().toString();
+            String[] strings = color.split("x");
+            String string = "-fx-background-color: #"+strings[1]+";";
+            group.setStyle(string);
+            group.setOnAction(actionEvent ->
+            {
+                if (g.isleGroupList.get(key).containsIsle(isleID))
+                {
+                    Stage warningStage = new Stage();
+                    warningStage.initModality(Modality.APPLICATION_MODAL);
+                    warningStage.initOwner(stage);
+                    VBox warningVbox = new VBox();
+                    warningVbox.setSpacing(5);
+                    warningVbox.setAlignment(Pos.CENTER);
+                    Label warningLabel1 = new Label("This isleID already exists.");
+                    Label warningLabel2 = new Label("Do you want to add this new isle to the already existing one?");
+                    Label warningLabel3 = new Label("If not, please rename isle.");
+                    Button yes = new Button("Yes");
+                    yes.setOnAction(actionEvent1 ->
+                    {
+                        warningStage.hide();
+                        s.hide();
+                        g.addNewToExistingIsle(isleID, g.isleGroupList.get(key).getColor(), g.isleGroupList.get(key));
+                    });
+                    warningVbox.getChildren().addAll(warningLabel1, warningLabel2, warningLabel3, yes);
+                    Scene cellSizeScene = new Scene(warningVbox);
+                    warningStage.setScene(cellSizeScene);
+                    warningStage.show();
+                }
+                else
+                {
+                    g.makeIsle(isleID, g.isleGroupList.get(key).getName(), g.isleGroupList.get(key).getColor(), g.isleGroupList.get(key), true, null);
+                    s.hide();
+                }
+            });
+            v.getChildren().add(group);
+        }
 
         return v;
     }
@@ -1390,7 +1435,48 @@ public class ActualController3 {
                 String[] sArr = loc.split(" ");
                 if (g.isleGroupExists(sArr[0]))
                 {
+                    isleOfTest = g.getIsle(sArr[0]+sArr[1]+"", sArr[0]);
+                    System.out.println("IsleID: "+isleOfTest.getIsleID());
+                    if (isleOfTest.hasSetupInfo())
+                    {
+                        String subsection = sArr[2].charAt(sArr[2].length()-1)+"";
+                        System.out.println("isleSubsection: "+subsection);
 
+                        if (isleOfTest.inputingValidIsleLocationInBack(subsection))
+                            System.out.println("Coords Found: "+isleOfTest.getCoordsGivenLocationInBack(subsection));
+                        else
+                        {
+                            Stage warningStage = new Stage();
+                            warningStage.initModality(Modality.APPLICATION_MODAL);
+                            warningStage.initOwner(stage);
+                            VBox warningVbox = new VBox();
+                            warningVbox.setSpacing(5);
+                            warningVbox.setAlignment(Pos.CENTER);
+                            Label warningLabel = new Label("Isle Section/Isle Subsection not valid within possible isle locations");
+                            Button ok = new Button("Ok");
+                            ok.setOnAction(actionEvent1 -> warningStage.hide());
+                            warningVbox.getChildren().addAll(warningLabel, ok);
+                            Scene cellSizeScene = new Scene(warningVbox);
+                            warningStage.setScene(cellSizeScene);
+                            warningStage.show();
+                        }
+                    }
+                    else
+                    {
+                        Stage warningStage = new Stage();
+                        warningStage.initModality(Modality.APPLICATION_MODAL);
+                        warningStage.initOwner(stage);
+                        VBox warningVbox = new VBox();
+                        warningVbox.setSpacing(5);
+                        warningVbox.setAlignment(Pos.CENTER);
+                        Label warningLabel = new Label("Isle: "+sArr[0]+sArr[1]+" does not exist/has not been setup");
+                        Button ok = new Button("Ok");
+                        ok.setOnAction(actionEvent1 -> warningStage.hide());
+                        warningVbox.getChildren().addAll(warningLabel, ok);
+                        Scene cellSizeScene = new Scene(warningVbox);
+                        warningStage.setScene(cellSizeScene);
+                        warningStage.show();
+                    }
                 }
                 else
                 {
@@ -1408,7 +1494,6 @@ public class ActualController3 {
                     warningStage.setScene(cellSizeScene);
                     warningStage.show();
                 }
-
             }
             catch (NumberFormatException e)
             {
@@ -1427,7 +1512,7 @@ public class ActualController3 {
                         String[] loc3 = loc2[1].split("-");
                         System.out.println("isleSubsection: "+loc3[0]);
 
-                        if (isleOfTest.inputingValidIsleLocation(isleSection, loc3[0]))
+                        if (isleOfTest.inputingValidIsleLocationOnFloor(isleSection, loc3[0]))
                             System.out.println("Coords Found: "+isleOfTest.getCoordsGivenLocationOnFloor(isleSection, loc3[0]));
                         else
                         {
@@ -1484,6 +1569,49 @@ public class ActualController3 {
 
         v.getChildren().addAll(title, tester);
 
+        return v;
+    }
+
+    private VBox testPathSetup(Stage s, GridData3 g, GraphOfTheGrid graph)
+    {
+        VBox v = new VBox();
+
+        v.setAlignment(Pos.CENTER);
+
+        Label title = new Label("Test Path!!");
+        title.setStyle("-fx-font-size: 16;");
+
+        HBox h = new HBox();
+        TextField v1 = new TextField();
+        Label to = new Label("->");
+        TextField v2 = new TextField();
+
+        h.getChildren().addAll(v1, to, v2);
+
+        Button done = new Button("Test!");
+        done.setOnAction(actionEvent ->
+        {
+            GraphOfTheGrid.DistanceReturn dr = graph.findDistanceBetween(v1.getText(), v2.getText());
+            System.out.println("Distance: "+dr.getDistance());
+            String path = dr.getPath();
+            System.out.println("Path: "+path);
+            String[] pathArr = path.split(" ");
+            for (int i=1; i< pathArr.length; i++)
+            {
+                try
+                {
+                    String[] coords = pathArr[i].split(",");
+                    int x = Integer.parseInt(coords[0]);
+                    int y = Integer.parseInt(coords[1]);
+                    Rectangle r = g.getRNode(x, y).getR();
+                    r.setFill(Color.RED);
+                    r.setOpacity(0.5);
+                }
+                catch (NumberFormatException ignored) {}
+            }
+        });
+
+        v.getChildren().addAll(title, h, done);
         return v;
     }
 

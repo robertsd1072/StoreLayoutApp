@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="DJR_Store_Layout.SetupPickingPath">
+   <children>
+      <Label text="Enter Locations of Items">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <HBox alignment="CENTER" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text1" />
+            <Button fx:id="button1" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="37.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text2" />
+            <Button fx:id="button2" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="62.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text3" />
+            <Button fx:id="button3" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="87.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text4" />
+            <Button fx:id="button4" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="112.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text5" />
+            <Button fx:id="button5" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="137.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text6" />
+            <Button fx:id="button6" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="162.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text7" />
+            <Button fx:id="button7" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="187.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text8" />
+            <Button fx:id="button8" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="212.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text9" />
+            <Button fx:id="button9" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="237.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text10" />
+            <Button fx:id="button10" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="262.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text11" />
+            <Button fx:id="button11" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="287.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text12" />
+            <Button fx:id="button12" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="312.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text13" />
+            <Button fx:id="button13" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="337.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text14" />
+            <Button fx:id="button14" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="362.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text15" />
+            <Button fx:id="button15" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="387.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text16" />
+            <Button fx:id="button16" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="412.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text17" />
+            <Button fx:id="button17" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="437.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text18" />
+            <Button fx:id="button18" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="462.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text19" />
+            <Button fx:id="button19" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="487.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text20" />
+            <Button fx:id="button20" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="512.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text21" />
+            <Button fx:id="button21" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="537.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text22" />
+            <Button fx:id="button22" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="562.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text23" />
+            <Button fx:id="button23" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="587.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text24" />
+            <Button fx:id="button24" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="612.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text25" />
+            <Button fx:id="button25" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="637.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text26" />
+            <Button fx:id="button26" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="662.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text27" />
+            <Button fx:id="button27" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="687.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text28" />
+            <Button fx:id="button28" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="712.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text29" />
+            <Button fx:id="button29" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="10.0" layoutY="737.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="text30" />
+            <Button fx:id="button30" mnemonicParsing="false" text="Verify" />
+         </children>
+      </HBox>
+      <ChoiceBox fx:id="choice1" prefWidth="150.0" />
+      <Button fx:id="done" mnemonicParsing="false" onAction="#done" text="Done" />
+   </children>
+</VBox>

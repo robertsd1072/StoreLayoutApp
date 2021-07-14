@@ -2,16 +2,21 @@ Cosas Para Hacer en Cualquier Momento:
 
 Item Location:
 D39(1)1-1-1.90
-99B 103B04
+99B 103 B04
 
 - Setup all isles with new info
 
-- Path finding algorithm to connect two locations (Dijkstra's with edge weight one between each cell)
-
 - Custom Warning class that makes it easy to flash a warning popup given input string
+
+- Classes for converting coords to String and back to coords
 
 - Select multiple isles at a time and move them
 
+- When find cell given item location, make sure returning "closet" actual works
+
 - Bug Line 542 of ActualController3: Why do I need to add 1 to each remainder??
 
+- Line 217 of Isle: Half-assed this, need to change
+
 Optimization:
+- Multithreading (EVERYWHERE)

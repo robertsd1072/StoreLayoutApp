@@ -21,11 +21,11 @@ public class GridData3 {
     /**
      * number of cells
      */
-    private int size;
+    protected int size;
     /**
      * grid dimensions
      */
-    private final int colSize, rowSize;
+    protected final int colSize, rowSize;
     /**
      * limit values used for adding correct amount of cells in rows/cols
      */
@@ -611,12 +611,16 @@ public class GridData3 {
         Isle.IsleCellList.IsleCellNode curr = cellIsle.getIsleCellList().getFirst();
         while (curr != null)
         {
-            if (!grid[curr.getrNode().xCoord+xDif][curr.getrNode().yCoord+yDif].isIsle() && !grid[curr.getrNode().xCoord+xDif][curr.getrNode().yCoord+yDif].isNulled())
+            try
             {
-                toMoveList.add(grid[curr.getrNode().xCoord+xDif][curr.getrNode().yCoord+yDif]);
-                grid[curr.getrNode().xCoord+xDif][curr.getrNode().yCoord+yDif].setIsleIsBeingMoved(true, cellIsle.getIsleGroup().getColor());
+                if (!grid[curr.getrNode().xCoord+xDif][curr.getrNode().yCoord+yDif].isIsle() && !grid[curr.getrNode().xCoord+xDif][curr.getrNode().yCoord+yDif].isNulled())
+                {
+                    toMoveList.add(grid[curr.getrNode().xCoord+xDif][curr.getrNode().yCoord+yDif]);
+                    grid[curr.getrNode().xCoord+xDif][curr.getrNode().yCoord+yDif].setIsleIsBeingMoved(true, cellIsle.getIsleGroup().getColor());
+                }
+                curr = curr.getNext();
             }
-            curr = curr.getNext();
+            catch (ArrayIndexOutOfBoundsException ignored) {}
         }
     }
 
@@ -628,7 +632,7 @@ public class GridData3 {
      * @param c color
      * @param isleGroup isle group
      */
-    public void makeIsleFromToMoveList(String isleID, String igName, Color c, IsleGroup isleGroup)
+    public void makeIsleFromToMoveList(String isleID, String igName, Color c, IsleGroup isleGroup, Isle isle)
     {
         IsleBeingMovedList.IsleBeingMovedNode curr = toMoveList.first;
 
@@ -639,6 +643,7 @@ public class GridData3 {
         }
 
         makeIsle(isleID, igName, c, isleGroup, true, null);
+        isleGroupList.get(igName).getIsleIDList().get(isleID).setupIsleInfo(isle.getNumberOfIsleSections(), isle.getNumberOfSubsectionsForEachSection(), isle.getEndCapLocation(), isle.getDirectionOfIncreasingIsleSections());
         toMoveList.clear();
 
         moving = false;
@@ -700,31 +705,6 @@ public class GridData3 {
                 curr = curr.next;
             }
         }
-    }
-
-    /**
-     * @param x coord
-     * @param y coord
-     * @return cell given coords
-     */
-    public RNode getRNode(int x, int y)
-    {
-        return grid[x][y];
-    }
-
-    public int getHighlightingXLength()
-    {
-        return highlightingXLength;
-    }
-
-    public int getHighlightingYLength()
-    {
-        return highlightingYLength;
-    }
-
-    public IsleBeingMovedList getToMoveList()
-    {
-        return toMoveList;
     }
 
     public Isle getIsle(String s, String ig)
@@ -930,6 +910,41 @@ public class GridData3 {
         catch (NullPointerException ignored) {}
 
         return false;
+    }
+
+    /**
+     * @param x coord
+     * @param y coord
+     * @return cell given coords
+     */
+    public RNode getRNode(int x, int y)
+    {
+        return grid[x][y];
+    }
+
+    public int getHighlightingXLength()
+    {
+        return highlightingXLength;
+    }
+
+    public int getHighlightingYLength()
+    {
+        return highlightingYLength;
+    }
+
+    public IsleBeingMovedList getToMoveList()
+    {
+        return toMoveList;
+    }
+
+    public RNode getOpuStartEndNode()
+    {
+        return opuStartEndNode;
+    }
+
+    public RNode getRegStartEndNode()
+    {
+        return regStartEndNode;
     }
 
     /**
