@@ -185,36 +185,31 @@ public class Isle
      */
     public String getCoordsGivenLocationOnFloor(int isleSection, String isleSubsection)
     {
-        if (shape.compareTo("straight") == 0)
+        if (isleSection == 0)
         {
-            if (isleSection == 0)
+            System.out.println("Returning cuz at endcap");
+            if (endCapLocation.compareTo("west") == 0)
             {
-                System.out.println("Returning cuz at endcap");
-                if (endCapLocation.compareTo("west") == 0)
-                {
-                    return getIsleCoordsGivenEndcap("west");
-                }
-                if (endCapLocation.compareTo("south") == 0)
-                {
-                    return getIsleCoordsGivenEndcap("south");
-                }
-                if (endCapLocation.compareTo("east") == 0)
-                {
-                    return getIsleCoordsGivenEndcap("east");
-                }
-                if (endCapLocation.compareTo("north") == 0)
-                {
-                    return getIsleCoordsGivenEndcap("north");
-                }
+                return getIsleCoordsGivenEndcap("west");
             }
-            else
+            if (endCapLocation.compareTo("south") == 0)
             {
-                System.out.println("Returning using Section and Subsection");
-                return getIsleCoordsGivenSectionAndSubsection(isleSection, Integer.parseInt(isleSubsection));
+                return getIsleCoordsGivenEndcap("south");
+            }
+            if (endCapLocation.compareTo("east") == 0)
+            {
+                return getIsleCoordsGivenEndcap("east");
+            }
+            if (endCapLocation.compareTo("north") == 0)
+            {
+                return getIsleCoordsGivenEndcap("north");
             }
         }
-        else //if shape == area or shape == diagonal
-            return "closet";
+        else
+        {
+            System.out.println("Returning using Section and Subsection");
+            return getIsleCoordsGivenSectionAndSubsection(isleSection, Integer.parseInt(isleSubsection));
+        }
 
         return "getCoordsGivenLocationOnFloor didn't work";
     }
@@ -859,6 +854,11 @@ public class Isle
         return numberOfSubsectionsForEachSection;
     }
 
+    public String getShape()
+    {
+        return shape;
+    }
+
     /**
      * For determining if given item location is valid for isle
      *
@@ -936,7 +936,7 @@ public class Isle
         return "area";
     }
 
-    private boolean verifyCell(String s)
+    public boolean verifyCell(String s)
     {
         String[] coords = s.split(",");
         int x = Integer.parseInt(coords[0]);

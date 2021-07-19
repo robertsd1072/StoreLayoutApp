@@ -15,6 +15,7 @@
             <Font size="18.0" />
          </font>
       </Label>
+      <ChoiceBox fx:id="choiceA" prefWidth="150.0" />
       <HBox alignment="CENTER" prefWidth="200.0">
          <children>
             <TextField fx:id="text1" />

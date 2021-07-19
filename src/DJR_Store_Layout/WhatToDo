@@ -12,11 +12,11 @@ D39(1)1-1-1.90
 
 - Select multiple isles at a time and move them
 
-- When find cell given item location, make sure returning "closet" actual works
-
 - Bug Line 542 of ActualController3: Why do I need to add 1 to each remainder??
 
 - Line 217 of Isle: Half-assed this, need to change
+
+- Line 427 of GraphOfTheGrid: findPickingPath2()
 
 Optimization:
 - Multithreading (EVERYWHERE)

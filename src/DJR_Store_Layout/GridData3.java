@@ -707,17 +707,6 @@ public class GridData3 {
         }
     }
 
-    public Isle getIsle(String s, String ig)
-    {
-        Set<String> isleIDS = isleGroupList.get(ig).getIsleIDList().keySet();
-        for (String idKey : isleIDS)
-        {
-            if (idKey.compareTo(s) == 0)
-                return isleGroupList.get(ig).getIsleIDList().get(s);
-        }
-        return null;
-    }
-
     /**
      * Determines if isle group exists in grid
      *
@@ -920,6 +909,26 @@ public class GridData3 {
     public RNode getRNode(int x, int y)
     {
         return grid[x][y];
+    }
+
+    public Isle getIsle(String id, String ig)
+    {
+        return isleGroupList.get(ig).getIsleIDList().get(id);
+    }
+
+    public Isle getIsleWithUnknownIG(String id)
+    {
+        Set<String> groups = isleGroupList.keySet();
+        for (String ig : groups)
+        {
+            Set<String> isles = isleGroupList.get(ig).isleIDList.keySet();
+            for (String i : isles)
+            {
+                if (i.compareTo(id) == 0)
+                    return isleGroupList.get(ig).getIsleIDList().get(i);
+            }
+        }
+        return null;
     }
 
     public int getHighlightingXLength()

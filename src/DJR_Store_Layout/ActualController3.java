@@ -463,7 +463,6 @@ public class ActualController3 {
         {
             Stage testStage = new Stage();
             testStage.setTitle("Test Path");
-            testStage.initModality(Modality.APPLICATION_MODAL);
             testStage.initOwner(stage);
             VBox testVBox = testPathSetup(testStage, g, graph);
             Scene testScene = new Scene(testVBox);
@@ -1013,13 +1012,13 @@ public class ActualController3 {
                 {
                     System.out.println("Connects to: ");
 
-                    GraphOfTheGrid.Edge curr = graph.graph.get(node.getX()+","+node.getY());
+                    GraphOfTheGrid.EdgeNode curr = graph.graph.get(node.getX()+","+node.getY());
                     while (curr != null)
                     {
-                        System.out.print(curr.w+" ");
-                        if (curr.next == null)
+                        System.out.print(curr.getEdge().getW()+" ");
+                        if (curr.getNext() == null)
                             System.out.print("\n");
-                        curr = curr.next;
+                        curr = curr.getNext();
                     }
                 }
                 if (moving && !node.isNulled())
@@ -1591,10 +1590,19 @@ public class ActualController3 {
         Button done = new Button("Test!");
         done.setOnAction(actionEvent ->
         {
-            GraphOfTheGrid.DistanceReturn dr = graph.findDistanceBetween(v1.getText(), v2.getText());
+            GraphOfTheGrid.DistanceReturn dr = null;
+            try
+            {
+                int hmm = Integer.parseInt(v2.getText().charAt(0)+"");
+                dr = graph.findDistanceBetween(v1.getText(), v2.getText());
+            }
+            catch (NumberFormatException e)
+            {
+                dr = graph.findClosestCellAndComputeDistanceIfIsleShapeIsArea(v2.getText(), v1.getText()).get(0);
+            }
             System.out.println("Distance: "+dr.getDistance());
             String path = dr.getPath();
-            System.out.println("Path: "+path);
+            System.out.println("Path:"+path);
             String[] pathArr = path.split(" ");
             for (int i=1; i< pathArr.length; i++)
             {
