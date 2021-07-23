@@ -8,14 +8,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="DJR_Store_Layout.SetupPickingPath">
+<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="DJR_Store_Layout.SetupPickingPath">
    <children>
       <Label text="Enter Locations of Items">
          <font>
             <Font size="18.0" />
          </font>
       </Label>
-      <ChoiceBox fx:id="choiceA" prefWidth="150.0" />
       <HBox alignment="CENTER" prefWidth="200.0">
          <children>
             <TextField fx:id="text1" />
@@ -136,67 +135,9 @@
             <Button fx:id="button20" mnemonicParsing="false" text="Verify" />
          </children>
       </HBox>
-      <HBox alignment="CENTER" layoutX="10.0" layoutY="512.0" prefWidth="200.0">
-         <children>
-            <TextField fx:id="text21" />
-            <Button fx:id="button21" mnemonicParsing="false" text="Verify" />
-         </children>
-      </HBox>
-      <HBox alignment="CENTER" layoutX="10.0" layoutY="537.0" prefWidth="200.0">
-         <children>
-            <TextField fx:id="text22" />
-            <Button fx:id="button22" mnemonicParsing="false" text="Verify" />
-         </children>
-      </HBox>
-      <HBox alignment="CENTER" layoutX="10.0" layoutY="562.0" prefWidth="200.0">
-         <children>
-            <TextField fx:id="text23" />
-            <Button fx:id="button23" mnemonicParsing="false" text="Verify" />
-         </children>
-      </HBox>
-      <HBox alignment="CENTER" layoutX="10.0" layoutY="587.0" prefWidth="200.0">
-         <children>
-            <TextField fx:id="text24" />
-            <Button fx:id="button24" mnemonicParsing="false" text="Verify" />
-         </children>
-      </HBox>
-      <HBox alignment="CENTER" layoutX="10.0" layoutY="612.0" prefWidth="200.0">
-         <children>
-            <TextField fx:id="text25" />
-            <Button fx:id="button25" mnemonicParsing="false" text="Verify" />
-         </children>
-      </HBox>
-      <HBox alignment="CENTER" layoutX="10.0" layoutY="637.0" prefWidth="200.0">
-         <children>
-            <TextField fx:id="text26" />
-            <Button fx:id="button26" mnemonicParsing="false" text="Verify" />
-         </children>
-      </HBox>
-      <HBox alignment="CENTER" layoutX="10.0" layoutY="662.0" prefWidth="200.0">
-         <children>
-            <TextField fx:id="text27" />
-            <Button fx:id="button27" mnemonicParsing="false" text="Verify" />
-         </children>
-      </HBox>
-      <HBox alignment="CENTER" layoutX="10.0" layoutY="687.0" prefWidth="200.0">
-         <children>
-            <TextField fx:id="text28" />
-            <Button fx:id="button28" mnemonicParsing="false" text="Verify" />
-         </children>
-      </HBox>
-      <HBox alignment="CENTER" layoutX="10.0" layoutY="712.0" prefWidth="200.0">
-         <children>
-            <TextField fx:id="text29" />
-            <Button fx:id="button29" mnemonicParsing="false" text="Verify" />
-         </children>
-      </HBox>
-      <HBox alignment="CENTER" layoutX="10.0" layoutY="737.0" prefWidth="200.0">
-         <children>
-            <TextField fx:id="text30" />
-            <Button fx:id="button30" mnemonicParsing="false" text="Verify" />
-         </children>
-      </HBox>
+      <ChoiceBox fx:id="choiceA" prefWidth="150.0" />
       <ChoiceBox fx:id="choice1" prefWidth="150.0" />
       <Button fx:id="done" mnemonicParsing="false" onAction="#done" text="Done" />
+      <Button fx:id="clearPath" mnemonicParsing="false" onAction="#clearCellPath" text="Clear Path" />
    </children>
 </VBox>

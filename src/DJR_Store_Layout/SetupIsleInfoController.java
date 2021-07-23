@@ -11,9 +11,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 public class SetupIsleInfoController
 {
@@ -107,19 +105,7 @@ public class SetupIsleInfoController
             }
             catch (Exception e)
             {
-                Stage warningStage = new Stage();
-                warningStage.initModality(Modality.APPLICATION_MODAL);
-                warningStage.initOwner(stage);
-                VBox warningVbox = new VBox();
-                warningVbox.setSpacing(5);
-                warningVbox.setAlignment(Pos.CENTER);
-                Label warningLabel = new Label("Enter Valid Numbers for Each Isle Section Field");
-                Button ok = new Button("Ok");
-                ok.setOnAction(actionEvent -> warningStage.hide());
-                warningVbox.getChildren().addAll(warningLabel, ok);
-                Scene cellSizeScene = new Scene(warningVbox);
-                warningStage.setScene(cellSizeScene);
-                warningStage.show();
+                new MyPopup("Enter Valid Numbers for Each Isle Section Field", stage).getStage().show();
             }
         }
 

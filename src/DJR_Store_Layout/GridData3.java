@@ -351,6 +351,50 @@ public class GridData3 {
         highlightingYLength = 1;
     }
 
+    public RNode getSoutheastMostHighlightedCell(String which)
+    {
+        HighlightedList.HighlightedNode curr;
+        if (which.equals("Normal"))
+            curr = highlightedList.first;
+        else
+            curr = highlightedNullList.first;
+
+        int biggestX = curr.rNode.xCoord;
+        int biggestY = curr.rNode.yCoord;
+
+        while (curr != null)
+        {
+            if (curr.rNode.xCoord > biggestX || curr.rNode.yCoord > biggestY)
+            {
+                biggestX = curr.rNode.xCoord;
+                biggestY = curr.rNode.yCoord;
+            }
+            curr = curr.next;
+        }
+
+        return grid[biggestX][biggestY];
+    }
+
+    public RNode getSoutheastMostIsleCell(Isle isle)
+    {
+        Isle.IsleCellList.IsleCellNode curr = isle.getIsleCellList().getFirst();
+
+        int biggestX = curr.getrNode().getX();
+        int biggestY = curr.getrNode().getY();
+
+        while (curr != null)
+        {
+            if (curr.getrNode().getX() > biggestX || curr.getrNode().getY() > biggestY)
+            {
+                biggestX = curr.getrNode().getX();
+                biggestY = curr.getrNode().getY();
+            }
+            curr = curr.getNext();
+        }
+
+        return grid[biggestX][biggestY];
+    }
+
     /**
      * Adjusts size of cells and pluses for a window resize
      *

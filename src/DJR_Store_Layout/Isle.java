@@ -337,10 +337,9 @@ public class Isle
 
             if (directionOfIncreasingIsleSections.compareTo("right") == 0)
             {
-                String s = getIsleCoordsGivenEndcap("west");
-                String[] coords = s.split(",");
-                int x = Integer.parseInt(coords[0]);
-                int y = Integer.parseInt(coords[1]);
+                Coords coords = new Coords(getIsleCoordsGivenEndcap("west"));
+                int x = coords.getX();
+                int y = coords.getY();
 
                 int xToReturn = (int) (x+(getCellsToSubsection()*whatSubsection));
                 if (endCapLocation.compareTo("west") != 0  && xToReturn != x)
@@ -353,10 +352,9 @@ public class Isle
             }
             if (directionOfIncreasingIsleSections.compareTo("up") == 0)
             {
-                String s = getIsleCoordsGivenEndcap("south");
-                String[] coords = s.split(",");
-                int x = Integer.parseInt(coords[0]);
-                int y = Integer.parseInt(coords[1]);
+                Coords coords = new Coords(getIsleCoordsGivenEndcap("south"));
+                int x = coords.getX();
+                int y = coords.getY();
 
                 int yToReturn = (int) (y-(getCellsToSubsection()*whatSubsection));
                 if (endCapLocation.compareTo("south") != 0 && yToReturn != y)
@@ -369,10 +367,9 @@ public class Isle
             }
             if (directionOfIncreasingIsleSections.compareTo("left") == 0)
             {
-                String s = getIsleCoordsGivenEndcap("east");
-                String[] coords = s.split(",");
-                int x = Integer.parseInt(coords[0]);
-                int y = Integer.parseInt(coords[1]);
+                Coords coords = new Coords(getIsleCoordsGivenEndcap("east"));
+                int x = coords.getX();
+                int y = coords.getY();
 
                 int xToReturn = (int) (x-(getCellsToSubsection()*whatSubsection));
                 if (endCapLocation.compareTo("east") != 0 && xToReturn != x)
@@ -385,10 +382,9 @@ public class Isle
             }
             if (directionOfIncreasingIsleSections.compareTo("down") == 0)
             {
-                String s = getIsleCoordsGivenEndcap("north");
-                String[] coords = s.split(",");
-                int x = Integer.parseInt(coords[0]);
-                int y = Integer.parseInt(coords[1]);
+                Coords coords = new Coords(getIsleCoordsGivenEndcap("north"));
+                int x = coords.getX();
+                int y = coords.getY();
 
                 int yToReturn = (int) (y+(getCellsToSubsection()*whatSubsection));
                 if (endCapLocation.compareTo("north") != 0 && yToReturn != y)
@@ -409,11 +405,10 @@ public class Isle
 
             if (directionOfIncreasingIsleSections.compareTo("right") == 0)
             {
-                String s = getIsleCoordsGivenEndcap("west");
-                System.out.println("Starting: "+s);
-                String[] coords = s.split(",");
-                int x = Integer.parseInt(coords[0]);
-                int y = Integer.parseInt(coords[1]);
+                Coords coords = new Coords(getIsleCoordsGivenEndcap("west"));
+                System.out.println("Starting: "+coords);
+                int x = coords.getX();
+                int y = coords.getY();
 
                 int xToReturn = x;
                 for (int i=1; i<whatSection+1; i++)
@@ -438,10 +433,9 @@ public class Isle
             }
             if (directionOfIncreasingIsleSections.compareTo("up") == 0)
             {
-                String s = getIsleCoordsGivenEndcap("south");
-                String[] coords = s.split(",");
-                int x = Integer.parseInt(coords[0]);
-                int y = Integer.parseInt(coords[1]);
+                Coords coords = new Coords(getIsleCoordsGivenEndcap("south"));
+                int x = coords.getX();
+                int y = coords.getY();
 
                 int yToReturn = y;
                 for (int i=1; i<whatSection+1; i++)
@@ -462,10 +456,9 @@ public class Isle
             }
             if (directionOfIncreasingIsleSections.compareTo("left") == 0)
             {
-                String s = getIsleCoordsGivenEndcap("east");
-                String[] coords = s.split(",");
-                int x = Integer.parseInt(coords[0]);
-                int y = Integer.parseInt(coords[1]);
+                Coords coords = new Coords(getIsleCoordsGivenEndcap("east"));
+                int x = coords.getX();
+                int y = coords.getY();
 
                 int xToReturn = x;
                 for (int i=1; i<whatSection+1; i++)
@@ -486,10 +479,9 @@ public class Isle
             }
             if (directionOfIncreasingIsleSections.compareTo("down") == 0)
             {
-                String s = getIsleCoordsGivenEndcap("north");
-                String[] coords = s.split(",");
-                int x = Integer.parseInt(coords[0]);
-                int y = Integer.parseInt(coords[1]);
+                Coords coords = new Coords(getIsleCoordsGivenEndcap("north"));
+                int x = coords.getX();
+                int y = coords.getY();
 
                 int yToReturn = y;
                 for (int i=1; i<whatSection+1; i++)
@@ -519,11 +511,10 @@ public class Isle
 
         if (directionOfIncreasingIsleSections.compareTo("right") == 0)
         {
-            String s = getIsleCoordsGivenEndcapSplit("west", which);
-            System.out.println("Starting: "+s);
-            String[] coords = s.split(",");
-            int x = Integer.parseInt(coords[0]);
-            int y = Integer.parseInt(coords[1]);
+            Coords coords = new Coords(getIsleCoordsGivenEndcapSplit("west", which));
+            System.out.println("Starting: "+coords);
+            int x = coords.getX();
+            int y = coords.getY();
 
             int xToReturn = (x+((int) (getCellsToSubsection()/2)*whatSubsection));
             if (endCapLocation.compareTo("west") != 0)
@@ -533,10 +524,9 @@ public class Isle
         }
         if (directionOfIncreasingIsleSections.compareTo("up") == 0)
         {
-            String s = getIsleCoordsGivenEndcapSplit("south", which);
-            String[] coords = s.split(",");
-            int x = Integer.parseInt(coords[0]);
-            int y = Integer.parseInt(coords[1]);
+            Coords coords = new Coords(getIsleCoordsGivenEndcapSplit("south", which));
+            int x = coords.getX();
+            int y = coords.getY();
 
             int yToReturn = (int) (y-((int) (getCellsToSubsection()/2)*whatSubsection));
             if (endCapLocation.compareTo("south") != 0)
@@ -546,10 +536,9 @@ public class Isle
         }
         if (directionOfIncreasingIsleSections.compareTo("left") == 0)
         {
-            String s = getIsleCoordsGivenEndcapSplit("east", which);
-            String[] coords = s.split(",");
-            int x = Integer.parseInt(coords[0]);
-            int y = Integer.parseInt(coords[1]);
+            Coords coords = new Coords(getIsleCoordsGivenEndcapSplit("east", which));
+            int x = coords.getX();
+            int y = coords.getY();
 
             int xToReturn = (int) (x-((int) (getCellsToSubsection()/2)*whatSubsection));
             if (endCapLocation.compareTo("east") != 0)
@@ -559,10 +548,9 @@ public class Isle
         }
         if (directionOfIncreasingIsleSections.compareTo("down") == 0)
         {
-            String s = getIsleCoordsGivenEndcapSplit("north", which);
-            String[] coords = s.split(",");
-            int x = Integer.parseInt(coords[0]);
-            int y = Integer.parseInt(coords[1]);
+            Coords coords = new Coords(getIsleCoordsGivenEndcapSplit("north", which));
+            int x = coords.getX();
+            int y = coords.getY();
 
             int yToReturn = (int) (y+((int) (getCellsToSubsection()/2)*whatSubsection));
             if (endCapLocation.compareTo("north") != 0)
@@ -938,11 +926,9 @@ public class Isle
 
     public boolean verifyCell(String s)
     {
-        String[] coords = s.split(",");
-        int x = Integer.parseInt(coords[0]);
-        int y = Integer.parseInt(coords[1]);
+        Coords coords = new Coords(s);
 
-        return g.getRNode(x, y).getIsle().getIsleID().compareTo(isleID) == 0;
+        return g.getRNode(coords.getX(), coords.getY()).getIsle().getIsleID().compareTo(isleID) == 0;
     }
 
     /**

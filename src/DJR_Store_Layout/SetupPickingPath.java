@@ -1,34 +1,33 @@
 package DJR_Store_Layout;
 
+import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SetupPickingPath
 {
     private Stage stage;
-    public TextField text1, text2, text3, text4, text5, text6, text7, text8, text9, text10, text11, text12, text13, text14, text15, text16, text17, text18, text19, text20, text21, text22, text23, text24, text25, text26, text27, text28, text29, text30;
-    public Button button1, button2, button3, button4, button5, button6, button7, button8, button9, button10, button11, button12, button13, button14, button15, button16, button17, button18, button19, button20, button21, button22, button23, button24, button25, button26, button27, button28, button29, button30, done;
+    public TextField text1, text2, text3, text4, text5, text6, text7, text8, text9, text10, text11, text12, text13, text14, text15, text16, text17, text18, text19, text20;
+    public Button button1, button2, button3, button4, button5, button6, button7, button8, button9, button10, button11, button12, button13, button14, button15, button16, button17, button18, button19, button20, done, clearPath;
     public ChoiceBox choice1, choiceA;
 
     private TextField[] textArr;
     private Button[] buttonArr;
     private GridData3 grid;
     private GraphOfTheGrid graph;
+    private String[] cellPath;
+    private ArrayList<String> vertexPath;
 
     public SetupPickingPath()
     {
@@ -45,9 +44,9 @@ public class SetupPickingPath
     public void initialize()
     {
         choiceA.setItems(FXCollections.observableArrayList("Coordinates", "Locations"));
-        choice1.setItems(FXCollections.observableArrayList("OPU", "Regular"));
-        textArr = new TextField[]{text1, text2, text3, text4, text5, text6, text7, text8, text9, text10, text11, text12, text13, text14, text15, text16, text17, text18, text19, text20, text21, text22, text23, text24, text25, text26, text27, text28, text29, text30};
-        buttonArr = new Button[]{button1, button2, button3, button4, button5, button6, button7, button8, button9, button10, button11, button12, button13, button14, button15, button16, button17, button18, button19, button20, button21, button22, button23, button24, button25, button26, button27, button28, button29, button30};
+        choice1.setItems(FXCollections.observableArrayList("OPU", "OPU Grocery", "Regular"));
+        textArr = new TextField[]{text1, text2, text3, text4, text5, text6, text7, text8, text9, text10, text11, text12, text13, text14, text15, text16, text17, text18, text19, text20};
+        buttonArr = new Button[]{button1, button2, button3, button4, button5, button6, button7, button8, button9, button10, button11, button12, button13, button14, button15, button16, button17, button18, button19, button20};
         /*
         for (int i=0; i<buttonArr.length; i++)
         {
@@ -56,7 +55,6 @@ public class SetupPickingPath
 
             });
         }
-
          */
     }
 
@@ -70,24 +68,36 @@ public class SetupPickingPath
             {
                 if (!tf.getText().trim().isEmpty())
                 {
-                    list.put(tf.getText(), null);
+                    list.put(tf.getText(), tf.getText());
                     //System.out.println("Adding "+tf.getText()+" to list");
                 }
             }
 
-            GraphOfTheGrid.FindingPathReturn path = graph.findPickingPath(grid, list, choice1.getValue().toString());
+            GraphOfTheGrid.FindingPathReturn path = graph.findPickingPath3(list, choice1.getValue().toString());
             System.out.println("Location Path: "+path.getLocationPath());
             System.out.println("Vertex Path: "+path.getVertexPath());
+            vertexPath = path.getVertexPath();
             String[] coords = path.getCellPath().split(" ");
-            for (int i=1; i<coords.length; i++)
+            cellPath = coords;
+
+            AtomicInteger i = new AtomicInteger(1);
+            PauseTransition drawPath = new PauseTransition(Duration.millis(25));
+            drawPath.setOnFinished(actionEvent ->
             {
-                String[] coord = coords[i].split(",");
+                String[] coord = coords[i.get()].split(",");
                 int x = Integer.parseInt(coord[0]);
                 int y = Integer.parseInt(coord[1]);
                 Rectangle r = grid.getRNode(x, y).getR();
                 r.setFill(Color.RED);
                 r.setOpacity(0.5);
-            }
+                if (i.get() < coords.length-1)
+                {
+                    i.getAndIncrement();
+                    drawPath.play();
+                }
+            });
+            drawPath.play();
+
             for (String s : path.getVertexPath())
             {
                 String[] coord = s.split(",");
@@ -169,7 +179,9 @@ public class SetupPickingPath
             GraphOfTheGrid.FindingPathReturn path = graph.findPickingPath(grid, list, choice1.getValue().toString());
             System.out.println("Location Path: "+path.getLocationPath());
             System.out.println("Vertex Path: "+path.getVertexPath());
+            vertexPath = path.getVertexPath();
             String[] coords = path.getCellPath().split(" ");
+            cellPath = coords;
             for (int i=1; i<coords.length; i++)
             {
                 String[] coord = coords[i].split(",");
@@ -187,6 +199,35 @@ public class SetupPickingPath
                 Rectangle r = grid.getRNode(x, y).getR();
                 r.setFill(Color.RED);
                 r.setOpacity(1.0);
+            }
+        }
+    }
+
+    public void clearCellPath()
+    {
+        for (int i=1; i<cellPath.length; i++)
+        {
+            String[] coord = cellPath[i].split(",");
+            try
+            {
+                int x = Integer.parseInt(coord[0]);
+                int y = Integer.parseInt(coord[1]);
+                grid.getRNode(x, y).setHighlighted(false);
+            }
+            catch (NumberFormatException ignored) {}
+        }
+        for (String coords : vertexPath)
+        {
+            String[] coord = coords.split(",");
+            int x = Integer.parseInt(coord[0]);
+            int y = Integer.parseInt(coord[1]);
+            GridData3.RNode rNode = grid.getRNode(x, y);
+            if (rNode.isIsle())
+                rNode.getR().setFill(rNode.getColor());
+            else
+            {
+                rNode.getR().setFill(Color.RED);
+                rNode.getR().setOpacity(1.0);
             }
         }
     }

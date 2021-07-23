@@ -355,6 +355,9 @@ public class ActualController3 {
 
         stage.setMaximized(true);
 
+        new MyPopup("Each cell represents "+cellSizeInFeet+" feet.", stage).getStage().show();
+
+        /*
         Stage cellSize = new Stage();
         cellSize.initModality(Modality.APPLICATION_MODAL);
         cellSize.initOwner(stage);
@@ -368,6 +371,7 @@ public class ActualController3 {
         Scene cellSizeScene = new Scene(cellSizeVbox);
         cellSize.setScene(cellSizeScene);
         cellSize.show();
+         */
     }
 
     /**
@@ -434,7 +438,7 @@ public class ActualController3 {
         {
             final JFileChooser fc = new JFileChooser();
 
-            File f = new File("C:\\Users\\rober\\IdeaProjects\\Target2\\src\\Saves");
+            File f = new File("src\\Saves");
 
             fc.setCurrentDirectory(f);
 
@@ -849,10 +853,8 @@ public class ActualController3 {
         try
         {
             System.out.println("OPU Start/End: "+startAndEndPickPoints[0]);
-            String[] opuCoords = startAndEndPickPoints[0].split(",");
-            int opuX = Integer.parseInt(opuCoords[0]);
-            int opuY = Integer.parseInt(opuCoords[1]);
-            g.setOPUstartEndNode(g.getRNode(opuX, opuY), true);
+            Coords opuCoords = new Coords(startAndEndPickPoints[0]);
+            g.setOPUstartEndNode(g.getRNode(opuCoords.getX(), opuCoords.getY()), true);
         }
         catch (Exception e)
         {
@@ -860,11 +862,9 @@ public class ActualController3 {
         }
         try
         {
-            String[] regCoords = startAndEndPickPoints[1].split(",");
-            System.out.println("Reg Start/End: "+startAndEndPickPoints[1]);
-            int regX = Integer.parseInt(regCoords[0]);
-            int regY = Integer.parseInt(regCoords[1]);
-            g.setRegStartEndNode(g.getRNode(regX, regY), true);
+            Coords regCoords = new Coords(startAndEndPickPoints[1]);
+            System.out.println("Reg Start/End: "+regCoords);
+            g.setRegStartEndNode(g.getRNode(regCoords.getX(), regCoords.getY()), true);
         }
         catch (Exception e)
         {
@@ -875,7 +875,7 @@ public class ActualController3 {
     }
 
     /**
-     * Setups cell and functions assciated with creating groups
+     * Setups cell and functions associated with creating groups
      *
      * @param r rectangle that is the cell on display
      * @param node node of drawn cell in data
@@ -926,62 +926,11 @@ public class ActualController3 {
         });
         r.setOnMouseClicked(mouseEvent ->
         {
-            if (mouseEvent.getButton() == MouseButton.SECONDARY)
+            if (mouseEvent.getButton() == MouseButton.PRIMARY)
             {
-                if (node.isHighlighted())
-                {
-                    if (g.highlightedList.size() == 1)
-                    {
-                        if (g.opuStartEndNode != null)
-                            rightClick.getItems().remove(setupOPUstartEnd);
-                        if (g.regStartEndNode != null)
-                            rightClick.getItems().remove(setupRegularPickStartEnd);
-
-                        if (!showingSetOPUstartEnd && g.opuStartEndNode == null)
-                            rightClick.getItems().add(setupOPUstartEnd);
-                        showingSetOPUstartEnd = true;
-                        if (!showingSetRegStartEnd && g.regStartEndNode == null)
-                            rightClick.getItems().add(setupRegularPickStartEnd);
-                        showingSetRegStartEnd = true;
-                    }
-                    else
-                    {
-                        if (showingSetOPUstartEnd)
-                            rightClick.getItems().remove(setupOPUstartEnd);
-                        showingSetOPUstartEnd = false;
-                        if (showingSetRegStartEnd)
-                            rightClick.getItems().remove(setupRegularPickStartEnd);
-                        showingSetRegStartEnd = false;
-                    }
-                    rightClick.show(r, mouseEvent.getScreenX(), mouseEvent.getScreenY());
-                }
-                else if (node.isIsle())
-                {
-                    g.resetHighlighted();
-                    if (!node.getIsle().hasSetupInfo())
-                    {
-                        if (!showingSetupInfoMenu)
-                            rightClick2.getItems().add(setupInfoMenu);
-                        showingSetupInfoMenu = true;
-                    }
-                    else
-                    {
-                        if (showingSetupInfoMenu)
-                            rightClick2.getItems().remove(setupInfoMenu);
-                        showingSetupInfoMenu = false;
-                    }
-
-                    rightClick2.show(r, mouseEvent.getScreenX(), mouseEvent.getScreenY());
-                    editGroupNode = node;
-                }
-                else if (node.isNulled() && node.isHighlightedNull())
-                {
-                    rightClick3.show(r, mouseEvent.getScreenX(), mouseEvent.getScreenY());
-                    editGroupNode = node;
-                }
-            }
-            else if (mouseEvent.getButton() == MouseButton.PRIMARY)
-            {
+                g.resetHighlighted();
+                rightClick.hide();
+                rightClick2.hide();
                 if (!moving && node.isNulled())
                 {
                     g.resetHighlightedNulls();
@@ -997,6 +946,22 @@ public class ActualController3 {
                     if (node.isIsle())
                     {
                         node.getIsle().printInfo();
+
+                        if (!node.getIsle().hasSetupInfo())
+                        {
+                            if (!showingSetupInfoMenu)
+                                rightClick2.getItems().add(setupInfoMenu);
+                            showingSetupInfoMenu = true;
+                        }
+                        else
+                        {
+                            if (showingSetupInfoMenu)
+                                rightClick2.getItems().remove(setupInfoMenu);
+                            showingSetupInfoMenu = false;
+                        }
+                        GridData3.RNode rNode = g.getSoutheastMostIsleCell(node.getIsle());
+                        rightClick2.show(rNode.getR(), rNode.getsXMaxCoord()+finalSizeOfCells, rNode.getsYMaxCoord()+finalSizeOfCells);
+                        editGroupNode = node;
                     }
                     else
                     {
@@ -1012,16 +977,16 @@ public class ActualController3 {
                 {
                     System.out.println("Connects to: ");
 
-                    GraphOfTheGrid.EdgeNode curr = graph.graph.get(node.getX()+","+node.getY());
+                    GraphOfTheGrid.Edge curr = graph.graph.get(node.getX()+","+node.getY());
                     while (curr != null)
                     {
-                        System.out.print(curr.getEdge().getW()+" ");
+                        System.out.print(curr.getW()+" ");
                         if (curr.getNext() == null)
                             System.out.print("\n");
                         curr = curr.getNext();
                     }
                 }
-                if (moving && !node.isNulled())
+                if (moving && !node.isNulled() && !node.isIsle())
                 {
                     System.out.println("Remade Isle After Move");
                     node.setHighlighted(false);
@@ -1061,6 +1026,7 @@ public class ActualController3 {
             }
             if (mouseEvent.getButton() == MouseButton.PRIMARY && node.isNulled())
             {
+                g.resetHighlighted();
                 if (!highlighting)
                 {
                     g.resetHighlightedNulls();
@@ -1090,6 +1056,45 @@ public class ActualController3 {
         {
             g.resetHighlighted2();
             highlighting = false;
+            rightClick2.hide();
+            rightClick3.hide();
+            if (!moving)
+            {
+                if (!node.isNulled() && !node.isIsle() && g.highlightedList.size() > 0)
+                {
+                    GridData3.RNode rNode = g.getSoutheastMostHighlightedCell("Normal");
+                    if (g.highlightedList.size() == 1)
+                    {
+                        if (g.opuStartEndNode != null)
+                            rightClick.getItems().remove(setupOPUstartEnd);
+                        if (g.regStartEndNode != null)
+                            rightClick.getItems().remove(setupRegularPickStartEnd);
+
+                        if (!showingSetOPUstartEnd && g.opuStartEndNode == null)
+                            rightClick.getItems().add(setupOPUstartEnd);
+                        showingSetOPUstartEnd = true;
+                        if (!showingSetRegStartEnd && g.regStartEndNode == null)
+                            rightClick.getItems().add(setupRegularPickStartEnd);
+                        showingSetRegStartEnd = true;
+                    }
+                    else
+                    {
+                        if (showingSetOPUstartEnd)
+                            rightClick.getItems().remove(setupOPUstartEnd);
+                        showingSetOPUstartEnd = false;
+                        if (showingSetRegStartEnd)
+                            rightClick.getItems().remove(setupRegularPickStartEnd);
+                        showingSetRegStartEnd = false;
+                    }
+                    rightClick.show(rNode.getR(), rNode.getsXMaxCoord()+finalSizeOfCells, rNode.getsYMaxCoord()+finalSizeOfCells);
+                }
+                else if (!node.isIsle())
+                {
+                    GridData3.RNode rNode = g.getSoutheastMostHighlightedCell("Nulls");
+                    rightClick3.show(rNode.getR(), rNode.getsXMaxCoord()+finalSizeOfCells, rNode.getsYMaxCoord()+finalSizeOfCells);
+                    editGroupNode = node;
+                }
+            }
             //System.out.println("highlightingIterations: "+highlightingIterations);
         });
 
@@ -1124,19 +1129,7 @@ public class ActualController3 {
         {
             if (idT.getText().trim().isEmpty())
             {
-                Stage warning = new Stage();
-                warning.initModality(Modality.APPLICATION_MODAL);
-                warning.initOwner(stage);
-                VBox warningVbox = new VBox();
-                warningVbox.setSpacing(5);
-                warningVbox.setAlignment(Pos.CENTER);
-                Label warningText = new Label("Please Input an Isle Letter & Number");
-                Button ok = new Button("Ok");
-                ok.setOnAction(actionEvent1 -> warning.hide());
-                warningVbox.getChildren().addAll(warningText, ok);
-                Scene cellSizeScene = new Scene(warningVbox);
-                warning.setScene(cellSizeScene);
-                warning.show();
+                new MyPopup("Please Input an Isle Letter & Number", stage).getStage().show();
             }
             else
             {
@@ -1157,21 +1150,7 @@ public class ActualController3 {
         makeNew.setOnAction(actionEvent ->
         {
             if (idT.getText().trim().isEmpty())
-            {
-                Stage warning = new Stage();
-                warning.initModality(Modality.APPLICATION_MODAL);
-                warning.initOwner(stage);
-                VBox warningVbox = new VBox();
-                warningVbox.setSpacing(5);
-                warningVbox.setAlignment(Pos.CENTER);
-                Label warningText = new Label("Please Input an Isle Letter & Number");
-                Button ok = new Button("Ok");
-                ok.setOnAction(actionEvent1 -> warning.hide());
-                warningVbox.getChildren().addAll(warningText, ok);
-                Scene cellSizeScene = new Scene(warningVbox);
-                warning.setScene(cellSizeScene);
-                warning.show();
-            }
+                new MyPopup("Please Input an Isle Letter & Number", stage).getStage().show();
             else
             {
                 String isleID = idT.getText();
@@ -1228,21 +1207,7 @@ public class ActualController3 {
         submit.setOnAction(actionEvent ->
         {
             if (nameT.getText().trim().isEmpty())
-            {
-                Stage warning = new Stage();
-                warning.initModality(Modality.APPLICATION_MODAL);
-                warning.initOwner(stage);
-                VBox warningVbox = new VBox();
-                warningVbox.setSpacing(5);
-                warningVbox.setAlignment(Pos.CENTER);
-                Label warningText = new Label("Please Input a Isle Group Name");
-                Button ok = new Button("Ok");
-                ok.setOnAction(actionEvent1 -> warning.hide());
-                warningVbox.getChildren().addAll(warningText, ok);
-                Scene cellSizeScene = new Scene(warningVbox);
-                warning.setScene(cellSizeScene);
-                warning.show();
-            }
+                new MyPopup("Please Input a Isle Group Name", stage).getStage().show();
             else
             {
                 s.hide();
@@ -1444,55 +1409,13 @@ public class ActualController3 {
                         if (isleOfTest.inputingValidIsleLocationInBack(subsection))
                             System.out.println("Coords Found: "+isleOfTest.getCoordsGivenLocationInBack(subsection));
                         else
-                        {
-                            Stage warningStage = new Stage();
-                            warningStage.initModality(Modality.APPLICATION_MODAL);
-                            warningStage.initOwner(stage);
-                            VBox warningVbox = new VBox();
-                            warningVbox.setSpacing(5);
-                            warningVbox.setAlignment(Pos.CENTER);
-                            Label warningLabel = new Label("Isle Section/Isle Subsection not valid within possible isle locations");
-                            Button ok = new Button("Ok");
-                            ok.setOnAction(actionEvent1 -> warningStage.hide());
-                            warningVbox.getChildren().addAll(warningLabel, ok);
-                            Scene cellSizeScene = new Scene(warningVbox);
-                            warningStage.setScene(cellSizeScene);
-                            warningStage.show();
-                        }
+                            new MyPopup("Isle Section/Isle Subsection not valid within possible isle locations", stage).getStage().show();
                     }
                     else
-                    {
-                        Stage warningStage = new Stage();
-                        warningStage.initModality(Modality.APPLICATION_MODAL);
-                        warningStage.initOwner(stage);
-                        VBox warningVbox = new VBox();
-                        warningVbox.setSpacing(5);
-                        warningVbox.setAlignment(Pos.CENTER);
-                        Label warningLabel = new Label("Isle: "+sArr[0]+sArr[1]+" does not exist/has not been setup");
-                        Button ok = new Button("Ok");
-                        ok.setOnAction(actionEvent1 -> warningStage.hide());
-                        warningVbox.getChildren().addAll(warningLabel, ok);
-                        Scene cellSizeScene = new Scene(warningVbox);
-                        warningStage.setScene(cellSizeScene);
-                        warningStage.show();
-                    }
+                        new MyPopup("Isle: "+sArr[0]+sArr[1]+" does not exist/has not been setup", stage).getStage().show();
                 }
                 else
-                {
-                    Stage warningStage = new Stage();
-                    warningStage.initModality(Modality.APPLICATION_MODAL);
-                    warningStage.initOwner(stage);
-                    VBox warningVbox = new VBox();
-                    warningVbox.setSpacing(5);
-                    warningVbox.setAlignment(Pos.CENTER);
-                    Label warningLabel = new Label("Isle Group does not exist");
-                    Button ok = new Button("Ok");
-                    ok.setOnAction(actionEvent1 -> warningStage.hide());
-                    warningVbox.getChildren().addAll(warningLabel, ok);
-                    Scene cellSizeScene = new Scene(warningVbox);
-                    warningStage.setScene(cellSizeScene);
-                    warningStage.show();
-                }
+                    new MyPopup("Isle Group does not exist", stage).getStage().show();
             }
             catch (NumberFormatException e)
             {
@@ -1514,55 +1437,13 @@ public class ActualController3 {
                         if (isleOfTest.inputingValidIsleLocationOnFloor(isleSection, loc3[0]))
                             System.out.println("Coords Found: "+isleOfTest.getCoordsGivenLocationOnFloor(isleSection, loc3[0]));
                         else
-                        {
-                            Stage warningStage = new Stage();
-                            warningStage.initModality(Modality.APPLICATION_MODAL);
-                            warningStage.initOwner(stage);
-                            VBox warningVbox = new VBox();
-                            warningVbox.setSpacing(5);
-                            warningVbox.setAlignment(Pos.CENTER);
-                            Label warningLabel = new Label("Isle Section/Isle Subsection not valid within possible isle locations");
-                            Button ok = new Button("Ok");
-                            ok.setOnAction(actionEvent1 -> warningStage.hide());
-                            warningVbox.getChildren().addAll(warningLabel, ok);
-                            Scene cellSizeScene = new Scene(warningVbox);
-                            warningStage.setScene(cellSizeScene);
-                            warningStage.show();
-                        }
+                            new MyPopup("Isle Section/Isle Subsection not valid within possible isle locations", stage).getStage().show();
                     }
                     else
-                    {
-                        Stage warningStage = new Stage();
-                        warningStage.initModality(Modality.APPLICATION_MODAL);
-                        warningStage.initOwner(stage);
-                        VBox warningVbox = new VBox();
-                        warningVbox.setSpacing(5);
-                        warningVbox.setAlignment(Pos.CENTER);
-                        Label warningLabel = new Label("Isle: "+loc1[0]+" does not exist/has not been setup");
-                        Button ok = new Button("Ok");
-                        ok.setOnAction(actionEvent1 -> warningStage.hide());
-                        warningVbox.getChildren().addAll(warningLabel, ok);
-                        Scene cellSizeScene = new Scene(warningVbox);
-                        warningStage.setScene(cellSizeScene);
-                        warningStage.show();
-                    }
+                        new MyPopup("Isle: "+loc1[0]+" does not exist/has not been setup", stage).getStage().show();
                 }
                 else
-                {
-                    Stage warningStage = new Stage();
-                    warningStage.initModality(Modality.APPLICATION_MODAL);
-                    warningStage.initOwner(stage);
-                    VBox warningVbox = new VBox();
-                    warningVbox.setSpacing(5);
-                    warningVbox.setAlignment(Pos.CENTER);
-                    Label warningLabel = new Label("Isle Group does not exist");
-                    Button ok = new Button("Ok");
-                    ok.setOnAction(actionEvent1 -> warningStage.hide());
-                    warningVbox.getChildren().addAll(warningLabel, ok);
-                    Scene cellSizeScene = new Scene(warningVbox);
-                    warningStage.setScene(cellSizeScene);
-                    warningStage.show();
-                }
+                    new MyPopup("Isle Group does not exist", stage).getStage().show();
             }
         });
 
@@ -1608,10 +1489,8 @@ public class ActualController3 {
             {
                 try
                 {
-                    String[] coords = pathArr[i].split(",");
-                    int x = Integer.parseInt(coords[0]);
-                    int y = Integer.parseInt(coords[1]);
-                    Rectangle r = g.getRNode(x, y).getR();
+                    Coords coords = new Coords(pathArr[i]);
+                    Rectangle r = g.getRNode(coords.getX(), coords.getY()).getR();
                     r.setFill(Color.RED);
                     r.setOpacity(0.5);
                 }

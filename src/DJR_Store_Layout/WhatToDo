@@ -6,17 +6,22 @@ D39(1)1-1-1.90
 
 - Setup all isles with new info
 
-- Custom Warning class that makes it easy to flash a warning popup given input string
-
-- Classes for converting coords to String and back to coords
-
-- Select multiple isles at a time and move them
-
 - Bug Line 542 of ActualController3: Why do I need to add 1 to each remainder??
 
 - Line 217 of Isle: Half-assed this, need to change
 
-- Line 427 of GraphOfTheGrid: findPickingPath2()
+- Finalize findPickingPath algorithms and make sure they work with location strings
+
+- UI:
+    - Buttons for OPU, Regular Pick start/end
+    - Button for saving layout
+    - Thread for saving layout automatically
+    - Startup info graphic for explaining for to make a layout
+    - Info graphic for setup isle info
 
 Optimization:
 - Multithreading (EVERYWHERE)
+
+Tests:
+- Making sure cells line up with crosses
+- Testing distances for finding picking path & retracing steps
