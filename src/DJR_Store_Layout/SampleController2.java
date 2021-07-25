@@ -103,7 +103,8 @@ public class SampleController2 {
         bP.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
         //vbox.setBorder(new Border(new BorderStroke(Color.RED, BorderStrokeStyle.SOLID, null , null)));
 
-        submit.setOnAction(actionEvent -> {
+        submit.setOnAction(actionEvent ->
+        {
             try
             {
                 floors = Integer.parseInt(floorsText.getText());
@@ -141,7 +142,7 @@ public class SampleController2 {
                 Rectangle2D screenBounds = Screen.getPrimary().getBounds();
                 double x = screenBounds.getWidth();
                 double y = screenBounds.getHeight();
-                new ActualController3(floors, length, width, x, y-63).launchScene(stage);
+                new ActualController3(floors, length, width, x, y-63).launchScene(stage, false);
             }
             catch (ArithmeticException e)
             {

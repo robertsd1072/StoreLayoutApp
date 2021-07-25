@@ -1,21 +1,24 @@
 package DJR_Store_Layout;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import java.util.ArrayList;
 
 public class MyPopup
 {
-    private final String message;
+    private final ArrayList<Node> listOfNodes;
     private final Stage stage;
 
-    public MyPopup(String s, Stage st)
+    public MyPopup(ArrayList<Node> list, Stage st)
     {
-        message = s;
+        listOfNodes = list;
         stage = st;
     }
 
@@ -27,10 +30,11 @@ public class MyPopup
         VBox popupStageVbox = new VBox();
         popupStageVbox.setSpacing(5);
         popupStageVbox.setAlignment(Pos.CENTER);
-        Label messageLabel = new Label(message);
         Button ok = new Button("Ok");
         ok.setOnAction(actionEvent -> popupStage.hide());
-        popupStageVbox.getChildren().addAll(messageLabel, ok);
+        listOfNodes.add(ok);
+        for (Node thing : listOfNodes)
+            popupStageVbox.getChildren().add(thing);
         Scene popupScene = new Scene(popupStageVbox);
         popupStage.setScene(popupScene);
 

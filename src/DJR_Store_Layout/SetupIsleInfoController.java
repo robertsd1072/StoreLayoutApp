@@ -2,6 +2,7 @@ package DJR_Store_Layout;
 
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -105,7 +106,10 @@ public class SetupIsleInfoController
             }
             catch (Exception e)
             {
-                new MyPopup("Enter Valid Numbers for Each Isle Section Field", stage).getStage().show();
+                ArrayList<Node> list = new ArrayList<>();
+                Label label = new Label("Enter Valid Numbers for Each Isle Section Field");
+                list.add(label);
+                new MyPopup(list, stage).getStage().show();
             }
         }
 

@@ -102,7 +102,7 @@ public class LoadOrCreateController {
         if (returnVal == JFileChooser.APPROVE_OPTION)
         {
             File file = fc.getSelectedFile();
-            new ActualController3(file, x, y).launchScene(stage);
+            new ActualController3(file, x, y).launchScene(stage, true);
         }
     }
 }

@@ -8,6 +8,7 @@ package DJR_Store_Layout;
 
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -17,6 +18,8 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -56,7 +59,7 @@ public class ActualController3 {
     private int floors, length, width;
     private final int cols, rows;
     private float cellSizeInFeet;
-    private double sX, sY, xRemainderSize1, yRemainderSize1, mouseX, mouseY;
+    private double sX, sY, xRemainderSize1, yRemainderSize1;
     private final double finalSizeOfCells;
     private boolean highlighting, moving, showingSetupInfoMenu, showingSetOPUstartEnd, showingSetRegStartEnd;
     private GridData3.RNode editGroupNode;
@@ -108,7 +111,7 @@ public class ActualController3 {
         cellSizeInFeet = 2;
 
         finalSizeOfCells = sizeOfCells;
-        System.out.println("Final Cell Size in Feet: "+finalSizeOfCells);
+        System.out.println("Final Cell Size in Pixels: "+finalSizeOfCells);
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("actual.fxml"));
         loader.setController(this);
@@ -323,7 +326,7 @@ public class ActualController3 {
      * Launches scene
      * Also sets mouse/screen dimensions for debugging
      */
-    public void launchScene(Stage stage)
+    public void launchScene(Stage stage, boolean fromFile)
     {
         this.stage = stage;
         stage.setScene(scene);
@@ -355,23 +358,22 @@ public class ActualController3 {
 
         stage.setMaximized(true);
 
-        new MyPopup("Each cell represents "+cellSizeInFeet+" feet.", stage).getStage().show();
-
-        /*
-        Stage cellSize = new Stage();
-        cellSize.initModality(Modality.APPLICATION_MODAL);
-        cellSize.initOwner(stage);
-        VBox cellSizeVbox = new VBox();
-        cellSizeVbox.setSpacing(5);
-        cellSizeVbox.setAlignment(Pos.CENTER);
-        Label ratioOfCellsToFeet = new Label("Each cell represents "+cellSizeInFeet+" feet.");
-        Button ok = new Button("Ok");
-        ok.setOnAction(actionEvent -> cellSize.hide());
-        cellSizeVbox.getChildren().addAll(ratioOfCellsToFeet, ok);
-        Scene cellSizeScene = new Scene(cellSizeVbox);
-        cellSize.setScene(cellSizeScene);
-        cellSize.show();
-         */
+        if (!fromFile)
+        {
+            ArrayList<Node> list = new ArrayList<>();
+            ImageView iv = new ImageView(getClass().getResource("introInfoFirst.jpg").toExternalForm());
+            iv.setFitWidth(600);
+            iv.setFitHeight(337.5);
+            list.add(iv);
+            ImageView iv2 = new ImageView(getClass().getResource("introInfoSecond.jpg").toExternalForm());
+            iv2.setFitWidth(600);
+            iv2.setFitHeight(246.91);
+            list.add(iv2);
+            Label cellSize = new Label("Each cell represents "+cellSizeInFeet+" feet.");
+            cellSize.setStyle("-fx-font-size: 16;");
+            list.add(cellSize);
+            new MyPopup(list, stage).getStage().show();
+        }
     }
 
     /**
@@ -389,7 +391,7 @@ public class ActualController3 {
         {
             final JFileChooser fc = new JFileChooser();
 
-            File f = new File("C:\\Users\\rober\\IdeaProjects\\Target2\\src\\Saves");
+            File f = new File("src\\Saves");
 
             fc.setCurrentDirectory(f);
 
@@ -620,44 +622,23 @@ public class ActualController3 {
     private void initOutsidePanes(double x, double y)
     {
         System.out.println("Initializing Outside Panes w/ x: "+x+" and y: "+y);
-        double xRemainderSize = (int) x-(finalSizeOfCells * cols);
-        double yRemainderSize = (int) y-(finalSizeOfCells * rows)-25;
+        double xRemainderSize = x-(finalSizeOfCells * cols)+3;
+        double yRemainderSize = y-(finalSizeOfCells * rows)-25+2.5;
+        System.out.println("x rem: "+xRemainderSize);
+        System.out.println("y rem: "+yRemainderSize);
 
-        if (xRemainderSize % 2 == 1)
-        {
-            xRemainderSize1 = (int) (xRemainderSize/2+1);
-        }
-        else
-        {
-            xRemainderSize1 = (int) (xRemainderSize/2);
-        }
-        double xRemainderSize2 = (int) (xRemainderSize/2);
+        leftPthatHelpsCells.setPrefWidth(xRemainderSize/2);
+        rightPthatHelpsCells.setPrefWidth(xRemainderSize/2);
+        topPthatHelpsCells.setPrefHeight(yRemainderSize/2);
+        botPthatHelpsCells.setPrefHeight(yRemainderSize/2);
 
-        if (yRemainderSize % 2 == 1)
-        {
-            yRemainderSize1 = (int) (yRemainderSize/2+1);
-        }
-        else
-        {
-            yRemainderSize1 = (int) (yRemainderSize/2);
-        }
-        double yRemainderSize2 = (int) (yRemainderSize/2);
+        xRemainderSize1 = xRemainderSize/2;
+        yRemainderSize1 = yRemainderSize/2;
 
-        if (yRemainderSize1 == 18)
-        {
-            yRemainderSize1+=1;
-            yRemainderSize2+=1;
-        }
-
-        leftPthatHelpsCells.setPrefWidth(xRemainderSize1);
-        rightPthatHelpsCells.setPrefWidth(xRemainderSize2);
-        topPthatHelpsCells.setPrefHeight(yRemainderSize1);
-        botPthatHelpsCells.setPrefHeight(yRemainderSize2);
-
-        System.out.println("x rem 1: "+xRemainderSize1);
-        System.out.println("x rem 2: "+xRemainderSize2);
-        System.out.println("y rem 1: "+yRemainderSize1);
-        System.out.println("y rem 2: "+yRemainderSize2);
+        System.out.println("x rem 1: "+xRemainderSize/2);
+        System.out.println("x rem 2: "+xRemainderSize/2);
+        System.out.println("y rem 1: "+yRemainderSize/2);
+        System.out.println("y rem 2: "+yRemainderSize/2);
     }
 
     /**
@@ -1129,7 +1110,10 @@ public class ActualController3 {
         {
             if (idT.getText().trim().isEmpty())
             {
-                new MyPopup("Please Input an Isle Letter & Number", stage).getStage().show();
+                ArrayList<Node> list = new ArrayList<>();
+                Label label = new Label("Please Input an Isle Letter & Number");
+                list.add(label);
+                new MyPopup(list, stage).getStage().show();
             }
             else
             {
@@ -1150,7 +1134,12 @@ public class ActualController3 {
         makeNew.setOnAction(actionEvent ->
         {
             if (idT.getText().trim().isEmpty())
-                new MyPopup("Please Input an Isle Letter & Number", stage).getStage().show();
+            {
+                ArrayList<Node> list = new ArrayList<>();
+                Label label = new Label("Please Input an Isle Letter & Number");
+                list.add(label);
+                new MyPopup(list, stage).getStage().show();
+            }
             else
             {
                 String isleID = idT.getText();
@@ -1207,7 +1196,12 @@ public class ActualController3 {
         submit.setOnAction(actionEvent ->
         {
             if (nameT.getText().trim().isEmpty())
-                new MyPopup("Please Input a Isle Group Name", stage).getStage().show();
+            {
+                ArrayList<Node> list = new ArrayList<>();
+                Label label = new Label("Please Input a Isle Group Name");
+                list.add(label);
+                new MyPopup(list, stage).getStage().show();
+            }
             else
             {
                 s.hide();
@@ -1409,13 +1403,28 @@ public class ActualController3 {
                         if (isleOfTest.inputingValidIsleLocationInBack(subsection))
                             System.out.println("Coords Found: "+isleOfTest.getCoordsGivenLocationInBack(subsection));
                         else
-                            new MyPopup("Isle Section/Isle Subsection not valid within possible isle locations", stage).getStage().show();
+                        {
+                            ArrayList<Node> list = new ArrayList<>();
+                            Label label = new Label("Isle Section/Isle Subsection not valid within possible isle locations");
+                            list.add(label);
+                            new MyPopup(list, stage).getStage().show();
+                        }
                     }
                     else
-                        new MyPopup("Isle: "+sArr[0]+sArr[1]+" does not exist/has not been setup", stage).getStage().show();
+                    {
+                        ArrayList<Node> list = new ArrayList<>();
+                        Label label = new Label("Isle: "+sArr[0]+sArr[1]+" does not exist/has not been setup");
+                        list.add(label);
+                        new MyPopup(list, stage).getStage().show();
+                    }
                 }
                 else
-                    new MyPopup("Isle Group does not exist", stage).getStage().show();
+                {
+                    ArrayList<Node> list = new ArrayList<>();
+                    Label label = new Label("Isle Group does not exist");
+                    list.add(label);
+                    new MyPopup(list, stage).getStage().show();
+                }
             }
             catch (NumberFormatException e)
             {
@@ -1437,13 +1446,28 @@ public class ActualController3 {
                         if (isleOfTest.inputingValidIsleLocationOnFloor(isleSection, loc3[0]))
                             System.out.println("Coords Found: "+isleOfTest.getCoordsGivenLocationOnFloor(isleSection, loc3[0]));
                         else
-                            new MyPopup("Isle Section/Isle Subsection not valid within possible isle locations", stage).getStage().show();
+                        {
+                            ArrayList<Node> list = new ArrayList<>();
+                            Label label = new Label("Isle Section/Isle Subsection not valid within possible isle locations");
+                            list.add(label);
+                            new MyPopup(list, stage).getStage().show();
+                        }
                     }
                     else
-                        new MyPopup("Isle: "+loc1[0]+" does not exist/has not been setup", stage).getStage().show();
+                    {
+                        ArrayList<Node> list = new ArrayList<>();
+                        Label label = new Label("Isle: "+loc1[0]+" does not exist/has not been setup");
+                        list.add(label);
+                        new MyPopup(list, stage).getStage().show();
+                    }
                 }
                 else
-                    new MyPopup("Isle Group does not exist", stage).getStage().show();
+                {
+                    ArrayList<Node> list = new ArrayList<>();
+                    Label label = new Label("Isle Group does not exist");
+                    list.add(label);
+                    new MyPopup(list, stage).getStage().show();
+                }
             }
         });
 
@@ -1522,8 +1546,6 @@ public class ActualController3 {
      */
     public void sendMouse(double x, double y)
     {
-        mouseX = x;
-        mouseY = y;
         m1.setText("MouseX: " + x);
         m2.setText("MouseY: " + y);
     }
