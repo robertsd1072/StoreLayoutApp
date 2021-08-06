@@ -10,6 +10,8 @@ D39(1)1-1-1.90
 
 - Line 217 of Isle: Half-assed this, need to change
 
+- Creating new layout does not create a graph of the grid
+
 - Finalize findPickingPath algorithms and make sure they work with location strings
 
 - UI:
