@@ -23,17 +23,17 @@
                   <MenuItem fx:id="testPickingPath" mnemonicParsing="false" text="Text Picking Path" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Edit">
+          <Menu mnemonicParsing="false" text="Set Start/End">
             <items>
-                  <MenuItem fx:id="addCol" mnemonicParsing="false" text="Add Column" />
-              <MenuItem fx:id="addRow" mnemonicParsing="false" text="Add Row" />
-                  <MenuItem fx:id="delCol" mnemonicParsing="false" text="Delete Column" />
-                  <MenuItem fx:id="delRow" mnemonicParsing="false" text="Delete Row" />
+                  <MenuItem fx:id="setupRegularPickStartEnd" mnemonicParsing="false" text="Set Regular Pick Start/End" />
+              <MenuItem fx:id="setupRegOPUstartEnd" mnemonicParsing="false" text="Set Regular OPU Pick Start/End" />
+                  <MenuItem fx:id="setupGroOPUstartEnd" mnemonicParsing="false" text="Set Grocery OPU Pick Start/End" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Help">
             <items>
-              <MenuItem mnemonicParsing="false" text="About" />
+              <MenuItem fx:id="layoutInstructionsMenu" mnemonicParsing="false" text="Show layout instructions" />
+                  <MenuItem fx:id="isleInfoInstructionsMenu" mnemonicParsing="false" text="Show isle info instructions" />
             </items>
           </Menu>
             <Menu fx:id="m1" mnemonicParsing="false" text="MouseX:" />

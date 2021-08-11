@@ -1,5 +1,5 @@
 /**
- * SampleController2 class for project DJR_Store_Layout
+ * CreateNewLayoutController class for project DJR_Store_Layout
  * Lets user dictate store dimensions for layout setup
  * @author David Roberts
  */
@@ -22,7 +22,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class SampleController2 {
+public class CreateNewLayoutController {
     /**
      * Launching variables
      */
@@ -47,9 +47,9 @@ public class SampleController2 {
     /**
      * Constructor loads fxml and connects this controller
      */
-    public SampleController2() throws RuntimeException
+    public CreateNewLayoutController() throws RuntimeException
     {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("sample.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("createNewLayout.fxml"));
         loader.setController(this);
         try
         {
@@ -142,7 +142,7 @@ public class SampleController2 {
                 Rectangle2D screenBounds = Screen.getPrimary().getBounds();
                 double x = screenBounds.getWidth();
                 double y = screenBounds.getHeight();
-                new ActualController3(floors, length, width, x, y-63).launchScene(stage, false);
+                new IsleLayoutController(floors, length, width, x, y-63).launchScene(stage, false);
             }
             catch (ArithmeticException e)
             {

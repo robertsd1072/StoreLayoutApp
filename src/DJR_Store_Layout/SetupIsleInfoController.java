@@ -1,24 +1,22 @@
 package DJR_Store_Layout;
 
 import javafx.collections.FXCollections;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 public class SetupIsleInfoController
 {
     private Stage stage;
     public VBox theV, vboxOfTexts;
-    public Button addSection, done;
+    public Button addSection, done, help;
     public HBox hbox0, hboxEnd;
     public TextField text0, text1;
     public ChoiceBox choiceA, choiceB;
@@ -26,30 +24,37 @@ public class SetupIsleInfoController
     private GridData3 g;
     private Isle isle;
     private int numberOfIsleSections;
-    private final ArrayList<Integer> numberOfSubsectionsForEachSection;
-    private final ArrayList<TextField> textFields;
+    private final Hashtable<Integer, Integer> numberOfSubsectionsForEachSection;
+    private final ArrayList<TextField> subsectionTextfields, sectionNumberTextfields;
+    private IsleLayoutController ac;
 
     public SetupIsleInfoController()
     {
         g = null;
         numberOfIsleSections = 2;
-        numberOfSubsectionsForEachSection = new ArrayList<>();
-        textFields = new ArrayList<>();
+        numberOfSubsectionsForEachSection = new Hashtable<>();
+        subsectionTextfields = new ArrayList<>();
+        sectionNumberTextfields = new ArrayList<>();
     }
 
     public void initialize()
     {
-        textFields.add(text0);
-        textFields.add(text1);
+        subsectionTextfields.add(text0);
+        subsectionTextfields.add(text1);
         choiceA.setItems(FXCollections.observableArrayList("north", "south", "east", "west"));
         choiceB.setItems(FXCollections.observableArrayList("up", "down", "left", "right", "diagonal right", "diagonal left"));
+        help.setOnAction(actionEvent -> ac.displayIsleInfoInstructions());
     }
 
-    public void setImportantInfo(GridData3 grid, Isle i, Stage s)
+    public void setImportantInfo(GridData3 grid, Isle i, Stage s, IsleLayoutController actualController3)
     {
         g = grid;
         isle = i;
         stage = s;
+        ac = actualController3;
+
+        text0.setText(1+"");
+        text1.setText((isle.getNumberOfCellsInIsle()-1)+"");
 
         if (isle.getIsleGroup().getBackOrFloor().compareTo("back") == 0)
         {
@@ -64,7 +69,7 @@ public class SetupIsleInfoController
             Isle.IsleCellList.IsleCellNode curr = isle.getIsleCellList().getFirst();
             while (curr != null)
             {
-                curr.getrNode().getR().setOpacity(1.0);
+                curr.getrNode().getR().setFill(isle.getIsleGroup().getColor());
                 curr = curr.getNext();
             }
         });
@@ -73,44 +78,65 @@ public class SetupIsleInfoController
     public void addSection()
     {
         HBox hbox = new HBox();
-        Label label1;
-        if (numberOfIsleSections < 10)
-            label1 = new Label("Isle Section "+numberOfIsleSections+"       ");
-        else
-            label1 = new Label("Isle Section "+numberOfIsleSections+"      ");
+        Label label1 = new Label("Isle Section ");
         label1.setStyle("-fx-font-size: 16;");
-        Label label2 = new Label("# of Subsections: ");
+        TextField numOfSection = new TextField();
+        numOfSection.setPrefWidth(30);
+        Label label2 = new Label("      ");
         label2.setStyle("-fx-font-size: 16;");
+        Label label3 = new Label("# of Subsections: ");
+        label3.setStyle("-fx-font-size: 16;");
         TextField textFieldNew = new TextField();
-        hbox.getChildren().addAll(label1, label2, textFieldNew);
+        hbox.getChildren().addAll(label1, numOfSection, label2, label3, textFieldNew);
         vboxOfTexts.getChildren().add(hbox);
         stage.setHeight(stage.getHeight()+25);
-        textFields.add(textFieldNew);
+        subsectionTextfields.add(textFieldNew);
+        sectionNumberTextfields.add(numOfSection);
         numberOfIsleSections++;
     }
 
     public void done()
     {
-        for (TextField textField : textFields)
+        if (isle.getIsleGroup().getBackOrFloor().compareTo("back") == 0)
+        {
+            numberOfSubsectionsForEachSection.put(0, 1);
+            numberOfSubsectionsForEachSection.put(1, Integer.parseInt(text1.getText()));
+        }
+        else
         {
             try
             {
-                if (isle.getIsleGroup().getBackOrFloor().compareTo("floor") == 0)
-                    numberOfSubsectionsForEachSection.add(Integer.parseInt(textField.getText()));
-                else
-                {
-                    numberOfSubsectionsForEachSection.add(1);
-                    numberOfSubsectionsForEachSection.add(Integer.parseInt(text1.getText()));
-                    break;
-                }
+                numberOfSubsectionsForEachSection.put(0, Integer.parseInt(subsectionTextfields.get(0).getText()));
+                numberOfSubsectionsForEachSection.put(1, Integer.parseInt(subsectionTextfields.get(1).getText()));
             }
-            catch (Exception e)
+            catch (NumberFormatException e)
             {
                 ArrayList<Node> list = new ArrayList<>();
                 Label label = new Label("Enter Valid Numbers for Each Isle Section Field");
                 list.add(label);
                 new MyPopup(list, stage).getStage().show();
             }
+
+            for (int i=2; i<subsectionTextfields.size(); i++)
+            {
+                try
+                {
+                    numberOfSubsectionsForEachSection.put(Integer.parseInt(sectionNumberTextfields.get(i-2).getText()), Integer.parseInt(subsectionTextfields.get(i).getText()));
+                    numberOfIsleSections++;
+                }
+                catch (NumberFormatException e)
+                {
+                    ArrayList<Node> list = new ArrayList<>();
+                    Label label = new Label("Enter Valid Numbers for Each Isle Section Field");
+                    list.add(label);
+                    new MyPopup(list, stage).getStage().show();
+                }
+            }
+        }
+
+        for (int i : numberOfSubsectionsForEachSection.keySet())
+        {
+            System.out.println("Isle Section "+i+" has "+numberOfSubsectionsForEachSection.get(i)+" subsections");
         }
 
         if (isle.getIsleGroup().getBackOrFloor().compareTo("back") == 0)
@@ -122,7 +148,7 @@ public class SetupIsleInfoController
         Isle.IsleCellList.IsleCellNode curr = isle.getIsleCellList().getFirst();
         while (curr != null)
         {
-            curr.getrNode().getR().setOpacity(1.0);
+            curr.getrNode().getR().setFill(isle.getIsleGroup().getColor());
             curr = curr.getNext();
         }
         stage.hide();

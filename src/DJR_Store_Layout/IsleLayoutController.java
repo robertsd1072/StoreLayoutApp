@@ -1,11 +1,12 @@
 /**
- * ActualController3 class for project DJR_Store_Layout
+ * IsleLayoutController class for project DJR_Store_Layout
  * Controls store layout and all accompanying functionality
  * @author David Roberts
  */
 
 package DJR_Store_Layout;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -18,7 +19,6 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -32,7 +32,7 @@ import javax.swing.*;
 import java.io.*;
 import java.util.*;
 
-public class ActualController3 {
+public class IsleLayoutController {
     /**
      * Launching variables
      */
@@ -44,10 +44,12 @@ public class ActualController3 {
      * FXML variables
      */
     public HBox hboxWithThePluses, hboxWithTheCells;
-    public MenuItem resize, back, saveLayout, testLocation, testPath, testPickingPath, setupInfoMenu, setupOPUstartEnd, setupRegularPickStartEnd;
+    public MenuItem resize, back, saveLayout, testLocation, testPath, testPickingPath, setupInfoMenu, setupRegOPUstartEnd,
+            setupGroOPUstartEnd, setupRegularPickStartEnd, layoutInstructionsMenu, isleInfoInstructionsMenu;
     public Menu file, m1, m2, m3, m4, m5, m6;
     public MenuBar menuBar;
-    public Pane topPthatHelpsPluses, botPthatHelpsPluses, leftPthatHelpsPluses, rightPthatHelpsPluses, topPthatHelpsCells, botPthatHelpsCells, leftPthatHelpsCells, rightPthatHelpsCells;
+    public Pane topPthatHelpsPluses, botPthatHelpsPluses, leftPthatHelpsPluses, rightPthatHelpsPluses, topPthatHelpsCells,
+            botPthatHelpsCells, leftPthatHelpsCells, rightPthatHelpsCells;
     public VBox theV;
     public StackPane sP;
     public ContextMenu rightClick, rightClick2, rightClick3;
@@ -61,7 +63,7 @@ public class ActualController3 {
     private float cellSizeInFeet;
     private double sX, sY, xRemainderSize1, yRemainderSize1;
     private final double finalSizeOfCells;
-    private boolean highlighting, moving, showingSetupInfoMenu, showingSetOPUstartEnd, showingSetRegStartEnd;
+    private boolean highlighting, moving, showingSetupInfoMenu, settingRegOpuStartEnd, settingGroOpuStartEnd, settingRegStartEnd;
     private GridData3.RNode editGroupNode;
     private Isle isleToMove;
     private SetupIsleInfoController setupInfoStuff;
@@ -78,7 +80,7 @@ public class ActualController3 {
      * @param x screen x dimension
      * @param y scrren y dimension
      */
-    public ActualController3(int f, int l, int w, double x, double y)
+    public IsleLayoutController(int f, int l, int w, double x, double y)
     {
         floors = f;
         length = l;
@@ -113,7 +115,7 @@ public class ActualController3 {
         finalSizeOfCells = sizeOfCells;
         System.out.println("Final Cell Size in Pixels: "+finalSizeOfCells);
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("actual.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("isleLayout.fxml"));
         loader.setController(this);
         try
         {
@@ -137,7 +139,7 @@ public class ActualController3 {
      * @param x screen horizontal dimension
      * @param y screen vertical dimension
      */
-    public ActualController3(File file, double x, double y)
+    public IsleLayoutController(File file, double x, double y)
     {
         int cols1 = 0;
         int rows1 = 0;
@@ -149,7 +151,7 @@ public class ActualController3 {
         ArrayList<ArrayList<Hashtable<String, String>>> listOfIslesWithCells = new ArrayList<>();
         ArrayList<ArrayList<Hashtable<String, InfoToMakeIsleFromFile>>> listOfIslesWithSetupInfo = new ArrayList<>();
         String cellsToNull = null;
-        String[] startAndEndPickPoints = new String[2];
+        String[] startAndEndPickPoints = new String[3];
         try
         {
             Scanner scanner = new Scanner(file);
@@ -254,20 +256,30 @@ public class ActualController3 {
                     catch (NumberFormatException ignored) {}
 
                     String string1 = scanner.nextLine();
-                    String[] opuStartEnd = string1.split(":");
+                    String[] regOpuStartEnd = string1.split(":");
                     try
                     {
-                        startAndEndPickPoints[0] = opuStartEnd[1];
+                        startAndEndPickPoints[0] = regOpuStartEnd[1];
                     }
                     catch (ArrayIndexOutOfBoundsException e)
                     {
                         e.printStackTrace();
                     }
-                    String next = scanner.nextLine();
-                    String[] regStartEnd = next.split(":");
+                    String string2 = scanner.nextLine();
+                    String[] groOpuStartEnd = string2.split(":");
                     try
                     {
-                        startAndEndPickPoints[1] = regStartEnd[1];
+                        startAndEndPickPoints[1] = groOpuStartEnd[1];
+                    }
+                    catch (ArrayIndexOutOfBoundsException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    String string3 = scanner.nextLine();
+                    String[] regStartEnd = string3.split(":");
+                    try
+                    {
+                        startAndEndPickPoints[2] = regStartEnd[1];
                     }
                     catch (ArrayIndexOutOfBoundsException e)
                     {
@@ -306,7 +318,7 @@ public class ActualController3 {
         System.out.println("Columns: "+cols);
         System.out.println("Rows: "+rows);
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("actual.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("isleLayout.fxml"));
         loader.setController(this);
         try
         {
@@ -359,21 +371,7 @@ public class ActualController3 {
         stage.setMaximized(true);
 
         if (!fromFile)
-        {
-            ArrayList<Node> list = new ArrayList<>();
-            ImageView iv = new ImageView(getClass().getResource("introInfoFirst.jpg").toExternalForm());
-            iv.setFitWidth(600);
-            iv.setFitHeight(337.5);
-            list.add(iv);
-            ImageView iv2 = new ImageView(getClass().getResource("introInfoSecond.jpg").toExternalForm());
-            iv2.setFitWidth(600);
-            iv2.setFitHeight(246.91);
-            list.add(iv2);
-            Label cellSize = new Label("Each cell represents "+cellSizeInFeet+" feet.");
-            cellSize.setStyle("-fx-font-size: 16;");
-            list.add(cellSize);
-            new MyPopup(list, stage).getStage().show();
-        }
+            displayLayoutInstructions();
     }
 
     /**
@@ -404,7 +402,7 @@ public class ActualController3 {
             }
         });
 
-        initRightClickMenus();
+        initMenus();
 
         initOutsidePanes(sX, sY);
         initInsidePanes(finalSizeOfCells);
@@ -412,6 +410,8 @@ public class ActualController3 {
         drawPluses(finalSizeOfCells, hboxWithThePluses);
 
         drawCells(finalSizeOfCells, hboxWithTheCells);
+
+        menuBar.getMenus().removeAll(m1, m2, m3, m4, m5, m6);
 
         //System.out.println("sp Dimension: "+sP.getWidth()+", "+sP.getHeight());
     }
@@ -499,7 +499,7 @@ public class ActualController3 {
             setupPath.setInfo(g, graph, inputStage);
         });
 
-        initRightClickMenus();
+        initMenus();
 
         initOutsidePanes(sX, sY);
         initInsidePanes(finalSizeOfCells);
@@ -513,7 +513,7 @@ public class ActualController3 {
      * Initializes some right click menus for grouping/ungrouping and other
      * related functions
      */
-    private void initRightClickMenus()
+    private void initMenus()
     {
         rightClick = new ContextMenu();
         MenuItem makeIsle = new MenuItem("Make Isle");
@@ -575,7 +575,7 @@ public class ActualController3 {
             Isle.IsleCellList.IsleCellNode curr = editGroupNode.getIsle().getIsleCellList().getFirst();
             while (curr != null)
             {
-                curr.getrNode().getR().setOpacity(0.5);
+                curr.getrNode().getR().setFill(Color.RED);
                 curr = curr.getNext();
             }
 
@@ -597,15 +597,65 @@ public class ActualController3 {
             inputStage.show();
 
             setupInfoStuff = loader.getController();
-            setupInfoStuff.setImportantInfo(g, editGroupNode.getIsle(), inputStage);
+            setupInfoStuff.setImportantInfo(g, editGroupNode.getIsle(), inputStage, this);
         });
         showingSetupInfoMenu = false;
-        setupOPUstartEnd = new MenuItem("Set OPU Start/End Point");
-        setupOPUstartEnd.setOnAction(actionEvent -> g.setOPUstartEndNode(g.highlightedList.first.rNode, true));
-        setupRegularPickStartEnd = new MenuItem("Set Regular Pick Start/End");
-        setupRegularPickStartEnd.setOnAction(actionEvent -> g.setRegStartEndNode(g.highlightedList.first.rNode, true));
-        showingSetOPUstartEnd = false;
-        showingSetRegStartEnd = false;
+
+        setupRegOPUstartEnd.setOnAction(actionEvent ->
+        {
+            if (g.regOpuStartEndNode != null)
+                g.setRegOPUstartEndNode(g.regOpuStartEndNode, false);
+
+            g.resetHighlighted();
+
+            Label whatToDo = new Label("Click on the cell that best represents the area in the store where Regular OPU pickers start and end.");
+            whatToDo.setStyle("-fx-font-size: 16;");
+            ArrayList<Node> list = new ArrayList<>();
+            list.add(whatToDo);
+            new MyPopup(list, stage).getStage().show();
+
+            settingRegOpuStartEnd = true;
+        });
+        setupGroOPUstartEnd.setOnAction(actionEvent ->
+        {
+            if (g.groOpuStartEndNode != null)
+                g.setGroOpuStartEndNode(g.groOpuStartEndNode, false);
+
+            g.resetHighlighted();
+
+            Label whatToDo = new Label("Click on the cell that best represents the area in the store where Grocery OPU pickers start and end.");
+            whatToDo.setStyle("-fx-font-size: 16;");
+            ArrayList<Node> list = new ArrayList<>();
+            list.add(whatToDo);
+            new MyPopup(list, stage).getStage().show();
+
+            settingGroOpuStartEnd = true;
+        });
+        setupRegularPickStartEnd.setOnAction(actionEvent ->
+        {
+            if (g.regStartEndNode != null)
+                g.setRegStartEndNode(g.regStartEndNode, false);
+
+            g.resetHighlighted();
+
+            Label whatToDo = new Label("Click on the cell that best represents the area in the store where Regular pickers start and end.");
+            whatToDo.setStyle("-fx-font-size: 16;");
+            ArrayList<Node> list = new ArrayList<>();
+            list.add(whatToDo);
+            new MyPopup(list, stage).getStage().show();
+
+            settingRegStartEnd = true;
+        });
+        highlighting = false;
+
+        layoutInstructionsMenu.setOnAction(actionEvent ->
+        {
+            displayLayoutInstructions();
+        });
+        isleInfoInstructionsMenu.setOnAction(actionEvent ->
+        {
+            displayIsleInfoInstructions();
+        });
 
         rightClick3 = new ContextMenu();
         MenuItem unnull = new MenuItem("Remove null");
@@ -804,14 +854,16 @@ public class ActualController3 {
                     if (isleInfo != null)
                     {
                         System.out.println("Setting Up Isle "+listOfIsleIDs.get(i).get(j)+" Info From File");
-                        ArrayList<Integer> arr = new ArrayList<>();
+                        Hashtable<Integer, Integer> table = new Hashtable<>();
                         String s = isleInfo.getNumberOfSubsectionsForEachSection();
-                        String[] sArr = s.split("-");
-                        for (String value : sArr)
-                            arr.add(Integer.parseInt(value));
-
-                        g.isleGroupList.get(groupNames.get(i)).getIsleIDList().get(listOfIsleIDs.get(i).get(j)).setupIsleInfo(isleInfo.getNumberOfIsleSections(), arr,
-                                isleInfo.getEndCapLocation(), isleInfo.getDirectionOfIncreasingIsleSections());
+                        String[] sArr = s.split(",");
+                        for (String string : sArr)
+                        {
+                            String[] sArr2 = string.split("-");
+                            table.put(Integer.parseInt(sArr2[0]), Integer.parseInt(sArr2[1]));
+                        }
+                        g.isleGroupList.get(groupNames.get(i)).getIsleIDList().get(listOfIsleIDs.get(i).get(j))
+                                .setupIsleInfo(isleInfo.getNumberOfIsleSections(), table, isleInfo.getEndCapLocation(), isleInfo.getDirectionOfIncreasingIsleSections());
                     }
                 }
                 else
@@ -833,17 +885,27 @@ public class ActualController3 {
 
         try
         {
-            System.out.println("OPU Start/End: "+startAndEndPickPoints[0]);
+            System.out.println("Regular OPU Start/End: "+startAndEndPickPoints[0]);
             Coords opuCoords = new Coords(startAndEndPickPoints[0]);
-            g.setOPUstartEndNode(g.getRNode(opuCoords.getX(), opuCoords.getY()), true);
+            g.setRegOPUstartEndNode(g.getRNode(opuCoords.getX(), opuCoords.getY()), true);
         }
         catch (Exception e)
         {
-            System.out.println("No start/end location for OPU");
+            System.out.println("No start/end location for Reg OPU");
         }
         try
         {
-            Coords regCoords = new Coords(startAndEndPickPoints[1]);
+            System.out.println("Grocery OPU Start/End: "+startAndEndPickPoints[1]);
+            Coords opuCoords = new Coords(startAndEndPickPoints[1]);
+            g.setGroOpuStartEndNode(g.getRNode(opuCoords.getX(), opuCoords.getY()), true);
+        }
+        catch (Exception e)
+        {
+            System.out.println("No start/end location for Gro OPU");
+        }
+        try
+        {
+            Coords regCoords = new Coords(startAndEndPickPoints[2]);
             System.out.println("Reg Start/End: "+regCoords);
             g.setRegStartEndNode(g.getRNode(regCoords.getX(), regCoords.getY()), true);
         }
@@ -948,23 +1010,50 @@ public class ActualController3 {
                     {
                         System.out.println("No Isle/IsleGroup");
                         node.setHighlighted(true);
+
+                        if (graph != null)
+                        {
+                            System.out.println("Connects to: ");
+                            GraphOfTheGrid.Edge curr = graph.graph.get(node.getX()+","+node.getY());
+                            while (curr != null)
+                            {
+                                System.out.print(curr.getW()+" ");
+                                if (curr.getNext() == null)
+                                    System.out.print("\n");
+                                curr = curr.getNext();
+                            }
+                        }
+
+                        if (g.highlightedList.size() == 1)
+                        {
+                            if (settingRegOpuStartEnd)
+                            {
+                                g.setRegOPUstartEndNode(node, true);
+
+                                settingRegOpuStartEnd = false;
+                            }
+                            else if (settingGroOpuStartEnd)
+                            {
+                                g.setGroOpuStartEndNode(node, true);
+
+                                settingGroOpuStartEnd = false;
+                            }
+                            else if (settingRegStartEnd)
+                            {
+                                g.setRegStartEndNode(node, true);
+
+                                settingRegStartEnd = false;
+                            }
+                            else
+                            {
+                                GridData3.RNode rNode = g.getSoutheastMostHighlightedCell("Normal");
+                                rightClick.show(rNode.getR(), rNode.getsXMaxCoord()+finalSizeOfCells, rNode.getsYMaxCoord()+finalSizeOfCells);
+                            }
+                        }
                     }
                     if (g.nodeIsPickPoint(node.getX(), node.getY()))
                     {
                         System.out.println("Cell is Pick Point");
-                    }
-                }
-                if (!moving && !node.isNulled() && !node.isIsle())
-                {
-                    System.out.println("Connects to: ");
-
-                    GraphOfTheGrid.Edge curr = graph.graph.get(node.getX()+","+node.getY());
-                    while (curr != null)
-                    {
-                        System.out.print(curr.getW()+" ");
-                        if (curr.getNext() == null)
-                            System.out.print("\n");
-                        curr = curr.getNext();
                     }
                 }
                 if (moving && !node.isNulled() && !node.isIsle())
@@ -1041,35 +1130,12 @@ public class ActualController3 {
             rightClick3.hide();
             if (!moving)
             {
-                if (!node.isNulled() && !node.isIsle() && g.highlightedList.size() > 0)
+                if (!node.isNulled() && !node.isIsle() && g.highlightedList.size() > 1)
                 {
                     GridData3.RNode rNode = g.getSoutheastMostHighlightedCell("Normal");
-                    if (g.highlightedList.size() == 1)
-                    {
-                        if (g.opuStartEndNode != null)
-                            rightClick.getItems().remove(setupOPUstartEnd);
-                        if (g.regStartEndNode != null)
-                            rightClick.getItems().remove(setupRegularPickStartEnd);
-
-                        if (!showingSetOPUstartEnd && g.opuStartEndNode == null)
-                            rightClick.getItems().add(setupOPUstartEnd);
-                        showingSetOPUstartEnd = true;
-                        if (!showingSetRegStartEnd && g.regStartEndNode == null)
-                            rightClick.getItems().add(setupRegularPickStartEnd);
-                        showingSetRegStartEnd = true;
-                    }
-                    else
-                    {
-                        if (showingSetOPUstartEnd)
-                            rightClick.getItems().remove(setupOPUstartEnd);
-                        showingSetOPUstartEnd = false;
-                        if (showingSetRegStartEnd)
-                            rightClick.getItems().remove(setupRegularPickStartEnd);
-                        showingSetRegStartEnd = false;
-                    }
                     rightClick.show(rNode.getR(), rNode.getsXMaxCoord()+finalSizeOfCells, rNode.getsYMaxCoord()+finalSizeOfCells);
                 }
-                else if (!node.isIsle())
+                else if (node.isNulled())
                 {
                     GridData3.RNode rNode = g.getSoutheastMostHighlightedCell("Nulls");
                     rightClick3.show(rNode.getR(), rNode.getsXMaxCoord()+finalSizeOfCells, rNode.getsYMaxCoord()+finalSizeOfCells);
@@ -1105,6 +1171,10 @@ public class ActualController3 {
         TextField idT = new TextField();
         hboxA.getChildren().addAll(isle, idT);
         v.getChildren().add(hboxA);
+        ImageView iv = new ImageView(Objects.requireNonNull(getClass().getResource("makeIsleInfo.jpg")).toExternalForm());
+        iv.setFitWidth(350);
+        iv.setFitHeight(61.5);
+        v.getChildren().add(iv);
         Button addToExisting = new Button("Add Isle to Existing Group");
         addToExisting.setOnAction(actionEvent ->
         {
@@ -1115,19 +1185,24 @@ public class ActualController3 {
                 list.add(label);
                 new MyPopup(list, stage).getStage().show();
             }
-            else
+            else if (g.isleGroupList.size() > 0)
             {
                 String isleID = idT.getText();
-
-                s.hide();
 
                 Stage addToExistingStage = new Stage();
                 addToExistingStage.initModality(Modality.APPLICATION_MODAL);
                 addToExistingStage.initOwner(stage);
-                VBox addToExistingVBox = addToExistingGroupMenu(addToExistingStage, g, isleID);
+                VBox addToExistingVBox = addToExistingGroupMenu(addToExistingStage, g, isleID, s);
                 Scene groupSelectScene = new Scene(addToExistingVBox);
                 addToExistingStage.setScene(groupSelectScene);
                 addToExistingStage.show();
+            }
+            else
+            {
+                Label label = new Label("There are no existing isle groups, please create a new one.");
+                ArrayList<Node> list = new ArrayList<>();
+                list.add(label);
+                new MyPopup(list, stage).getStage().show();
             }
         });
         Button makeNew = new Button("Create New Isle Group");
@@ -1144,19 +1219,17 @@ public class ActualController3 {
             {
                 String isleID = idT.getText();
 
-                s.hide();
-
                 Stage groupSelect = new Stage();
                 groupSelect.setTitle("Select Isle Group Name and Color");
                 groupSelect.initModality(Modality.APPLICATION_MODAL);
                 groupSelect.initOwner(stage);
-                VBox groupSelectVbox = setupGroupCreation(groupSelect, g, isleID);
+                VBox groupSelectVbox = setupGroupCreation(groupSelect, g, isleID, s);
                 Scene groupSelectScene = new Scene(groupSelectVbox);
                 groupSelect.setScene(groupSelectScene);
                 groupSelect.show();
             }
         });
-        v.getChildren().addAll(addToExisting, makeNew);
+        v.getChildren().addAll(makeNew, addToExisting);
 
         return v;
     }
@@ -1168,7 +1241,7 @@ public class ActualController3 {
      * @param g data used to create and implement new group
      * @return vbox with all necessary elements
      */
-    private VBox setupGroupCreation(Stage s, GridData3 g, String isleID)
+    private VBox setupGroupCreation(Stage s, GridData3 g, String isleID, Stage previousWindowStage)
     {
         VBox v = new VBox();
 
@@ -1180,12 +1253,16 @@ public class ActualController3 {
         name.setStyle("-fx-font-size: 16;");
         TextField nameT = new TextField();
         hboxA.getChildren().addAll(name, nameT);
+        ImageView iv = new ImageView(Objects.requireNonNull(getClass().getResource("newIsleGroupInfo.jpg")).toExternalForm());
+        iv.setFitWidth(290);
+        iv.setFitHeight(48.1);
         HBox hboxC = new HBox();
         hboxC.setAlignment(Pos.CENTER);
         Label bOrF = new Label("Isle Group in Back or on Floor: ");
         bOrF.setStyle("-fx-font-size: 16;");
-        TextField bOrFtext = new TextField();
-        hboxC.getChildren().addAll(bOrF, bOrFtext);
+        ChoiceBox choiceBox = new ChoiceBox();
+        choiceBox.setItems(FXCollections.observableArrayList("floor", "back"));
+        hboxC.getChildren().addAll(bOrF, choiceBox);
         HBox hboxD = new HBox();
         hboxD.setAlignment(Pos.CENTER);
         Label color = new Label("Select Color: ");
@@ -1205,10 +1282,11 @@ public class ActualController3 {
             else
             {
                 s.hide();
-                g.makeIsle(isleID, nameT.getText(), colorP.getValue(), null, false, bOrFtext.getText());
+                g.makeIsle(isleID, nameT.getText(), colorP.getValue(), null, false, choiceBox.getValue().toString());
+                previousWindowStage.hide();
             }
         });
-        v.getChildren().addAll(hboxA, hboxC, hboxD, submit);
+        v.getChildren().addAll(hboxA, iv, hboxC, hboxD, submit);
 
         return v;
     }
@@ -1221,7 +1299,7 @@ public class ActualController3 {
      * @param isleID of new isle
      * @return vbox with all necessary elements
      */
-    private VBox addToExistingGroupMenu(Stage s, GridData3 g, String isleID)
+    private VBox addToExistingGroupMenu(Stage s, GridData3 g, String isleID, Stage previousWindowStage)
     {
         VBox v = new VBox();
         v.setPrefWidth(120);
@@ -1255,6 +1333,7 @@ public class ActualController3 {
                     {
                         warningStage.hide();
                         s.hide();
+                        previousWindowStage.hide();
                         g.addNewToExistingIsle(isleID, g.isleGroupList.get(key).getColor(), g.isleGroupList.get(key));
                     });
                     warningVbox.getChildren().addAll(warningLabel1, warningLabel2, warningLabel3, yes);
@@ -1266,6 +1345,7 @@ public class ActualController3 {
                 {
                     g.makeIsle(isleID, g.isleGroupList.get(key).getName(), g.isleGroupList.get(key).getColor(), g.isleGroupList.get(key), true, null);
                     s.hide();
+                    previousWindowStage.hide();
                 }
             });
             v.getChildren().add(group);
@@ -1307,10 +1387,10 @@ public class ActualController3 {
                     {
                         fileStream.println("Has Setup Info");
                         fileStream.println(isleGroup.getIsleIDList().get(idKey).getNumberOfIsleSections());
-                        ArrayList<Integer> arr = isleGroup.getIsleIDList().get(idKey).getNumberOfSubsectionsForEachSection();
-                        for (int i : arr)
+                        Hashtable<Integer, Integer> table = isleGroup.getIsleIDList().get(idKey).getNumberOfSubsectionsForEachSection();
+                        for (int i : table.keySet())
                         {
-                            fileStream.print(i+"-");
+                            fileStream.print(i+"-"+table.get(i)+",");
                         }
                         fileStream.print("\n");
                         fileStream.println(isleGroup.getIsleIDList().get(idKey).getEndCapLocation());
@@ -1345,15 +1425,20 @@ public class ActualController3 {
             else
                 fileStream.println("No nulls to null");
 
-            if (g.opuStartEndNode == null)
-                fileStream.println("No OPU start/end");
+            if (g.getRegOpuStartEndNode() == null)
+                fileStream.println("No Reg OPU start/end");
             else
-                fileStream.println("OPU start/end:"+g.opuStartEndNode.getX()+","+g.opuStartEndNode.getY());
+                fileStream.println("Reg OPU start/end:"+g.getRegOpuStartEndNode().getX()+","+g.getRegOpuStartEndNode().getY());
 
-            if (g.regStartEndNode == null)
+            if (g.getGroOpuStartEndNode() == null)
+                fileStream.println("No Gro OPU start/end");
+            else
+                fileStream.println("Gro OPU start/end:"+g.getGroOpuStartEndNode().getX()+","+g.getGroOpuStartEndNode().getY());
+
+            if (g.getRegStartEndNode() == null)
                 fileStream.println("No Regular start/end");
             else
-                fileStream.println("Regular start/end:"+g.regStartEndNode.getX()+","+g.regStartEndNode.getY());
+                fileStream.println("Regular start/end:"+g.getRegStartEndNode().getX()+","+g.getRegStartEndNode().getY());
 
             fileStream.close();
         }
@@ -1436,7 +1521,7 @@ public class ActualController3 {
                     isleOfTest = g.getIsle(loc1[0], loc.charAt(0)+"");
                     if (isleOfTest != null && isleOfTest.hasSetupInfo())
                     {
-                        String[] loc2 = loc1[1].split("\\)");
+                        String[] loc2 = loc1[1].split("\\) ");
                         int isleSection = Integer.parseInt(loc2[0]);
                         System.out.println("isleSection: "+isleSection);
 
@@ -1495,7 +1580,7 @@ public class ActualController3 {
         Button done = new Button("Test!");
         done.setOnAction(actionEvent ->
         {
-            GraphOfTheGrid.DistanceReturn dr = null;
+            GraphOfTheGrid.DistanceReturn dr;
             try
             {
                 int hmm = Integer.parseInt(v2.getText().charAt(0)+"");
@@ -1524,6 +1609,42 @@ public class ActualController3 {
 
         v.getChildren().addAll(title, h, done);
         return v;
+    }
+
+    private void displayLayoutInstructions()
+    {
+        ArrayList<Node> list = new ArrayList<>();
+        ImageView iv = new ImageView(Objects.requireNonNull(getClass().getResource("introInfoFirst.jpg")).toExternalForm());
+        iv.setFitWidth(600);
+        iv.setFitHeight(337.5);
+        ImageView iv2 = new ImageView(Objects.requireNonNull(getClass().getResource("introInfoSecond.jpg")).toExternalForm());
+        iv2.setFitWidth(600);
+        iv2.setFitHeight(337.5);
+        HBox hbox = new HBox();
+        hbox.getChildren().addAll(iv, iv2);
+        list.add(hbox);
+        ImageView iv3 = new ImageView(Objects.requireNonNull(getClass().getResource("introInfoThird.jpg")).toExternalForm());
+        iv3.setFitWidth(600);
+        iv3.setFitHeight(170.93);
+        list.add(iv3);
+        Label cellSize = new Label("Each cell represents "+cellSizeInFeet+" feet.");
+        cellSize.setStyle("-fx-font-size: 16;");
+        list.add(cellSize);
+        new MyPopup(list, stage).getStage().show();
+    }
+
+    public void displayIsleInfoInstructions()
+    {
+        ArrayList<Node> list = new ArrayList<>();
+        ImageView iv = new ImageView(Objects.requireNonNull(getClass().getResource("setupIsleInfoPicFirst.jpg")).toExternalForm());
+        iv.setFitWidth(600);
+        iv.setFitHeight(337.5);
+        list.add(iv);
+        ImageView iv2 = new ImageView(Objects.requireNonNull(getClass().getResource("setupIsleInfoPicSecond.jpg")).toExternalForm());
+        iv2.setFitWidth(600);
+        iv2.setFitHeight(232.5);
+        list.add(iv2);
+        new MyPopup(list, stage).getStage().show();
     }
 
     /**

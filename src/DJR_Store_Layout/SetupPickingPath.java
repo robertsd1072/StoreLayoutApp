@@ -44,162 +44,146 @@ public class SetupPickingPath
     public void initialize()
     {
         choiceA.setItems(FXCollections.observableArrayList("Coordinates", "Locations"));
-        choice1.setItems(FXCollections.observableArrayList("OPU", "OPU Grocery", "Regular"));
+        choice1.setItems(FXCollections.observableArrayList("OPU Regular", "OPU Grocery", "Regular"));
         textArr = new TextField[]{text1, text2, text3, text4, text5, text6, text7, text8, text9, text10, text11, text12, text13, text14, text15, text16, text17, text18, text19, text20};
         buttonArr = new Button[]{button1, button2, button3, button4, button5, button6, button7, button8, button9, button10, button11, button12, button13, button14, button15, button16, button17, button18, button19, button20};
-        /*
+
         for (int i=0; i<buttonArr.length; i++)
         {
+            int finalI = i;
             buttonArr[i].setOnAction(actionEvent ->
             {
-
+                String string = textArr[finalI].getText();
+                String isleGroup = string.charAt(0)+"";
+                String[] arr = string.split("\\(");
+                String isleID = arr[0];
+                int isleSection = Integer.parseInt(arr[1].charAt(0)+"");
+                Isle isle = grid.isleGroupList.get(isleGroup).getIsleIDList().get(isleID);
+                buttonArr[finalI].setText(isle.getNumberOfSubsectionsForEachSection().get(isleSection)+"");
             });
         }
-         */
     }
 
     public void done()
     {
-        if (choiceA.getValue().toString().compareTo("Coordinates") == 0)
+        if (!choice1.getValue().toString().equals("OPU Grocery"))
         {
-            Hashtable<String, String> list = new Hashtable<>();
-
-            for (TextField tf : textArr)
+            if (choiceA.getValue().toString().compareTo("Coordinates") == 0)
             {
-                if (!tf.getText().trim().isEmpty())
+                Hashtable<String, String> list = new Hashtable<>();
+
+                for (TextField tf : textArr)
                 {
-                    list.put(tf.getText(), tf.getText());
-                    //System.out.println("Adding "+tf.getText()+" to list");
+                    if (!tf.getText().trim().isEmpty())
+                    {
+                        list.put(tf.getText(), tf.getText());
+                    }
+                }
+
+                GraphOfTheGrid.FindingPathReturn path = graph.findPickingPath2(list, choice1.getValue().toString());
+                System.out.println("Location Path: "+path.getLocationPath());
+                System.out.println("Vertex Path: "+path.getVertexPath());
+                vertexPath = path.getVertexPath();
+                String[] coords = path.getCellPath().split(" ");
+                cellPath = coords;
+
+                AtomicInteger i = new AtomicInteger(1);
+                PauseTransition drawPath = new PauseTransition(Duration.millis(25));
+                drawPath.setOnFinished(actionEvent ->
+                {
+                    String[] coord = coords[i.get()].split(",");
+                    try
+                    {
+                        int x = Integer.parseInt(coord[0]);
+                        int y = Integer.parseInt(coord[1]);
+                        Rectangle r = grid.getRNode(x, y).getR();
+                        r.setFill(Color.RED);
+                        r.setOpacity(0.5);
+                    }
+                    catch (NumberFormatException ignored) {}
+                    if (i.get() < coords.length-1)
+                    {
+                        i.getAndIncrement();
+                        drawPath.play();
+                    }
+                });
+                drawPath.play();
+
+                for (String s : path.getVertexPath())
+                {
+                    String[] coord = s.split(",");
+                    int x = Integer.parseInt(coord[0]);
+                    int y = Integer.parseInt(coord[1]);
+                    Rectangle r = grid.getRNode(x, y).getR();
+                    r.setFill(Color.RED);
+                    r.setOpacity(1.0);
                 }
             }
-
-            GraphOfTheGrid.FindingPathReturn path = graph.findPickingPath3(list, choice1.getValue().toString());
-            System.out.println("Location Path: "+path.getLocationPath());
-            System.out.println("Vertex Path: "+path.getVertexPath());
-            vertexPath = path.getVertexPath();
-            String[] coords = path.getCellPath().split(" ");
-            cellPath = coords;
-
-            AtomicInteger i = new AtomicInteger(1);
-            PauseTransition drawPath = new PauseTransition(Duration.millis(25));
-            drawPath.setOnFinished(actionEvent ->
+            else //Locations
             {
-                String[] coord = coords[i.get()].split(",");
-                int x = Integer.parseInt(coord[0]);
-                int y = Integer.parseInt(coord[1]);
-                Rectangle r = grid.getRNode(x, y).getR();
-                r.setFill(Color.RED);
-                r.setOpacity(0.5);
-                if (i.get() < coords.length-1)
+                Hashtable<String, String> list = new Hashtable<>();
+
+                for (TextField tf : textArr)
                 {
-                    i.getAndIncrement();
-                    drawPath.play();
-                }
-            });
-            drawPath.play();
+                    if (!tf.getText().trim().isEmpty())
+                    {
+                        String loc = tf.getText();
 
-            for (String s : path.getVertexPath())
-            {
-                String[] coord = s.split(",");
-                int x = Integer.parseInt(coord[0]);
-                int y = Integer.parseInt(coord[1]);
-                Rectangle r = grid.getRNode(x, y).getR();
-                r.setFill(Color.RED);
-                r.setOpacity(1.0);
+                        list.put(grid.getCoordsGivenLocation(loc), loc);
+                    }
+                }
+
+                System.out.println("List:");
+                Set<String> set = list.keySet();
+                for (String s : set)
+                {
+                    System.out.println(list.get(s)+" at "+s);
+                }
+
+                GraphOfTheGrid.FindingPathReturn path = graph.findPickingPath2(list, choice1.getValue().toString());
+                System.out.println("Location Path: "+path.getLocationPath());
+                System.out.println("Vertex Path: "+path.getVertexPath());
+                vertexPath = path.getVertexPath();
+                String[] coords = path.getCellPath().split(" ");
+                cellPath = coords;
+
+                AtomicInteger i = new AtomicInteger(1);
+                PauseTransition drawPath = new PauseTransition(Duration.millis(25));
+                drawPath.setOnFinished(actionEvent ->
+                {
+                    String[] coord = coords[i.get()].split(",");
+                    try
+                    {
+                        int x = Integer.parseInt(coord[0]);
+                        int y = Integer.parseInt(coord[1]);
+                        Rectangle r = grid.getRNode(x, y).getR();
+                        r.setFill(Color.RED);
+                        r.setOpacity(0.5);
+                    }
+                    catch (NumberFormatException ignored) {}
+                    if (i.get() < coords.length-1)
+                    {
+                        i.getAndIncrement();
+                        drawPath.play();
+                    }
+                });
+                drawPath.play();
+
+                for (String s : path.getVertexPath())
+                {
+                    String[] coord = s.split(",");
+                    int x = Integer.parseInt(coord[0]);
+                    int y = Integer.parseInt(coord[1]);
+                    Rectangle r = grid.getRNode(x, y).getR();
+                    r.setFill(Color.RED);
+                    r.setOpacity(1.0);
+                }
             }
         }
         else
         {
-            Hashtable<String, String> list = new Hashtable<>();
 
-            for (TextField tf : textArr)
-            {
-                if (!tf.getText().trim().isEmpty())
-                {
-                    String loc = tf.getText();
-
-                    Isle isle;
-                    System.out.println();
-                    try
-                    {
-                        int hmm = Integer.parseInt(loc.charAt(0)+"");
-                        //System.out.println("Isle in the back");
-                        String[] sArr = loc.split(" ");
-                        if (grid.isleGroupExists(sArr[0]))
-                        {
-                            isle = grid.getIsle(sArr[0]+sArr[1]+"", sArr[0]);
-                            //System.out.println("IsleID: "+isle.getIsleID());
-                            if (isle.hasSetupInfo())
-                            {
-                                String subsection = sArr[2].charAt(sArr[2].length()-1)+"";
-                                //System.out.println("isleSubsection: "+subsection);
-
-                                if (isle.inputingValidIsleLocationInBack(subsection))
-                                    list.put(isle.getCoordsGivenLocationInBack(subsection), tf.getText());
-                            }
-                        }
-                    }
-                    catch (NumberFormatException e)
-                    {
-                        //System.out.println("Isle on the floor");
-                        String[] loc1 = loc.split("\\(");
-                        //System.out.println("IsleID: "+loc1[0]);
-                        if (loc1.length > 1)
-                        {
-                            isle = grid.getIsle(loc1[0], loc.charAt(0)+"");
-                            if (isle.hasSetupInfo())
-                            {
-                                String[] loc2 = loc1[1].split("\\)");
-                                int isleSection = Integer.parseInt(loc2[0]);
-                                //System.out.println("isleSection: "+isleSection);
-
-                                String[] loc3 = loc2[1].split("-");
-                                //System.out.println("isleSubsection: "+loc3[0]);
-
-                                if (isle.inputingValidIsleLocationOnFloor(isleSection, loc3[0]))
-                                    list.put(isle.getCoordsGivenLocationOnFloor(isleSection, loc3[0]), tf.getText());
-                            }
-                        }
-                        else
-                        {
-                            isle = grid.getIsleWithUnknownIG(loc);
-                            list.put(isle.getIsleID(), tf.getText());
-                        }
-                    }
-                }
-            }
-
-            System.out.println("List:");
-            Set<String> set = list.keySet();
-            for (String s : set)
-            {
-                System.out.println(list.get(s)+" at "+s);
-            }
-
-            GraphOfTheGrid.FindingPathReturn path = graph.findPickingPath(grid, list, choice1.getValue().toString());
-            System.out.println("Location Path: "+path.getLocationPath());
-            System.out.println("Vertex Path: "+path.getVertexPath());
-            vertexPath = path.getVertexPath();
-            String[] coords = path.getCellPath().split(" ");
-            cellPath = coords;
-            for (int i=1; i<coords.length; i++)
-            {
-                String[] coord = coords[i].split(",");
-                int x = Integer.parseInt(coord[0]);
-                int y = Integer.parseInt(coord[1]);
-                Rectangle r = grid.getRNode(x, y).getR();
-                r.setFill(Color.RED);
-                r.setOpacity(0.5);
-            }
-            for (String s : path.getVertexPath())
-            {
-                String[] coord = s.split(",");
-                int x = Integer.parseInt(coord[0]);
-                int y = Integer.parseInt(coord[1]);
-                Rectangle r = grid.getRNode(x, y).getR();
-                r.setFill(Color.RED);
-                r.setOpacity(1.0);
-            }
+            //Make grocery OPU algorithm
         }
     }
 

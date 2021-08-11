@@ -18,7 +18,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
@@ -79,7 +78,7 @@ public class LoadOrCreateController {
      */
     public void create()
     {
-        new SampleController2().launchScene(stage);
+        new CreateNewLayoutController().launchScene(stage);
     }
 
     /**
@@ -102,7 +101,7 @@ public class LoadOrCreateController {
         if (returnVal == JFileChooser.APPROVE_OPTION)
         {
             File file = fc.getSelectedFile();
-            new ActualController3(file, x, y).launchScene(stage, true);
+            new IsleLayoutController(file, x, y).launchScene(stage, true);
         }
     }
 }

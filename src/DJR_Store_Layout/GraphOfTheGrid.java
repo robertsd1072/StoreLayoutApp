@@ -182,19 +182,19 @@ public class GraphOfTheGrid
         return new DistanceReturn(pathArr.length-2, path.toString(), end1);
     }
 
-    public FindingPathReturn findPickingPath(GridData3 g, Hashtable<String, String> list, String which)
+    public FindingPathReturn findPickingPath(Hashtable<String, String> list, String which)
     {
         int x;
         int y;
-        if (which.compareTo("OPU") == 0)
+        if (which.compareTo("OPU Regular") == 0)
         {
-            x = g.getOpuStartEndNode().getX();
-            y = g.getOpuStartEndNode().getY();
+            x = grid.getRegOpuStartEndNode().getX();
+            y = grid.getRegOpuStartEndNode().getY();
         }
         else
         {
-            x = g.getRegStartEndNode().getX();
-            y = g.getRegStartEndNode().getY();
+            x = grid.getRegStartEndNode().getX();
+            y = grid.getRegStartEndNode().getY();
         }
         startAndEnd = x+","+y;
 
@@ -236,21 +236,7 @@ public class GraphOfTheGrid
                 }
             }
 
-            if (!curr.equals(previousCell))
-                drList = getAllEdgesFromNode(previousCell, unvisitedVertexList);
-            else
-                drList = getAllEdgesFromNode(curr, unvisitedVertexList);
-
-            for (DistanceReturn dr : drList)
-            {
-                pq.add(new Edge(curr, dr.getEnd(), dr));
-            }
-
-            System.out.println("PQ:");
-            pq.print();
-            System.out.println();
-
-            Edge root = pq.getRoot();
+            Edge root = getClosestNeighborFromNode(curr, previousCell, unvisitedVertexList);
             //System.out.println("Root: "+root.u+"->"+root.w);
             //System.out.println("Comparing "+ids.get(root.u)+" and "+ids.get(root.w));
             if (!ids.get(root.u).equals(ids.get(root.w)))
@@ -295,10 +281,10 @@ public class GraphOfTheGrid
     {
         int x;
         int y;
-        if (which.compareTo("OPU") == 0)
+        if (which.compareTo("OPU Regular") == 0)
         {
-            x = grid.getOpuStartEndNode().getX();
-            y = grid.getOpuStartEndNode().getY();
+            x = grid.getRegOpuStartEndNode().getX();
+            y = grid.getRegOpuStartEndNode().getY();
         }
         else
         {
@@ -313,6 +299,12 @@ public class GraphOfTheGrid
         {
             visited.put(vertex, false);
             vertexSectorIds.put(vertex, getSectorOfCoordinate(vertex));
+        }
+
+        System.out.println("Sector List:");
+        for (String vertex : list.keySet())
+        {
+            System.out.println(vertex+" in sector: "+vertexSectorIds.get(vertex));
         }
 
         Sector[] sectorMap = mapVerticesToSectors(list.keySet(), vertexSectorIds);
@@ -336,41 +328,48 @@ public class GraphOfTheGrid
             System.out.println("Going to all vertices in sector: "+sectorOrder[i]);
             while (sectorMap[sectorOrder[i]].verticesInSectorList.size() > 0)
             {
-                //System.out.println("Curr: "+curr);
-                //System.out.println("Previous Cell: "+previousCell);
+                System.out.println("Curr: "+curr);
+                System.out.println("Previous Cell: "+previousCell);
 
                 ArrayList<String> unvisitedVertexList = new ArrayList<>();
                 for (String vertex : sectorMap[sectorOrder[i]].verticesInSectorList)
                 {
                     if (!visited.get(vertex))
                     {
-                        //System.out.println("Adding edge to "+vertex+" to pq");
+                        System.out.println("Adding edge to "+vertex+" to pq");
                         unvisitedVertexList.add(vertex);
                     }
                 }
 
-                ArrayList<DistanceReturn> drList = getAllEdgesFromNode(previousCell, unvisitedVertexList);
+                Edge closestNeighbor = getClosestNeighborFromNode(curr, previousCell, unvisitedVertexList);
+                System.out.println("Closest: "+closestNeighbor.u+"->"+closestNeighbor.w);
 
-                EdgePQ pq = new EdgePQ();
-                for (DistanceReturn dr : drList)
-                    pq.add(new Edge(curr, dr.getEnd(), dr));
+                edgePath.add(closestNeighbor);
+                vertexPath.add(closestNeighbor.dr.end);
 
-                System.out.println("PQ:");
-                pq.print();
+                String loc = list.get(closestNeighbor.w);
+                if (loc == null)
+                {
+                    Coords coords = new Coords(closestNeighbor.w);
+                    loc = grid.getRNode(coords.getX(), coords.getY()).getIsle().getIsleID();
+                    locationPath.add(list.get(loc));
+                }
+                else
+                    locationPath.add(loc);
 
-                Edge root = pq.getRoot();
-                //System.out.println("Root: "+root.u+"->"+root.w);
-                //System.out.println("Comparing "+ids.get(root.u)+" and "+ids.get(root.w));
+                System.out.println("Locatns: "+list.get(closestNeighbor.u)+"->"+loc);
 
-                edgePath.add(root);
-                vertexPath.add(root.dr.end);
-                locationPath.add(list.get(root.w));
-                System.out.println("Adding "+root.w+" to path in sector: "+vertexSectorIds.get(root.w));
-
-                curr = root.w;
-                previousCell = root.dr.end;
+                curr = loc;
+                previousCell = closestNeighbor.dr.end;
                 visited.put(curr, true);
-                sectorMap[vertexSectorIds.get(curr)].verticesInSectorList.remove(curr);
+                try
+                {
+                    sectorMap[vertexSectorIds.get(curr)].verticesInSectorList.remove(curr);
+                }
+                catch (NullPointerException e)
+                {
+                    sectorMap[vertexSectorIds.get(closestNeighbor.w)].verticesInSectorList.remove(closestNeighbor.w);
+                }
             }
             System.out.println("Visited all vertices in sector: "+sectorOrder[i]);
         }
@@ -390,14 +389,14 @@ public class GraphOfTheGrid
         return new FindingPathReturn(locationPath, vertexPath, cellPath.toString());
     }
 
-    public FindingPathReturn findPickingPath3(Hashtable<String, String> list, String which)
+    public FindingPathReturn findPickingPath3(Hashtable<String, String> list, String which, boolean testing)
     {
         int x;
         int y;
-        if (which.compareTo("OPU") == 0)
+        if (which.compareTo("OPU Regular") == 0)
         {
-            x = grid.getOpuStartEndNode().getX();
-            y = grid.getOpuStartEndNode().getY();
+            x = grid.getRegOpuStartEndNode().getX();
+            y = grid.getRegOpuStartEndNode().getY();
         }
         else
         {
@@ -435,7 +434,7 @@ public class GraphOfTheGrid
             if (sectorMap[sectorOrder[i]].verticesInSectorList.size() > 0)
             {
                 String nearestVertexToNextSector = getNearestVertexToNextSector(i, sectorOrder, sectorMap[sectorOrder[i]].verticesInSectorList);
-                System.out.println("Closest vertex to next sector: "+nearestVertexToNextSector);
+                //System.out.println("Closest vertex to next sector: "+nearestVertexToNextSector);
 
                 ArrayList<Edge> backwardsVertexPathInSector = new ArrayList<>();
                 String lastSectorEnd = curr;
@@ -458,24 +457,15 @@ public class GraphOfTheGrid
                         }
                     }
 
-                    ArrayList<DistanceReturn> drList = getAllEdgesFromNode(previousCell, unvisitedVertexList);
-
-                    EdgePQ pq = new EdgePQ();
-                    for (DistanceReturn dr : drList)
-                        pq.add(new Edge(curr, dr.getEnd(), dr));
-
-                    //System.out.println("PQ:");
-                    //pq.print();
-
-                    Edge root = pq.getRoot();
+                    Edge closestNeighbor = getClosestNeighborFromNode(curr, previousCell, unvisitedVertexList);
                     //System.out.println("Root: "+root.u+"->"+root.w);
                     //System.out.println("Comparing "+ids.get(root.u)+" and "+ids.get(root.w));
 
-                    backwardsVertexPathInSector.add(root);
+                    backwardsVertexPathInSector.add(closestNeighbor);
                     //System.out.println("Adding "+root.u+" to backwards path in sector: "+sectorOrder[i]);
 
-                    curr = root.w;
-                    previousCell = root.dr.end;
+                    curr = closestNeighbor.w;
+                    previousCell = closestNeighbor.dr.end;
                     visited.put(curr, true);
                     sectorMap[sectorOrder[i]].verticesInSectorList.remove(curr);
                 }
@@ -505,17 +495,32 @@ public class GraphOfTheGrid
         DistanceReturn dr = findDistanceBetween(previousCell, startAndEnd);
         edgePath.add(new Edge(curr, startAndEnd, dr.getDistance(), dr.getPath()));
 
-        StringBuilder cellPath = new StringBuilder();
-        for (Edge e : edgePath)
-            cellPath.append(e.cellPath);
+        if (testing)
+        {
+            StringBuilder cellPath = new StringBuilder();
+            for (int i=0; i<edgePath.size(); i++)
+            {
+                try
+                {
+                    if (edgePath.get(i).w.equals(edgePath.get(i-1).w))
+                        cellPath.append(reversePath(edgePath.get(i).cellPath));
+                    else
+                        cellPath.append(edgePath.get(i).cellPath);
+                }
+                catch (IndexOutOfBoundsException e)
+                {
+                    cellPath.append(edgePath.get(i).cellPath);
+                }
+            }
 
-        return new FindingPathReturn(locationPath, vertexPath, cellPath.toString());
+            return new FindingPathReturn(locationPath, vertexPath, cellPath.toString());
+        }
+        else
+            return new FindingPathReturn(locationPath, vertexPath, null);
     }
 
-    private ArrayList<DistanceReturn> getAllEdgesFromNode(String start1, ArrayList<String> endList)
+    private Edge getClosestNeighborFromNode(String startingLocation, String start1, ArrayList<String> endList)
     {
-        ArrayList<DistanceReturn> drList = new ArrayList<>();
-
         //Making sure start is on a valid vertex
         Coords startCoords = new Coords(start1);
 
@@ -567,6 +572,7 @@ public class GraphOfTheGrid
             }
         }
 
+        EdgePQ pq = new EdgePQ();
         for (String end : endList)
         {
             String[] hmm = end.split(",");
@@ -582,7 +588,8 @@ public class GraphOfTheGrid
                 {
                     StringBuilder path = previous.get(newEnd).append(" ").append(newEnd);
                     String[] pathArr = path.toString().split(" ");
-                    drList.add(new DistanceReturn(pathArr.length-2, path.toString(), end));
+                    DistanceReturn dr = new DistanceReturn(pathArr.length-2, path.toString(), end);
+                    pq.add(new Edge(startingLocation, dr.getEnd(), dr));
                 }
                 catch (NullPointerException ignored) {}
             }
@@ -590,43 +597,50 @@ public class GraphOfTheGrid
             {
                 //Irregular coords: Mens' Jeans
                 Isle isle = grid.getIsleWithUnknownIG(end);
-                if (isle == null)
-                    System.out.println("Isle not found");
-
-                ArrayList<String> listOfEnds = new ArrayList<>();
-                Isle.IsleCellList.IsleCellNode curr = isle.getIsleCellList().getFirst();
-                while (curr != null)
+                System.out.println("Irregular ending for isle: "+end);
+                if (isle != null)
                 {
-                    //System.out.println("Finding path for: "+curr.getrNode().getX()+","+curr.getrNode().getY());
-                    listOfEnds.add(curr.getrNode().getX()+","+curr.getrNode().getY());
-                    //System.out.println("Distance: "+listOfPaths.get(listOfPaths.size()-1).getDistance());
-                    curr = curr.getNext();
-                }
-
-                ArrayList<DistanceReturn> listOfPaths = new ArrayList<>();
-                for (String irregularEnd : listOfEnds)
-                {
-                    Coords endCoords = new Coords(irregularEnd);
-
-                    String newEnd = null;
-                    if (grid.getRNode(endCoords.getX(), endCoords.getY()).isIsle())
-                        newEnd = findNearestNonIsleCell(start1, endCoords.getX() ,endCoords.getY());
-                    try
+                    ArrayList<String> listOfEnds = new ArrayList<>();
+                    Isle.IsleCellList.IsleCellNode curr = isle.getIsleCellList().getFirst();
+                    while (curr != null)
                     {
-                        StringBuilder path = previous.get(newEnd).append(" ").append(newEnd);
-                        String[] pathArr = path.toString().split(" ");
-                        listOfPaths.add(new DistanceReturn(pathArr.length-2, path.toString(), irregularEnd));
+                        //System.out.println("Finding path for: "+curr.getrNode().getX()+","+curr.getrNode().getY());
+                        if (!findNearestNonIsleCell(curr.getrNode().getX()+","+curr.getrNode().getY(), curr.getrNode().getX(), curr.getrNode().getY())
+                                .equals(curr.getrNode().getX()+","+curr.getrNode().getY()))
+                        {
+                            System.out.println("Adding cell "+curr.getrNode().getX()+","+curr.getrNode().getY()+" on edge of isle");
+                            listOfEnds.add(curr.getrNode().getX()+","+curr.getrNode().getY());
+                        }
+                        //System.out.println("Distance: "+listOfPaths.get(listOfPaths.size()-1).getDistance());
+                        curr = curr.getNext();
                     }
-                    catch (NullPointerException ignored) {}
+
+                    EdgePQ possiblePathsPQ = new EdgePQ();
+                    for (String irregularEnd : listOfEnds)
+                    {
+                        Coords endCoords = new Coords(irregularEnd);
+
+                        String newEnd = null;
+                        if (grid.getRNode(endCoords.getX(), endCoords.getY()).isIsle())
+                            newEnd = findNearestNonIsleCell(start1, endCoords.getX() ,endCoords.getY());
+                        try
+                        {
+                            StringBuilder path = previous.get(newEnd).append(" ").append(newEnd);
+                            String[] pathArr = path.toString().split(" ");
+                            DistanceReturn dr = new DistanceReturn(pathArr.length-2, path.toString(), irregularEnd);
+                            possiblePathsPQ.add(new Edge(startingLocation, dr.getEnd(), dr));
+                        }
+                        catch (NullPointerException ignored) {}
+                    }
+
+                    pq.add(possiblePathsPQ.getRoot());
                 }
-
-                listOfPaths.sort(new DistanceReturn.DistanceComparator());
-
-                drList.add(listOfPaths.get(0));
+                else
+                    System.out.println("Isle not found");
             }
         }
 
-        return drList;
+        return pq.getRoot();
     }
 
     private String findNearestNonIsleCell(String old, int x, int y)
@@ -789,7 +803,17 @@ public class GraphOfTheGrid
 
     private Integer getSectorOfCoordinate(String coords1)
     {
-        Coords coords = new Coords(coords1);
+        Coords coords;
+        try
+        {
+            coords = new Coords(coords1);
+        }
+        catch (NumberFormatException e)
+        {
+            coords = grid.getIsleWithUnknownIG(coords1).getIsleCellList().getFirst().getrNode().getCoords();
+            System.out.println("Irregular coords for getting sector ("+coords1+"). Coords to use: "+coords.toString());
+        }
+
         int x = coords.getX();
         int y = coords.getY();
 
@@ -814,6 +838,25 @@ public class GraphOfTheGrid
             order[2] = 0;
             order[3] = 2;
         }
+        else if (startSector == 0)
+        {
+            order[1] = 2;
+            order[2] = 3;
+            order[3] = 1;
+        }
+        else if (startSector == 1)
+        {
+            order[1] = 0;
+            order[2] = 2;
+            order[3] = 3;
+        }
+        else //startSector == 2
+        {
+            order[1] = 3;
+            order[2] = 1;
+            order[3] = 0;
+        }
+
 
         return order;
     }
@@ -830,14 +873,14 @@ public class GraphOfTheGrid
         {
             nextSector = sectorOrder[0];
         }
-        System.out.println("Current Sector: "+currentSector);
-        System.out.println("Next Sector: "+nextSector);
+        //System.out.println("Current Sector: "+currentSector);
+        //System.out.println("Next Sector: "+nextSector);
 
         String closestVertex = listOfVerticesInCurrSector.get(0);
         if (currentSector == 0 && nextSector == 2)
         {
             int y = grid.rowSize/2;
-            System.out.println("Target Coord: y = "+y);
+            //System.out.println("Target Coord: y = "+y);
             for (String vertex : listOfVerticesInCurrSector)
             {
                 int currY = new Coords(vertex).getY();
@@ -849,7 +892,7 @@ public class GraphOfTheGrid
         else if (currentSector == 2 && nextSector == 3)
         {
             int x = grid.colSize/2;
-            System.out.println("Target Coord: x = "+x);
+            //System.out.println("Target Coord: x = "+x);
             for (String vertex : listOfVerticesInCurrSector)
             {
                 int currX = new Coords(vertex).getX();
@@ -861,7 +904,7 @@ public class GraphOfTheGrid
         else if (currentSector == 3 && nextSector == 1)
         {
             int y = grid.rowSize/2;
-            System.out.println("Target Coord: y = "+y);
+            //System.out.println("Target Coord: y = "+y);
             for (String vertex : listOfVerticesInCurrSector)
             {
                 int currY = new Coords(vertex).getY();
@@ -873,7 +916,7 @@ public class GraphOfTheGrid
         else if (currentSector == 1 && nextSector == 0)
         {
             int x = grid.colSize/2;
-            System.out.println("Target Coord: x = "+x);
+            //System.out.println("Target Coord: x = "+x);
             for (String vertex : listOfVerticesInCurrSector)
             {
                 int currX = new Coords(vertex).getX();
@@ -884,6 +927,17 @@ public class GraphOfTheGrid
         }
 
         return closestVertex;
+    }
+
+    private String reversePath(String originalPath)
+    {
+        StringBuilder newPath = new StringBuilder();
+
+        String[] originalPathArr = originalPath.split(" ");
+        for (int i=originalPathArr.length-1; i>-1; i--)
+            newPath.append(" ").append(originalPathArr[i]);
+
+        return newPath.toString();
     }
 
     protected static class Edge

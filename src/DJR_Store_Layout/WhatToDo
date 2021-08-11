@@ -1,28 +1,18 @@
 Cosas Para Hacer en Cualquier Momento:
 
 Item Location:
-D39(1)1-1-1.90
+D39(1) 1-1-1.90
 99B 103 B04
 
 - Setup all isles with new info
 
-- Bug Line 542 of ActualController3: Why do I need to add 1 to each remainder??
+- Finding cell from location is now different with different isle section/subsection system (simple version still works)
 
-- Line 217 of Isle: Half-assed this, need to change
+- Finding cell from location of isle that ends and starts again in a different location
 
-- Creating new layout does not create a graph of the grid
+- Algorithm for Grocery OPU
 
-- Finalize findPickingPath algorithms and make sure they work with location strings
-
-- UI:
-    - Buttons for OPU, Regular Pick start/end
-    - Button for saving layout
-    - Thread for saving layout automatically
-    - Info graphic for setup isle info
+- Create 2nd part of final product: inputting list of items and getting a list of locations without the store layout ui
 
 Optimization:
 - Multithreading (EVERYWHERE)
-
-Tests:
-- Making sure cells line up with crosses
-- Testing distances for finding picking path & retracing steps

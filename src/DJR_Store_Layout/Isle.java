@@ -9,6 +9,7 @@
 package DJR_Store_Layout;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 public class Isle
 {
@@ -17,7 +18,7 @@ public class Isle
     private final GridData3.IsleGroup isleGroup;
     private IsleCellList isleCellList;
     private int numberOfIsleSections;
-    private ArrayList<Integer> numberOfSubsectionsForEachSection;
+    private Hashtable<Integer, Integer> numberOfSubsectionsForEachSection;
     /**
      * Given by north/south/east/west
      */
@@ -67,14 +68,14 @@ public class Isle
      * Setups isle info for sections and subsections
      *
      * @param n number of isle sections
-     * @param arr number of subsections for each section
+     * @param hashtable number of subsections for each section
      * @param endCap location
      * @param direction direction of increasing sections
      */
-    public void setupIsleInfo(int n, ArrayList<Integer> arr, String endCap, String direction)
+    public void setupIsleInfo(int n, Hashtable<Integer, Integer> hashtable, String endCap, String direction)
     {
         numberOfIsleSections = n;
-        numberOfSubsectionsForEachSection = arr;
+        numberOfSubsectionsForEachSection = hashtable;
         endCapLocation = endCap;
         directionOfIncreasingIsleSections = direction;
     }
@@ -92,10 +93,8 @@ public class Isle
             System.out.println("EndCap Location: "+endCapLocation);
             System.out.println("Direction: "+directionOfIncreasingIsleSections);
             System.out.println("Number Of Isle Sections: "+numberOfIsleSections);
-            for (int i=0; i<numberOfSubsectionsForEachSection.size(); i++)
-            {
-                System.out.println("Isle Section "+i+": "+numberOfSubsectionsForEachSection.get(i)+" subsection(s)");
-            }
+            for (int i : numberOfSubsectionsForEachSection.keySet())
+                System.out.println("Isle Section "+i+" has "+numberOfSubsectionsForEachSection.get(i)+" subsections");
         }
         else
             System.out.println("Isle Info has not been setup");
@@ -307,7 +306,7 @@ public class Isle
     /**
      * @return total cell count in isle
      */
-    private int getNumberOfCellsInIsle()
+    public int getNumberOfCellsInIsle()
     {
         IsleCellList.IsleCellNode curr = isleCellList.first;
         int numberOfCells = 0;
@@ -348,7 +347,7 @@ public class Isle
                 if (verifyCell(xToReturn+","+y))
                     return xToReturn+","+y;
                 else
-                    throw new RuntimeException("getIsleCoordsGivenSectionAndSubsection returned a cell not belonging to the isle using direction right");
+                    System.out.println("Cell "+xToReturn+","+y+" is not in isle "+isleID);
             }
             if (directionOfIncreasingIsleSections.compareTo("up") == 0)
             {
@@ -363,7 +362,7 @@ public class Isle
                 if (verifyCell(x+","+yToReturn))
                     return x+","+yToReturn;
                 else
-                    throw new RuntimeException("getIsleCoordsGivenSectionAndSubsection returned a cell not belonging to the isle using direction up");
+                    System.out.println("Cell "+x+","+yToReturn+" is not in isle "+isleID);
             }
             if (directionOfIncreasingIsleSections.compareTo("left") == 0)
             {
@@ -378,7 +377,7 @@ public class Isle
                 if (verifyCell(xToReturn+","+y))
                     return xToReturn+","+y;
                 else
-                    throw new RuntimeException("getIsleCoordsGivenSectionAndSubsection returned a cell not belonging to the isle using direction left");
+                    System.out.println("Cell "+xToReturn+","+y+" is not in isle "+isleID);
             }
             if (directionOfIncreasingIsleSections.compareTo("down") == 0)
             {
@@ -393,7 +392,7 @@ public class Isle
                 if (verifyCell(x+","+yToReturn))
                     return x+","+yToReturn;
                 else
-                    throw new RuntimeException("getIsleCoordsGivenSectionAndSubsection returned a cell not belonging to the isle using direction down");
+                    System.out.println("Cell "+x+","+yToReturn+" is not in isle "+isleID);
             }
         }
         //If Isle is on the Floor w/ multiple Sections
@@ -819,7 +818,7 @@ public class Isle
         for (int i=1; i<numberOfSubsectionsForEachSection.size(); i++)
             totalNumberOfSubsections+=numberOfSubsectionsForEachSection.get(i);
 
-        return (float) getNumberOfCellsInIsle()/totalNumberOfSubsections;
+        return (float) (getNumberOfCellsInIsle()-1)/totalNumberOfSubsections;
     }
 
     public String getEndCapLocation()
@@ -837,7 +836,7 @@ public class Isle
         return numberOfIsleSections > 0;
     }
 
-    public ArrayList<Integer> getNumberOfSubsectionsForEachSection()
+    public Hashtable<Integer, Integer> getNumberOfSubsectionsForEachSection()
     {
         return numberOfSubsectionsForEachSection;
     }
@@ -928,7 +927,14 @@ public class Isle
     {
         Coords coords = new Coords(s);
 
-        return g.getRNode(coords.getX(), coords.getY()).getIsle().getIsleID().compareTo(isleID) == 0;
+        try
+        {
+            return g.getRNode(coords.getX(), coords.getY()).getIsle().getIsleID().compareTo(isleID) == 0;
+        }
+        catch (NullPointerException e)
+        {
+            return false;
+        }
     }
 
     /**

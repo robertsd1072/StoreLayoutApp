@@ -77,7 +77,7 @@ public class GridData3 {
     /**
      * Nodes of start/end points of picking: useful for determining quickest path
      */
-    protected RNode opuStartEndNode, regStartEndNode;
+    protected RNode regOpuStartEndNode, groOpuStartEndNode, regStartEndNode;
 
     /**
      * Basic constructor
@@ -888,18 +888,38 @@ public class GridData3 {
         highlightedNullList.clear();
     }
 
-    public void setOPUstartEndNode(RNode rNode, boolean hmm)
+    public void setRegOPUstartEndNode(RNode rNode, boolean hmm)
     {
         resetHighlighted();
         if (hmm)
         {
-            opuStartEndNode = rNode;
+            regOpuStartEndNode = rNode;
             rNode.getR().setFill(Color.RED);
             rNode.getR().setStroke(Color.RED);
             rNode.getR().setOpacity(1.0);
         }
         else
         {
+            regOpuStartEndNode = null;
+            rNode.getR().setFill(Color.TRANSPARENT);
+            rNode.getR().setStroke(Color.TRANSPARENT);
+            rNode.getR().setOpacity(0.5);
+        }
+    }
+
+    public void setGroOpuStartEndNode(RNode rNode, boolean hmm)
+    {
+        resetHighlighted();
+        if (hmm)
+        {
+            groOpuStartEndNode = rNode;
+            rNode.getR().setFill(Color.RED);
+            rNode.getR().setStroke(Color.RED);
+            rNode.getR().setOpacity(1.0);
+        }
+        else
+        {
+            groOpuStartEndNode = null;
             rNode.getR().setFill(Color.TRANSPARENT);
             rNode.getR().setStroke(Color.TRANSPARENT);
             rNode.getR().setOpacity(0.5);
@@ -918,6 +938,7 @@ public class GridData3 {
         }
         else
         {
+            regStartEndNode = null;
             rNode.getR().setFill(Color.TRANSPARENT);
             rNode.getR().setStroke(Color.TRANSPARENT);
             rNode.getR().setOpacity(0.5);
@@ -928,19 +949,42 @@ public class GridData3 {
     {
         try
         {
-            int opuX = opuStartEndNode.getX();
-            int opuY = opuStartEndNode.getY();
+            int opuX = regOpuStartEndNode.getX();
+            int opuY = regOpuStartEndNode.getY();
 
             if (x == opuX && y == opuY)
                 return true;
+        }
+        catch (NullPointerException e)
+        {
+            return false;
+        }
 
+        try
+        {
+            int opuX = groOpuStartEndNode.getX();
+            int opuY = groOpuStartEndNode.getY();
+
+            if (x == opuX && y == opuY)
+                return true;
+        }
+        catch (NullPointerException e)
+        {
+            return false;
+        }
+
+        try
+        {
             int regX = regStartEndNode.getX();
             int regY = regStartEndNode.getY();
 
             if (x == regX && y == regY)
                 return true;
         }
-        catch (NullPointerException ignored) {}
+        catch (NullPointerException e)
+        {
+            return false;
+        }
 
         return false;
     }
@@ -975,6 +1019,57 @@ public class GridData3 {
         return null;
     }
 
+    public String getCoordsGivenLocation(String location)
+    {
+        Isle isle;
+        try
+        {
+            int hmm = Integer.parseInt(location.charAt(0)+"");
+            //System.out.println("Isle in the back");
+            String[] sArr = location.split(" ");
+            if (isleGroupExists(sArr[0]))
+            {
+                isle = getIsle(sArr[0]+sArr[1]+"", sArr[0]);
+                //System.out.println("IsleID: "+isle.getIsleID());
+                if (isle.hasSetupInfo())
+                {
+                    String subsection = sArr[2].charAt(sArr[2].length()-1)+"";
+                    //System.out.println("isleSubsection: "+subsection);
+
+                    if (isle.inputingValidIsleLocationInBack(subsection))
+                        return isle.getCoordsGivenLocationInBack(subsection);
+                }
+            }
+        }
+        catch (NumberFormatException e)
+        {
+            //System.out.println("Isle on the floor");
+            String[] loc1 = location.split("\\(");
+            //System.out.println("IsleID: "+loc1[0]);
+            if (loc1.length > 1)
+            {
+                isle = getIsle(loc1[0], location.charAt(0)+"");
+                if (isle.hasSetupInfo())
+                {
+                    String[] loc2 = loc1[1].split("\\) ");
+                    int isleSection = Integer.parseInt(loc2[0]);
+                    //System.out.println("isleSection: "+isleSection);
+
+                    String[] loc3 = loc2[1].split("-");
+                    //System.out.println("isleSubsection: "+loc3[0]);
+
+                    if (isle.inputingValidIsleLocationOnFloor(isleSection, loc3[0]))
+                        return isle.getCoordsGivenLocationOnFloor(isleSection, loc3[0]);
+                }
+                else
+                    return isle.getIsleID();
+            }
+            else
+                return location;
+        }
+        return "Getting location didn't work.";
+    }
+
     public int getHighlightingXLength()
     {
         return highlightingXLength;
@@ -990,9 +1085,14 @@ public class GridData3 {
         return toMoveList;
     }
 
-    public RNode getOpuStartEndNode()
+    public RNode getRegOpuStartEndNode()
     {
-        return opuStartEndNode;
+        return regOpuStartEndNode;
+    }
+
+    public RNode getGroOpuStartEndNode()
+    {
+        return groOpuStartEndNode;
     }
 
     public RNode getRegStartEndNode()
@@ -1007,6 +1107,7 @@ public class GridData3 {
     {
         private final Rectangle r;
         private final int xCoord, yCoord;
+        private final Coords coords;
         private double sXMinCoord, sYMinCoord, sXMaxCoord, sYMaxCoord;
         private boolean highlighted, isIsle, nulled, beingMoved, highlightedNull;
         private Isle isle;
@@ -1022,6 +1123,7 @@ public class GridData3 {
             sXMaxCoord = x1+boxSize-1;
             sYMinCoord = y1;
             sYMaxCoord = y1+boxSize-1;
+            coords = new Coords(x+","+y);
         }
 
         public boolean isHighlighted()
@@ -1102,6 +1204,11 @@ public class GridData3 {
         public int getY()
         {
             return yCoord;
+        }
+
+        public Coords getCoords()
+        {
+            return coords;
         }
 
         private void setNulled(boolean hmm)
