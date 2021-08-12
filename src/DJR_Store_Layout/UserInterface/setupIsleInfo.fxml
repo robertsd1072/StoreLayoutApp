@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="theV" alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="425.0" spacing="5.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="DJR_Store_Layout.SetupIsleInfoController">
+<VBox fx:id="theV" alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="425.0" spacing="5.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="DJR_Store_Layout.UserInterface.SetupIsleInfoController">
    <children>
       <Button fx:id="help" mnemonicParsing="false" text="Help" />
       <VBox fx:id="vboxOfTexts" prefHeight="50.0" prefWidth="100.0">

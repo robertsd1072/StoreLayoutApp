@@ -1,5 +1,10 @@
-package DJR_Store_Layout;
+package DJR_Store_Layout.UserInterface;
 
+import DJR_Store_Layout.GraphsAndHelpers.FindingPathReturn;
+import DJR_Store_Layout.GraphsAndHelpers.GraphOfTheGrid;
+import DJR_Store_Layout.GridData.GridData3;
+import DJR_Store_Layout.GridData.Isle;
+import DJR_Store_Layout.GridData.RNode;
 import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Button;
@@ -15,7 +20,7 @@ import java.util.Hashtable;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class SetupPickingPath
+public class SetupPickingPathController
 {
     private Stage stage;
     public TextField text1, text2, text3, text4, text5, text6, text7, text8, text9, text10, text11, text12, text13, text14, text15, text16, text17, text18, text19, text20;
@@ -29,10 +34,7 @@ public class SetupPickingPath
     private String[] cellPath;
     private ArrayList<String> vertexPath;
 
-    public SetupPickingPath()
-    {
-
-    }
+    public SetupPickingPathController() {}
 
     public void setInfo(GridData3 g, GraphOfTheGrid g1, Stage s)
     {
@@ -58,7 +60,7 @@ public class SetupPickingPath
                 String[] arr = string.split("\\(");
                 String isleID = arr[0];
                 int isleSection = Integer.parseInt(arr[1].charAt(0)+"");
-                Isle isle = grid.isleGroupList.get(isleGroup).getIsleIDList().get(isleID);
+                Isle isle = grid.getIsleGroupList().get(isleGroup).getIsleIDList().get(isleID);
                 buttonArr[finalI].setText(isle.getNumberOfSubsectionsForEachSection().get(isleSection)+"");
             });
         }
@@ -80,7 +82,7 @@ public class SetupPickingPath
                     }
                 }
 
-                GraphOfTheGrid.FindingPathReturn path = graph.findPickingPath2(list, choice1.getValue().toString());
+                FindingPathReturn path = graph.findPickingPath2(list, choice1.getValue().toString());
                 System.out.println("Location Path: "+path.getLocationPath());
                 System.out.println("Vertex Path: "+path.getVertexPath());
                 vertexPath = path.getVertexPath();
@@ -140,7 +142,7 @@ public class SetupPickingPath
                     System.out.println(list.get(s)+" at "+s);
                 }
 
-                GraphOfTheGrid.FindingPathReturn path = graph.findPickingPath2(list, choice1.getValue().toString());
+                FindingPathReturn path = graph.findPickingPath2(list, choice1.getValue().toString());
                 System.out.println("Location Path: "+path.getLocationPath());
                 System.out.println("Vertex Path: "+path.getVertexPath());
                 vertexPath = path.getVertexPath();
@@ -205,7 +207,7 @@ public class SetupPickingPath
             String[] coord = coords.split(",");
             int x = Integer.parseInt(coord[0]);
             int y = Integer.parseInt(coord[1]);
-            GridData3.RNode rNode = grid.getRNode(x, y);
+            RNode rNode = grid.getRNode(x, y);
             if (rNode.isIsle())
                 rNode.getR().setFill(rNode.getColor());
             else

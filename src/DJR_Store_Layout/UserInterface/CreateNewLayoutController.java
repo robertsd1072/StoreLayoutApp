@@ -4,7 +4,7 @@
  * @author David Roberts
  */
 
-package DJR_Store_Layout;
+package DJR_Store_Layout.UserInterface;
 
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;

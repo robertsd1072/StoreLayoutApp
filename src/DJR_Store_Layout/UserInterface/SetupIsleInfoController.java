@@ -1,5 +1,9 @@
-package DJR_Store_Layout;
+package DJR_Store_Layout.UserInterface;
 
+import DJR_Store_Layout.GridData.CellList;
+import DJR_Store_Layout.GridData.GridData3;
+import DJR_Store_Layout.GridData.Isle;
+import DJR_Store_Layout.HelperClasses.MyPopup;
 import javafx.collections.FXCollections;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -9,8 +13,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import java.util.ArrayList;
-import java.util.Hashtable;
+
+import java.util.*;
 
 public class SetupIsleInfoController
 {
@@ -66,7 +70,7 @@ public class SetupIsleInfoController
 
         stage.setOnCloseRequest(windowEvent ->
         {
-            Isle.IsleCellList.IsleCellNode curr = isle.getIsleCellList().getFirst();
+            CellList.CellNode curr = isle.getIsleCellList().getFirst();
             while (curr != null)
             {
                 curr.getrNode().getR().setFill(isle.getIsleGroup().getColor());
@@ -92,7 +96,26 @@ public class SetupIsleInfoController
         stage.setHeight(stage.getHeight()+25);
         subsectionTextfields.add(textFieldNew);
         sectionNumberTextfields.add(numOfSection);
-        numberOfIsleSections++;
+    }
+
+    public void editingInfo()
+    {
+        ArrayList<Integer> isleSectionsInOrder = new ArrayList<>(isle.getNumberOfSubsectionsForEachSection().keySet());
+        Collections.sort(isleSectionsInOrder);
+
+        text0.setText(isle.getNumberOfSubsectionsForEachSection().get(0)+"");
+        text1.setText(isle.getNumberOfSubsectionsForEachSection().get(1)+"");
+
+        int numberOfAdditionalIsleSections = isle.getNumberOfIsleSections()-2;
+        for (int i=0; i<numberOfAdditionalIsleSections; i++)
+        {
+            addSection();
+            sectionNumberTextfields.get(i).setText(isleSectionsInOrder.get(i+2)+"");
+            subsectionTextfields.get(i+2).setText(isle.getNumberOfSubsectionsForEachSection().get(isleSectionsInOrder.get(i+2))+"");
+        }
+
+        choiceA.setValue(isle.getEndCapLocation());
+        choiceB.setValue(isle.getDirectionOfIncreasingIsleSections());
     }
 
     public void done()
@@ -134,18 +157,13 @@ public class SetupIsleInfoController
             }
         }
 
-        for (int i : numberOfSubsectionsForEachSection.keySet())
-        {
-            System.out.println("Isle Section "+i+" has "+numberOfSubsectionsForEachSection.get(i)+" subsections");
-        }
-
         if (isle.getIsleGroup().getBackOrFloor().compareTo("back") == 0)
 
             isle.setupIsleInfo(numberOfIsleSections, numberOfSubsectionsForEachSection, "none", choiceB.getValue().toString());
         else
             isle.setupIsleInfo(numberOfIsleSections, numberOfSubsectionsForEachSection, choiceA.getValue().toString(), choiceB.getValue().toString());
 
-        Isle.IsleCellList.IsleCellNode curr = isle.getIsleCellList().getFirst();
+        CellList.CellNode curr = isle.getIsleCellList().getFirst();
         while (curr != null)
         {
             curr.getrNode().getR().setFill(isle.getIsleGroup().getColor());

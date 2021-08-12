@@ -4,7 +4,7 @@
  * @author David Roberts
  */
 
-package DJR_Store_Layout;
+package DJR_Store_Layout.UserInterface;
 
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
@@ -16,10 +16,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-
 import javax.swing.*;
 import java.io.File;
-import java.io.IOException;
 
 public class LoadOrCreateController {
     /**
@@ -27,7 +25,6 @@ public class LoadOrCreateController {
      */
     private Stage stage;
     private final Scene scene;
-
     /**
      * Base javafx controller for the scene
      */
@@ -45,9 +42,10 @@ public class LoadOrCreateController {
             Parent parent = loader.load();
             scene = new Scene(parent, 600, 325);
         }
-        catch (IOException ex)
+        catch (Exception ex)
         {
             System.out.println("Error displaying login window");
+            ex.printStackTrace();
             throw new RuntimeException(ex);
         }
     }
@@ -68,18 +66,12 @@ public class LoadOrCreateController {
     /**
      * Basic initializer
      */
-    public void initialize()
-    {
-        bP.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
-    }
+    public void initialize() {bP.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));}
 
     /**
      * Launches new scene for the creation of a new layout
      */
-    public void create()
-    {
-        new CreateNewLayoutController().launchScene(stage);
-    }
+    public void create() {new CreateNewLayoutController().launchScene(stage);}
 
     /**
      * Launches new scene for the loading of an existing layout

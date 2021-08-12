@@ -4,8 +4,15 @@
  * @author David Roberts
  */
 
-package DJR_Store_Layout;
+package DJR_Store_Layout.UserInterface;
 
+import DJR_Store_Layout.GraphsAndHelpers.DistanceReturn;
+import DJR_Store_Layout.GraphsAndHelpers.Edge;
+import DJR_Store_Layout.GraphsAndHelpers.GraphOfTheGrid;
+import DJR_Store_Layout.GridData.*;
+import DJR_Store_Layout.HelperClasses.Coords;
+import DJR_Store_Layout.HelperClasses.InfoToMakeIsleFromFile;
+import DJR_Store_Layout.HelperClasses.MyPopup;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -64,10 +71,10 @@ public class IsleLayoutController {
     private double sX, sY, xRemainderSize1, yRemainderSize1;
     private final double finalSizeOfCells;
     private boolean highlighting, moving, showingSetupInfoMenu, settingRegOpuStartEnd, settingGroOpuStartEnd, settingRegStartEnd;
-    private GridData3.RNode editGroupNode;
+    private RNode editGroupNode;
     private Isle isleToMove;
     private SetupIsleInfoController setupInfoStuff;
-    private SetupPickingPath setupPath;
+    private SetupPickingPathController setupPath;
     private GraphOfTheGrid graph;
 
     /**
@@ -532,14 +539,14 @@ public class IsleLayoutController {
         MenuItem fillIn = new MenuItem("Fill In");
         fillIn.setOnAction(actionEvent ->
         {
-            GridData3.HighlightedList.HighlightedNode curr = g.highlightedList.first;
+            CellList.CellNode curr = g.getHighlightedList().getFirst();
             while (curr != null)
             {
-                curr.rNode.setHighlighted(false);
-                g.setCelltoNull(curr.rNode.getX(), curr.rNode.getY());
-                curr = curr.next;
+                curr.getrNode().setHighlighted(false);
+                g.setCelltoNull(curr.getrNode().getX(), curr.getrNode().getY());
+                curr = curr.getNext();
             }
-            g.highlightedList.clear();
+            g.getHighlightedList().clear();
         });
         rightClick.getItems().add(fillIn);
 
@@ -553,11 +560,11 @@ public class IsleLayoutController {
             rightClick2.hide();
             g.resetHighlighted();
             isleToMove = editGroupNode.getIsle();
-            GridData3.IsleBeingMovedList toMoveList = g.getToMoveList();
+            CellList toMoveList = g.getToMoveList();
             if (!moving)
             {
                 System.out.println("Ungrouping cells from isle");
-                Isle.IsleCellList.IsleCellNode curr = editGroupNode.getIsle().getIsleCellList().getFirst();
+                CellList.CellNode curr = editGroupNode.getIsle().getIsleCellList().getFirst();
                 while (curr != null)
                 {
                     g.getRNode(curr.getrNode().getX(), curr.getrNode().getY()).setIsled(false, null, null, null);
@@ -572,7 +579,7 @@ public class IsleLayoutController {
         setupInfoMenu = new MenuItem("Setup Isle Info");
         setupInfoMenu.setOnAction(actionEvent ->
         {
-            Isle.IsleCellList.IsleCellNode curr = editGroupNode.getIsle().getIsleCellList().getFirst();
+            CellList.CellNode curr = editGroupNode.getIsle().getIsleCellList().getFirst();
             while (curr != null)
             {
                 curr.getrNode().getR().setFill(Color.RED);
@@ -598,13 +605,15 @@ public class IsleLayoutController {
 
             setupInfoStuff = loader.getController();
             setupInfoStuff.setImportantInfo(g, editGroupNode.getIsle(), inputStage, this);
+            if (editGroupNode.getIsle().hasSetupInfo())
+                setupInfoStuff.editingInfo();
         });
-        showingSetupInfoMenu = false;
+        rightClick2.getItems().add(setupInfoMenu);
 
         setupRegOPUstartEnd.setOnAction(actionEvent ->
         {
-            if (g.regOpuStartEndNode != null)
-                g.setRegOPUstartEndNode(g.regOpuStartEndNode, false);
+            if (g.getRegOpuStartEndNode() != null)
+                g.setRegOPUstartEndNode(g.getRegOpuStartEndNode(), false);
 
             g.resetHighlighted();
 
@@ -618,8 +627,8 @@ public class IsleLayoutController {
         });
         setupGroOPUstartEnd.setOnAction(actionEvent ->
         {
-            if (g.groOpuStartEndNode != null)
-                g.setGroOpuStartEndNode(g.groOpuStartEndNode, false);
+            if (g.getGroOpuStartEndNode() != null)
+                g.setGroOpuStartEndNode(g.getGroOpuStartEndNode(), false);
 
             g.resetHighlighted();
 
@@ -633,8 +642,8 @@ public class IsleLayoutController {
         });
         setupRegularPickStartEnd.setOnAction(actionEvent ->
         {
-            if (g.regStartEndNode != null)
-                g.setRegStartEndNode(g.regStartEndNode, false);
+            if (g.getRegStartEndNode() != null)
+                g.setRegStartEndNode(g.getRegStartEndNode(), false);
 
             g.resetHighlighted();
 
@@ -771,7 +780,7 @@ public class IsleLayoutController {
             for (int j=0; j<rows; j++)
             {
                 Rectangle r = new Rectangle();
-                GridData3.RNode node = g.addRect(r, i, j, startX, startY);
+                RNode node = g.addRect(r, i, j, startX, startY);
 
                 setupCellsAndFunctions(r, node, z);
 
@@ -819,7 +828,7 @@ public class IsleLayoutController {
             for (int j=0; j<rows; j++)
             {
                 Rectangle r = new Rectangle();
-                GridData3.RNode node = g.addRect(r, i, j, startX, startY);
+                RNode node = g.addRect(r, i, j, startX, startY);
 
                 setupCellsAndFunctions(r, node, z);
 
@@ -845,10 +854,10 @@ public class IsleLayoutController {
                     g.getRNode(Integer.parseInt(groupCoords[k]), Integer.parseInt(groupCoords[k+1])).setHighlighted(true);
                     //System.out.println("Highlighting: "+Integer.parseInt(groupCoords[k])+","+Integer.parseInt(groupCoords[k+1]));
                 }
-                if (g.isleGroupList.containsKey(groupNames.get(i)))
+                if (g.getIsleGroupList().containsKey(groupNames.get(i)))
                 {
                     //System.out.println("Adding "+listOfIsleIDs.get(i).get(j)+" to existing isle group");
-                    g.makeIsle(listOfIsleIDs.get(i).get(j), groupNames.get(i), groupColors.get(i), g.isleGroupList.get(groupNames.get(i)), true, null);
+                    g.makeIsle(listOfIsleIDs.get(i).get(j), groupNames.get(i), groupColors.get(i), g.getIsleGroupList().get(groupNames.get(i)), true, null);
 
                     InfoToMakeIsleFromFile isleInfo = listOfIslesWithSetupInfo.get(i).get(j).get(listOfIsleIDs.get(i).get(j));
                     if (isleInfo != null)
@@ -862,7 +871,7 @@ public class IsleLayoutController {
                             String[] sArr2 = string.split("-");
                             table.put(Integer.parseInt(sArr2[0]), Integer.parseInt(sArr2[1]));
                         }
-                        g.isleGroupList.get(groupNames.get(i)).getIsleIDList().get(listOfIsleIDs.get(i).get(j))
+                        g.getIsleGroupList().get(groupNames.get(i)).getIsleIDList().get(listOfIsleIDs.get(i).get(j))
                                 .setupIsleInfo(isleInfo.getNumberOfIsleSections(), table, isleInfo.getEndCapLocation(), isleInfo.getDirectionOfIncreasingIsleSections());
                     }
                 }
@@ -924,7 +933,7 @@ public class IsleLayoutController {
      * @param node node of drawn cell in data
      * @param z size of cells
      */
-    private void setupCellsAndFunctions(Rectangle r, GridData3.RNode node, double z)
+    private void setupCellsAndFunctions(Rectangle r, RNode node, double z)
     {
         r.setFill(Color.TRANSPARENT);
         r.setStroke(Color.TRANSPARENT);
@@ -991,18 +1000,11 @@ public class IsleLayoutController {
                         node.getIsle().printInfo();
 
                         if (!node.getIsle().hasSetupInfo())
-                        {
-                            if (!showingSetupInfoMenu)
-                                rightClick2.getItems().add(setupInfoMenu);
-                            showingSetupInfoMenu = true;
-                        }
+                            setupInfoMenu.setText("Setup Isle Info");
                         else
-                        {
-                            if (showingSetupInfoMenu)
-                                rightClick2.getItems().remove(setupInfoMenu);
-                            showingSetupInfoMenu = false;
-                        }
-                        GridData3.RNode rNode = g.getSoutheastMostIsleCell(node.getIsle());
+                            setupInfoMenu.setText("Edit Isle Info");
+
+                        RNode rNode = g.getSoutheastMostIsleCell(node.getIsle());
                         rightClick2.show(rNode.getR(), rNode.getsXMaxCoord()+finalSizeOfCells, rNode.getsYMaxCoord()+finalSizeOfCells);
                         editGroupNode = node;
                     }
@@ -1014,7 +1016,7 @@ public class IsleLayoutController {
                         if (graph != null)
                         {
                             System.out.println("Connects to: ");
-                            GraphOfTheGrid.Edge curr = graph.graph.get(node.getX()+","+node.getY());
+                            Edge curr = graph.graph.get(node.getX()+","+node.getY());
                             while (curr != null)
                             {
                                 System.out.print(curr.getW()+" ");
@@ -1024,7 +1026,7 @@ public class IsleLayoutController {
                             }
                         }
 
-                        if (g.highlightedList.size() == 1)
+                        if (g.getHighlightedList().size() == 1)
                         {
                             if (settingRegOpuStartEnd)
                             {
@@ -1046,7 +1048,7 @@ public class IsleLayoutController {
                             }
                             else
                             {
-                                GridData3.RNode rNode = g.getSoutheastMostHighlightedCell("Normal");
+                                RNode rNode = g.getSoutheastMostHighlightedCell("Normal");
                                 rightClick.show(rNode.getR(), rNode.getsXMaxCoord()+finalSizeOfCells, rNode.getsYMaxCoord()+finalSizeOfCells);
                             }
                         }
@@ -1130,14 +1132,14 @@ public class IsleLayoutController {
             rightClick3.hide();
             if (!moving)
             {
-                if (!node.isNulled() && !node.isIsle() && g.highlightedList.size() > 1)
+                if (!node.isNulled() && !node.isIsle() && g.getHighlightedList().size() > 1)
                 {
-                    GridData3.RNode rNode = g.getSoutheastMostHighlightedCell("Normal");
+                    RNode rNode = g.getSoutheastMostHighlightedCell("Normal");
                     rightClick.show(rNode.getR(), rNode.getsXMaxCoord()+finalSizeOfCells, rNode.getsYMaxCoord()+finalSizeOfCells);
                 }
                 else if (node.isNulled())
                 {
-                    GridData3.RNode rNode = g.getSoutheastMostHighlightedCell("Nulls");
+                    RNode rNode = g.getSoutheastMostHighlightedCell("Nulls");
                     rightClick3.show(rNode.getR(), rNode.getsXMaxCoord()+finalSizeOfCells, rNode.getsYMaxCoord()+finalSizeOfCells);
                     editGroupNode = node;
                 }
@@ -1171,7 +1173,7 @@ public class IsleLayoutController {
         TextField idT = new TextField();
         hboxA.getChildren().addAll(isle, idT);
         v.getChildren().add(hboxA);
-        ImageView iv = new ImageView(Objects.requireNonNull(getClass().getResource("makeIsleInfo.jpg")).toExternalForm());
+        ImageView iv = new ImageView(Objects.requireNonNull(getClass().getResource("Pictures/makeIsleInfo.jpg")).toExternalForm());
         iv.setFitWidth(350);
         iv.setFitHeight(61.5);
         v.getChildren().add(iv);
@@ -1185,7 +1187,7 @@ public class IsleLayoutController {
                 list.add(label);
                 new MyPopup(list, stage).getStage().show();
             }
-            else if (g.isleGroupList.size() > 0)
+            else if (g.getIsleGroupList().size() > 0)
             {
                 String isleID = idT.getText();
 
@@ -1253,7 +1255,7 @@ public class IsleLayoutController {
         name.setStyle("-fx-font-size: 16;");
         TextField nameT = new TextField();
         hboxA.getChildren().addAll(name, nameT);
-        ImageView iv = new ImageView(Objects.requireNonNull(getClass().getResource("newIsleGroupInfo.jpg")).toExternalForm());
+        ImageView iv = new ImageView(Objects.requireNonNull(getClass().getResource("Pictures/newIsleGroupInfo.jpg")).toExternalForm());
         iv.setFitWidth(290);
         iv.setFitHeight(48.1);
         HBox hboxC = new HBox();
@@ -1306,18 +1308,17 @@ public class IsleLayoutController {
 
         v.setAlignment(Pos.CENTER);
 
-        Set<String> groups = g.isleGroupList.keySet();
-        for (String key : groups)
+        for (String key : g.getIsleGroupList().keySet())
         {
-            Button group = new Button("Group: "+g.isleGroupList.get(key).getName());
+            Button group = new Button("Group: "+g.getIsleGroupList().get(key).getName());
             group.setTextFill(Color.WHITE);
-            String color = g.isleGroupList.get(key).getColor().toString();
+            String color = g.getIsleGroupList().get(key).getColor().toString();
             String[] strings = color.split("x");
             String string = "-fx-background-color: #"+strings[1]+";";
             group.setStyle(string);
             group.setOnAction(actionEvent ->
             {
-                if (g.isleGroupList.get(key).containsIsle(isleID))
+                if (g.getIsleGroupList().get(key).containsIsle(isleID))
                 {
                     Stage warningStage = new Stage();
                     warningStage.initModality(Modality.APPLICATION_MODAL);
@@ -1334,7 +1335,7 @@ public class IsleLayoutController {
                         warningStage.hide();
                         s.hide();
                         previousWindowStage.hide();
-                        g.addNewToExistingIsle(isleID, g.isleGroupList.get(key).getColor(), g.isleGroupList.get(key));
+                        g.addNewToExistingIsle(isleID, g.getIsleGroupList().get(key).getColor(), g.getIsleGroupList().get(key));
                     });
                     warningVbox.getChildren().addAll(warningLabel1, warningLabel2, warningLabel3, yes);
                     Scene cellSizeScene = new Scene(warningVbox);
@@ -1343,7 +1344,8 @@ public class IsleLayoutController {
                 }
                 else
                 {
-                    g.makeIsle(isleID, g.isleGroupList.get(key).getName(), g.isleGroupList.get(key).getColor(), g.isleGroupList.get(key), true, null);
+                    g.makeIsle(isleID, g.getIsleGroupList().get(key).getName(), g.getIsleGroupList().get(key).getColor(),
+                            g.getIsleGroupList().get(key), true, null);
                     s.hide();
                     previousWindowStage.hide();
                 }
@@ -1369,10 +1371,10 @@ public class IsleLayoutController {
             fileStream.println(rows);
             fileStream.println(cellSizeInFeet);
 
-            Set<String> groups = g.isleGroupList.keySet();
+            Set<String> groups = g.getIsleGroupList().keySet();
             for (String key : groups)
             {
-                GridData3.IsleGroup isleGroup = g.isleGroupList.get(key);
+                IsleGroup isleGroup = g.getIsleGroupList().get(key);
                 fileStream.println(isleGroup.getName());
                 Color color = isleGroup.getColor();
                 fileStream.println(color.getRed()+" "+color.getGreen()+" "+color.getBlue());
@@ -1398,8 +1400,8 @@ public class IsleLayoutController {
                     }
                     else
                         fileStream.println("No Setup Info");
-                    Isle.IsleCellList isleCellList = isleGroup.getIsleIDList().get(idKey).getIsleCellList();
-                    Isle.IsleCellList.IsleCellNode curr = isleCellList.getFirst();
+                    CellList isleCellList = isleGroup.getIsleIDList().get(idKey).getIsleCellList();
+                    CellList.CellNode curr = isleCellList.getFirst();
                     while (curr != null)
                     {
                         fileStream.print(curr.getrNode().getX()+","+curr.getrNode().getY());
@@ -1415,7 +1417,7 @@ public class IsleLayoutController {
             }
 
             fileStream.println("Nulls");
-            Set<String> nulls = g.nullList.keySet();
+            Set<String> nulls = g.getNullList().keySet();
             if (nulls.size() > 0)
             {
                 for (String key : nulls)
@@ -1580,7 +1582,7 @@ public class IsleLayoutController {
         Button done = new Button("Test!");
         done.setOnAction(actionEvent ->
         {
-            GraphOfTheGrid.DistanceReturn dr;
+            DistanceReturn dr;
             try
             {
                 int hmm = Integer.parseInt(v2.getText().charAt(0)+"");
@@ -1614,16 +1616,16 @@ public class IsleLayoutController {
     private void displayLayoutInstructions()
     {
         ArrayList<Node> list = new ArrayList<>();
-        ImageView iv = new ImageView(Objects.requireNonNull(getClass().getResource("introInfoFirst.jpg")).toExternalForm());
+        ImageView iv = new ImageView(Objects.requireNonNull(getClass().getResource("Pictures/introInfoFirst.jpg")).toExternalForm());
         iv.setFitWidth(600);
         iv.setFitHeight(337.5);
-        ImageView iv2 = new ImageView(Objects.requireNonNull(getClass().getResource("introInfoSecond.jpg")).toExternalForm());
+        ImageView iv2 = new ImageView(Objects.requireNonNull(getClass().getResource("Pictures/introInfoSecond.jpg")).toExternalForm());
         iv2.setFitWidth(600);
         iv2.setFitHeight(337.5);
         HBox hbox = new HBox();
         hbox.getChildren().addAll(iv, iv2);
         list.add(hbox);
-        ImageView iv3 = new ImageView(Objects.requireNonNull(getClass().getResource("introInfoThird.jpg")).toExternalForm());
+        ImageView iv3 = new ImageView(Objects.requireNonNull(getClass().getResource("Pictures/introInfoThird.jpg")).toExternalForm());
         iv3.setFitWidth(600);
         iv3.setFitHeight(170.93);
         list.add(iv3);
@@ -1636,11 +1638,11 @@ public class IsleLayoutController {
     public void displayIsleInfoInstructions()
     {
         ArrayList<Node> list = new ArrayList<>();
-        ImageView iv = new ImageView(Objects.requireNonNull(getClass().getResource("setupIsleInfoPicFirst.jpg")).toExternalForm());
+        ImageView iv = new ImageView(Objects.requireNonNull(getClass().getResource("Pictures/setupIsleInfoPicFirst.jpg")).toExternalForm());
         iv.setFitWidth(600);
         iv.setFitHeight(337.5);
         list.add(iv);
-        ImageView iv2 = new ImageView(Objects.requireNonNull(getClass().getResource("setupIsleInfoPicSecond.jpg")).toExternalForm());
+        ImageView iv2 = new ImageView(Objects.requireNonNull(getClass().getResource("Pictures/setupIsleInfoPicSecond.jpg")).toExternalForm());
         iv2.setFitWidth(600);
         iv2.setFitHeight(232.5);
         list.add(iv2);

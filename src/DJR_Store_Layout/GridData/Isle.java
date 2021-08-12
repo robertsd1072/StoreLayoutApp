@@ -6,7 +6,10 @@
  * @author David Roberts
  */
 
-package DJR_Store_Layout;
+package DJR_Store_Layout.GridData;
+
+import DJR_Store_Layout.GridData.GridData3;
+import DJR_Store_Layout.HelperClasses.Coords;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -15,8 +18,8 @@ public class Isle
 {
     private final GridData3 g;
     private final String isleID;
-    private final GridData3.IsleGroup isleGroup;
-    private IsleCellList isleCellList;
+    private final IsleGroup isleGroup;
+    private CellList isleCellList;
     private int numberOfIsleSections;
     private Hashtable<Integer, Integer> numberOfSubsectionsForEachSection;
     /**
@@ -36,33 +39,24 @@ public class Isle
      * @param ig isle group
      * @param grid grid data class
      */
-    public Isle(String id, GridData3.IsleGroup ig, GridData3 grid)
+    public Isle(String id, IsleGroup ig, GridData3 grid)
     {
         isleID = id;
         isleGroup = ig;
         g = grid;
     }
 
-    public void setIsleCellList(IsleCellList icl)
+    public void setIsleCellList(CellList cl)
     {
-        isleCellList = icl;
+        isleCellList = cl;
         shape = findShape();
     }
 
-    public String getIsleID()
-    {
-        return isleID;
-    }
+    public String getIsleID() {return isleID;}
 
-    public GridData3.IsleGroup getIsleGroup()
-    {
-        return isleGroup;
-    }
+    public IsleGroup getIsleGroup() {return isleGroup;}
 
-    public IsleCellList getIsleCellList()
-    {
-        return isleCellList;
-    }
+    public CellList getIsleCellList() {return isleCellList;}
 
     /**
      * Setups isle info for sections and subsections
@@ -122,7 +116,7 @@ public class Isle
         String which = null;
         if (directionOfIncreasingIsleSections.compareTo("up") == 0 || directionOfIncreasingIsleSections.compareTo("down") == 0)
         {
-            IsleCellList.IsleCellNode curr = isleCellList.first;
+            CellList.CellNode curr = isleCellList.getFirst();
             int x = curr.getrNode().getX();
             while (curr != null)
             {
@@ -138,12 +132,12 @@ public class Isle
 
                     break;
                 }
-                curr = curr.next;
+                curr = curr.getNext();
             }
         }
         else if (directionOfIncreasingIsleSections.compareTo("right") == 0 || directionOfIncreasingIsleSections.compareTo("left") == 0)
         {
-            IsleCellList.IsleCellNode curr = isleCellList.first;
+            CellList.CellNode curr = isleCellList.getFirst();
             int y = curr.getrNode().getY();
             while (curr != null)
             {
@@ -159,7 +153,7 @@ public class Isle
 
                     break;
                 }
-                curr = curr.next;
+                curr = curr.getNext();
             }
         }
 
@@ -222,13 +216,13 @@ public class Isle
     private String getIsleCoordsGivenEndcap(String where)
     {
         //System.out.println("Endcap where: "+where);
-        IsleCellList.IsleCellNode nodeToReturnCoords = null;
+        CellList.CellNode nodeToReturnCoords = null;
 
         if (where.compareTo("south") == 0)
         {
             int furthestYCoord = 0;
 
-            IsleCellList.IsleCellNode curr = isleCellList.first;
+            CellList.CellNode curr = isleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getY() > furthestYCoord)
@@ -236,7 +230,7 @@ public class Isle
                     furthestYCoord = curr.getrNode().getY();
                     nodeToReturnCoords = curr;
                 }
-                curr = curr.next;
+                curr = curr.getNext();
             }
             if (verifyCell(nodeToReturnCoords.getrNode().getX()+","+nodeToReturnCoords.getrNode().getY()))
                 return nodeToReturnCoords.getrNode().getX()+","+nodeToReturnCoords.getrNode().getY();
@@ -247,7 +241,7 @@ public class Isle
         {
             int nearestYCoord = 10000000;
 
-            IsleCellList.IsleCellNode curr = isleCellList.first;
+            CellList.CellNode curr = isleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getY() < nearestYCoord)
@@ -255,7 +249,7 @@ public class Isle
                     nearestYCoord = curr.getrNode().getY();
                     nodeToReturnCoords = curr;
                 }
-                curr = curr.next;
+                curr = curr.getNext();
             }
             if (verifyCell(nodeToReturnCoords.getrNode().getX()+","+nodeToReturnCoords.getrNode().getY()))
                 return nodeToReturnCoords.getrNode().getX()+","+nodeToReturnCoords.getrNode().getY();
@@ -266,7 +260,7 @@ public class Isle
         {
             int nearestXCoord = 10000000;
 
-            IsleCellList.IsleCellNode curr = isleCellList.first;
+            CellList.CellNode curr = isleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getX() < nearestXCoord)
@@ -274,7 +268,7 @@ public class Isle
                     nearestXCoord = curr.getrNode().getX();
                     nodeToReturnCoords = curr;
                 }
-                curr = curr.next;
+                curr = curr.getNext();
             }
             if (verifyCell(nodeToReturnCoords.getrNode().getX()+","+nodeToReturnCoords.getrNode().getY()))
                 return nodeToReturnCoords.getrNode().getX()+","+nodeToReturnCoords.getrNode().getY();
@@ -285,7 +279,7 @@ public class Isle
         {
             int furthestXCoord = 0;
 
-            IsleCellList.IsleCellNode curr = isleCellList.first;
+            CellList.CellNode curr = isleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getX() > furthestXCoord)
@@ -293,7 +287,7 @@ public class Isle
                     furthestXCoord = curr.getrNode().getX();
                     nodeToReturnCoords = curr;
                 }
-                curr = curr.next;
+                curr = curr.getNext();
             }
             if (verifyCell(nodeToReturnCoords.getrNode().getX()+","+nodeToReturnCoords.getrNode().getY()))
                 return nodeToReturnCoords.getrNode().getX()+","+nodeToReturnCoords.getrNode().getY();
@@ -308,12 +302,12 @@ public class Isle
      */
     public int getNumberOfCellsInIsle()
     {
-        IsleCellList.IsleCellNode curr = isleCellList.first;
+        CellList.CellNode curr = isleCellList.getFirst();
         int numberOfCells = 0;
         while (curr != null)
         {
             numberOfCells++;
-            curr = curr.next;
+            curr = curr.getNext();
         }
         return numberOfCells;
     }
@@ -563,14 +557,14 @@ public class Isle
 
     private String getIsleCoordsGivenEndcapSplit(String where, String which)
     {
-        IsleCellList.IsleCellNode nodeToReturnCoords = null;
+        CellList.CellNode nodeToReturnCoords = null;
 
         if (where.compareTo("south") == 0)
         {
             int xCoord1 = 0;
             int xCoord2 = 0;
 
-            IsleCellList.IsleCellNode curr = isleCellList.first;
+            CellList.CellNode curr = isleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getX() != xCoord1)
@@ -578,9 +572,9 @@ public class Isle
                     xCoord1 = curr.getrNode().getX();
                     break;
                 }
-                curr = curr.next;
+                curr = curr.getNext();
             }
-            curr = isleCellList.first;
+            curr = isleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getX() != xCoord2 && curr.getrNode().getX() != xCoord1)
@@ -588,7 +582,7 @@ public class Isle
                     xCoord2 = curr.getrNode().getX();
                     break;
                 }
-                curr = curr.next;
+                curr = curr.getNext();
             }
 
             System.out.println("xCoord1: "+xCoord1);
@@ -613,7 +607,7 @@ public class Isle
 
             int furthestYCoord = 0;
 
-            curr = isleCellList.first;
+            curr = isleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getY() > furthestYCoord)
@@ -621,7 +615,7 @@ public class Isle
                     furthestYCoord = curr.getrNode().getY();
                     nodeToReturnCoords = curr;
                 }
-                curr = curr.next;
+                curr = curr.getNext();
             }
             return theCorrectX+","+nodeToReturnCoords.getrNode().getY();
         }
@@ -630,7 +624,7 @@ public class Isle
             int xCoord1 = 0;
             int xCoord2 = 0;
 
-            IsleCellList.IsleCellNode curr = isleCellList.first;
+            CellList.CellNode curr = isleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getX() != xCoord1)
@@ -638,9 +632,9 @@ public class Isle
                     xCoord1 = curr.getrNode().getX();
                     break;
                 }
-                curr = curr.next;
+                curr = curr.getNext();
             }
-            curr = isleCellList.first;
+            curr = isleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getX() != xCoord2 && curr.getrNode().getX() != xCoord1)
@@ -648,7 +642,7 @@ public class Isle
                     xCoord2 = curr.getrNode().getX();
                     break;
                 }
-                curr = curr.next;
+                curr = curr.getNext();
             }
 
             System.out.println("xCoord1: "+xCoord1);
@@ -673,7 +667,7 @@ public class Isle
 
             int nearestYCoord = 10000000;
 
-            curr = isleCellList.first;
+            curr = isleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getY() < nearestYCoord)
@@ -681,7 +675,7 @@ public class Isle
                     nearestYCoord = curr.getrNode().getY();
                     nodeToReturnCoords = curr;
                 }
-                curr = curr.next;
+                curr = curr.getNext();
             }
             return theCorrectX+","+nodeToReturnCoords.getrNode().getY();
         }
@@ -690,7 +684,7 @@ public class Isle
             int yCoord1 = 0;
             int yCoord2 = 0;
 
-            IsleCellList.IsleCellNode curr = isleCellList.first;
+            CellList.CellNode curr = isleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getY() != yCoord1)
@@ -698,9 +692,9 @@ public class Isle
                     yCoord1 = curr.getrNode().getY();
                     break;
                 }
-                curr = curr.next;
+                curr = curr.getNext();
             }
-            curr = isleCellList.first;
+            curr = isleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getY() != yCoord2 && curr.getrNode().getY() != yCoord1)
@@ -708,7 +702,7 @@ public class Isle
                     yCoord2 = curr.getrNode().getY();
                     break;
                 }
-                curr = curr.next;
+                curr = curr.getNext();
             }
 
             System.out.println("yCoord1: "+yCoord1);
@@ -733,7 +727,7 @@ public class Isle
 
             int nearestXCoord = 10000000;
 
-            curr = isleCellList.first;
+            curr = isleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getX() < nearestXCoord)
@@ -741,7 +735,7 @@ public class Isle
                     nearestXCoord = curr.getrNode().getX();
                     nodeToReturnCoords = curr;
                 }
-                curr = curr.next;
+                curr = curr.getNext();
             }
             return nodeToReturnCoords.getrNode().getX()+","+theCorrectY;
         }
@@ -750,7 +744,7 @@ public class Isle
             int yCoord1 = 0;
             int yCoord2 = 0;
 
-            IsleCellList.IsleCellNode curr = isleCellList.first;
+            CellList.CellNode curr = isleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getY() != yCoord1)
@@ -758,9 +752,9 @@ public class Isle
                     yCoord1 = curr.getrNode().getY();
                     break;
                 }
-                curr = curr.next;
+                curr = curr.getNext();
             }
-            curr = isleCellList.first;
+            curr = isleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getY() != yCoord2 && curr.getrNode().getY() != yCoord1)
@@ -768,7 +762,7 @@ public class Isle
                     yCoord2 = curr.getrNode().getY();
                     break;
                 }
-                curr = curr.next;
+                curr = curr.getNext();
             }
 
             System.out.println("yCoord1: "+yCoord1);
@@ -793,7 +787,7 @@ public class Isle
 
             int furthestXCoord = 0;
 
-            curr = isleCellList.first;
+            curr = isleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getX() > furthestXCoord)
@@ -801,7 +795,7 @@ public class Isle
                     furthestXCoord = curr.getrNode().getX();
                     nodeToReturnCoords = curr;
                 }
-                curr = curr.next;
+                curr = curr.getNext();
             }
             return nodeToReturnCoords.getrNode().getX()+","+theCorrectY;
         }
@@ -885,13 +879,13 @@ public class Isle
         ArrayList<Integer> xCoords = new ArrayList<>();
         ArrayList<Integer> yCoords = new ArrayList<>();
 
-        IsleCellList.IsleCellNode curr = isleCellList.first;
+        CellList.CellNode curr = isleCellList.getFirst();
         while (curr != null)
         {
             xCoords.add(curr.getrNode().getX());
             yCoords.add(curr.getrNode().getY());
 
-            curr = curr.next;
+            curr = curr.getNext();
         }
 
         int xCoord = xCoords.get(0);
@@ -934,73 +928,6 @@ public class Isle
         catch (NullPointerException e)
         {
             return false;
-        }
-    }
-
-    /**
-     * List of cells within isle
-     */
-    public static class IsleCellList
-    {
-        private IsleCellNode first;
-        private IsleCellNode last;
-        private int size;
-
-        public IsleCellList()
-        {
-            first = null;
-            last = null;
-            size = 0;
-        }
-
-        public void add(GridData3.RNode node)
-        {
-            if (size == 0)
-            {
-                first = new IsleCellNode(node);
-                last = first;
-                size = 1;
-            }
-            else if (size > 0)
-            {
-                last.next = new IsleCellNode(node);
-                last = last.next;
-                size++;
-            }
-        }
-
-        private void clear()
-        {
-            first = null;
-            last = null;
-            size = 0;
-        }
-
-        public IsleCellNode getFirst()
-        {
-            return first;
-        }
-
-        public class IsleCellNode
-        {
-            private final GridData3.RNode rNode;
-            private IsleCellNode next;
-
-            public IsleCellNode(GridData3.RNode node)
-            {
-                rNode = node;
-                next = null;
-            }
-
-            public GridData3.RNode getrNode()
-            {
-                return rNode;
-            }
-
-            public IsleCellNode getNext()
-            {
-                return next;
-            }
         }
     }
 }

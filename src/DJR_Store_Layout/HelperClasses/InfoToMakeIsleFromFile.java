@@ -6,7 +6,7 @@
  * @author David Roberts
  */
 
-package DJR_Store_Layout;
+package DJR_Store_Layout.HelperClasses;
 
 public class InfoToMakeIsleFromFile
 {

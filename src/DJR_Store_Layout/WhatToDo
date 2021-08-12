@@ -4,7 +4,7 @@ Item Location:
 D39(1) 1-1-1.90
 99B 103 B04
 
-- Setup all isles with new info
+- Setup all isles' info
 
 - Finding cell from location is now different with different isle section/subsection system (simple version still works)
 
@@ -16,3 +16,4 @@ D39(1) 1-1-1.90
 
 Optimization:
 - Multithreading (EVERYWHERE)
+- Java 1.8 Streams - https://stackify.com/streams-guide-java-8/

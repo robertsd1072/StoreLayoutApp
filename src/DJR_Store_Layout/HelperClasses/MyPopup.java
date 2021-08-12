@@ -1,4 +1,4 @@
-package DJR_Store_Layout;
+package DJR_Store_Layout.HelperClasses;
 
 import javafx.geometry.Pos;
 import javafx.scene.Node;

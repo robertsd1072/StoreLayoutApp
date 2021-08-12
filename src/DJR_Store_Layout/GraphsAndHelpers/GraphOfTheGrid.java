@@ -1,4 +1,10 @@
-package DJR_Store_Layout;
+package DJR_Store_Layout.GraphsAndHelpers;
+
+import DJR_Store_Layout.GridData.CellList;
+import DJR_Store_Layout.GridData.GridData3;
+import DJR_Store_Layout.GridData.RNode;
+import DJR_Store_Layout.HelperClasses.Coords;
+import DJR_Store_Layout.GridData.Isle;
 
 import java.util.*;
 
@@ -20,8 +26,8 @@ public class GraphOfTheGrid
 
         grid = g;
 
-        int cols = g.colSize;
-        int rows = g.rowSize;
+        int cols = g.getColSize();
+        int rows = g.getRowSize();
 
         for (int i=0; i<cols; i++)
         {
@@ -41,10 +47,10 @@ public class GraphOfTheGrid
                             else
                             {
                                 Edge curr = graph.get(i+","+j);
-                                while (curr != null && curr.next != null)
-                                    curr = curr.next;
+                                while (curr != null && curr.getNext() != null)
+                                    curr = curr.getNext();
 
-                                curr.next = new Edge(i+","+j, (i-1)+","+j);
+                                curr.setNext(new Edge(i+","+j, (i-1)+","+j));
                             }
                             numberOfEdges++;
                         }
@@ -61,10 +67,10 @@ public class GraphOfTheGrid
                             else
                             {
                                 Edge curr = graph.get(i+","+j);
-                                while (curr != null && curr.next != null)
-                                    curr = curr.next;
+                                while (curr != null && curr.getNext() != null)
+                                    curr = curr.getNext();
 
-                                curr.next = new Edge(i+","+j, i+","+(j-1));
+                                curr.setNext(new Edge(i+","+j, i+","+(j-1)));
                             }
                             numberOfEdges++;
                         }
@@ -81,10 +87,10 @@ public class GraphOfTheGrid
                             else
                             {
                                 Edge curr = graph.get(i+","+j);
-                                while (curr != null && curr.next != null)
-                                    curr = curr.next;
+                                while (curr != null && curr.getNext() != null)
+                                    curr = curr.getNext();
 
-                                curr.next = new Edge(i+","+j, (i+1)+","+j);
+                                curr.setNext(new Edge(i+","+j, (i+1)+","+j));
                             }
                             numberOfEdges++;
                         }
@@ -101,10 +107,10 @@ public class GraphOfTheGrid
                             else
                             {
                                 Edge curr = graph.get(i+","+j);
-                                while (curr != null && curr.next != null)
-                                    curr = curr.next;
+                                while (curr != null && curr.getNext() != null)
+                                    curr = curr.getNext();
 
-                                curr.next = new Edge(i+","+j, i+","+(j+1));
+                                curr.setNext(new Edge(i+","+j, i+","+(j+1)));
                             }
                             numberOfEdges++;
                         }
@@ -160,20 +166,20 @@ public class GraphOfTheGrid
             Edge currEdge = graph.get(currNode);
             while (currEdge != null)
             {
-                if (!visited.get(currEdge.w))
+                if (!visited.get(currEdge.getW()))
                 {
-                    if (!q.contains(currEdge.w))
-                        q.add(currEdge.w);
+                    if (!q.contains(currEdge.getW()))
+                        q.add(currEdge.getW());
 
-                    int dist = distance.get(currEdge.u) + currEdge.length;
-                    if (dist < distance.get(currEdge.w))
+                    int dist = distance.get(currEdge.getU()) + currEdge.getLength();
+                    if (dist < distance.get(currEdge.getW()))
                     {
-                        distance.put(currEdge.w, dist);
+                        distance.put(currEdge.getW(), dist);
 
-                        previous.get(currEdge.w).append(previous.get(currEdge.u)).append(" ").append(currEdge.u);
+                        previous.get(currEdge.getW()).append(previous.get(currEdge.getU())).append(" ").append(currEdge.getU());
                     }
                 }
-                currEdge = currEdge.next;
+                currEdge = currEdge.getNext();
             }
         }
 
@@ -226,7 +232,7 @@ public class GraphOfTheGrid
 
             ArrayList<String> unvisitedVertexList = new ArrayList<>();
             ArrayList<DistanceReturn> drList = new ArrayList<>();
-            EdgePQ pq = new EdgePQ();
+            EdgePQ pq = new EdgePQ(numberOfEdges);
             for (String vertex : set)
             {
                 if (!visited.get(vertex))
@@ -239,25 +245,25 @@ public class GraphOfTheGrid
             Edge root = getClosestNeighborFromNode(curr, previousCell, unvisitedVertexList);
             //System.out.println("Root: "+root.u+"->"+root.w);
             //System.out.println("Comparing "+ids.get(root.u)+" and "+ids.get(root.w));
-            if (!ids.get(root.u).equals(ids.get(root.w)))
+            if (!ids.get(root.getU()).equals(ids.get(root.getW())))
             {
                 edgePath.add(root);
-                vertexPath.add(root.dr.end);
-                locationPath.add(list.get(root.w));
+                vertexPath.add(root.getDistanceReturn().getEnd());
+                locationPath.add(list.get(root.getW()));
                 //System.out.println("Adding "+root.dr.end+" to coordinate path");
                 //System.out.println("Adding "+list.get(root.w)+" to location path");
 
-                int id = ids.get(root.u);
+                int id = ids.get(root.getU());
                 for (String vertex : set)
                 {
                     if (ids.get(vertex) == id)
-                        ids.put(vertex, ids.get(root.w));
+                        ids.put(vertex, ids.get(root.getW()));
                 }
-                ids.put(root.u, ids.get(root.w));
+                ids.put(root.getU(), ids.get(root.getW()));
 
-                curr = root.w;
-                previousCell = root.dr.end;
-                visited.put(root.w, true);
+                curr = root.getW();
+                previousCell = root.getDistanceReturn().getEnd();
+                visited.put(root.getW(), true);
             }
         }
 
@@ -271,7 +277,7 @@ public class GraphOfTheGrid
         StringBuilder cellPath = new StringBuilder();
         for (Edge e : edgePath)
         {
-            cellPath.append(e.cellPath);
+            cellPath.append(e.getCellPath());
         }
 
         return new FindingPathReturn(locationPath, vertexPath, cellPath.toString());
@@ -326,13 +332,13 @@ public class GraphOfTheGrid
         for (int i=0; i<sectorOrder.length; i++)
         {
             System.out.println("Going to all vertices in sector: "+sectorOrder[i]);
-            while (sectorMap[sectorOrder[i]].verticesInSectorList.size() > 0)
+            while (sectorMap[sectorOrder[i]].getVerticesInSectorList().size() > 0)
             {
                 System.out.println("Curr: "+curr);
                 System.out.println("Previous Cell: "+previousCell);
 
                 ArrayList<String> unvisitedVertexList = new ArrayList<>();
-                for (String vertex : sectorMap[sectorOrder[i]].verticesInSectorList)
+                for (String vertex : sectorMap[sectorOrder[i]].getVerticesInSectorList())
                 {
                     if (!visited.get(vertex))
                     {
@@ -342,33 +348,33 @@ public class GraphOfTheGrid
                 }
 
                 Edge closestNeighbor = getClosestNeighborFromNode(curr, previousCell, unvisitedVertexList);
-                System.out.println("Closest: "+closestNeighbor.u+"->"+closestNeighbor.w);
+                System.out.println("Closest: "+closestNeighbor.getU()+"->"+closestNeighbor.getW());
 
                 edgePath.add(closestNeighbor);
-                vertexPath.add(closestNeighbor.dr.end);
+                vertexPath.add(closestNeighbor.getDistanceReturn().getEnd());
 
-                String loc = list.get(closestNeighbor.w);
+                String loc = list.get(closestNeighbor.getW());
                 if (loc == null)
                 {
-                    Coords coords = new Coords(closestNeighbor.w);
+                    Coords coords = new Coords(closestNeighbor.getW());
                     loc = grid.getRNode(coords.getX(), coords.getY()).getIsle().getIsleID();
                     locationPath.add(list.get(loc));
                 }
                 else
                     locationPath.add(loc);
 
-                System.out.println("Locatns: "+list.get(closestNeighbor.u)+"->"+loc);
+                System.out.println("Locatns: "+list.get(closestNeighbor.getU())+"->"+loc);
 
                 curr = loc;
-                previousCell = closestNeighbor.dr.end;
+                previousCell = closestNeighbor.getDistanceReturn().getEnd();
                 visited.put(curr, true);
                 try
                 {
-                    sectorMap[vertexSectorIds.get(curr)].verticesInSectorList.remove(curr);
+                    sectorMap[vertexSectorIds.get(curr)].getVerticesInSectorList().remove(curr);
                 }
                 catch (NullPointerException e)
                 {
-                    sectorMap[vertexSectorIds.get(closestNeighbor.w)].verticesInSectorList.remove(closestNeighbor.w);
+                    sectorMap[vertexSectorIds.get(closestNeighbor.getW())].getVerticesInSectorList().remove(closestNeighbor.getW());
                 }
             }
             System.out.println("Visited all vertices in sector: "+sectorOrder[i]);
@@ -384,7 +390,7 @@ public class GraphOfTheGrid
 
         StringBuilder cellPath = new StringBuilder();
         for (Edge e : edgePath)
-            cellPath.append(e.cellPath);
+            cellPath.append(e.getCellPath());
 
         return new FindingPathReturn(locationPath, vertexPath, cellPath.toString());
     }
@@ -431,9 +437,10 @@ public class GraphOfTheGrid
         {
             //System.out.println("Going to all vertices in sector: "+sectorOrder[i]);
 
-            if (sectorMap[sectorOrder[i]].verticesInSectorList.size() > 0)
+            if (sectorMap[sectorOrder[i]].getVerticesInSectorList().size() > 0)
             {
-                String nearestVertexToNextSector = getNearestVertexToNextSector(i, sectorOrder, sectorMap[sectorOrder[i]].verticesInSectorList);
+                String nearestVertexToNextSector = getNearestVertexToNextSector(i, sectorOrder,
+                        sectorMap[sectorOrder[i]].getVerticesInSectorList());
                 //System.out.println("Closest vertex to next sector: "+nearestVertexToNextSector);
 
                 ArrayList<Edge> backwardsVertexPathInSector = new ArrayList<>();
@@ -443,12 +450,12 @@ public class GraphOfTheGrid
                 curr = nearestVertexToNextSector;
                 previousCell = nearestVertexToNextSector;
                 visited.put(curr, true);
-                sectorMap[sectorOrder[i]].verticesInSectorList.remove(curr);
+                sectorMap[sectorOrder[i]].getVerticesInSectorList().remove(curr);
 
-                while (sectorMap[sectorOrder[i]].verticesInSectorList.size() > 0)
+                while (sectorMap[sectorOrder[i]].getVerticesInSectorList().size() > 0)
                 {
                     ArrayList<String> unvisitedVertexList = new ArrayList<>();
-                    for (String vertex : sectorMap[sectorOrder[i]].verticesInSectorList)
+                    for (String vertex : sectorMap[sectorOrder[i]].getVerticesInSectorList())
                     {
                         if (!visited.get(vertex))
                         {
@@ -464,25 +471,25 @@ public class GraphOfTheGrid
                     backwardsVertexPathInSector.add(closestNeighbor);
                     //System.out.println("Adding "+root.u+" to backwards path in sector: "+sectorOrder[i]);
 
-                    curr = closestNeighbor.w;
-                    previousCell = closestNeighbor.dr.end;
+                    curr = closestNeighbor.getW();
+                    previousCell = closestNeighbor.getDistanceReturn().getEnd();
                     visited.put(curr, true);
-                    sectorMap[sectorOrder[i]].verticesInSectorList.remove(curr);
+                    sectorMap[sectorOrder[i]].getVerticesInSectorList().remove(curr);
                 }
                 //System.out.println("Visited all vertices in sector: "+sectorOrder[i]);
 
                 DistanceReturn dr = findDistanceBetween(lastSectorEndEndCoords, previousCell);
                 Edge fromPreviousSector = new Edge(lastSectorEnd, curr, dr);
                 edgePath.add(fromPreviousSector);
-                vertexPath.add(fromPreviousSector.dr.end);
-                locationPath.add(fromPreviousSector.w);
+                vertexPath.add(fromPreviousSector.getDistanceReturn().getEnd());
+                locationPath.add(fromPreviousSector.getW());
                 //System.out.println("Adding "+fromPreviousSector.dr.end+" to connect previous sector");
 
                 for (int j=backwardsVertexPathInSector.size()-1; j>-1; j--)
                 {
                     edgePath.add(backwardsVertexPathInSector.get(j));
-                    vertexPath.add(backwardsVertexPathInSector.get(j).u);
-                    locationPath.add(list.get(backwardsVertexPathInSector.get(j).u));
+                    vertexPath.add(backwardsVertexPathInSector.get(j).getU());
+                    locationPath.add(list.get(backwardsVertexPathInSector.get(j).getU()));
                     //System.out.println("Adding "+backwardsVertexPathInSector.get(j).u+" to path in sector: "+i);
                 }
 
@@ -502,14 +509,14 @@ public class GraphOfTheGrid
             {
                 try
                 {
-                    if (edgePath.get(i).w.equals(edgePath.get(i-1).w))
-                        cellPath.append(reversePath(edgePath.get(i).cellPath));
+                    if (edgePath.get(i).getW().equals(edgePath.get(i-1).getW()))
+                        cellPath.append(reversePath(edgePath.get(i).getCellPath()));
                     else
-                        cellPath.append(edgePath.get(i).cellPath);
+                        cellPath.append(edgePath.get(i).getCellPath());
                 }
                 catch (IndexOutOfBoundsException e)
                 {
-                    cellPath.append(edgePath.get(i).cellPath);
+                    cellPath.append(edgePath.get(i).getCellPath());
                 }
             }
 
@@ -555,24 +562,24 @@ public class GraphOfTheGrid
             Edge currEdge = graph.get(currNode);
             while (currEdge != null)
             {
-                if (!visited.get(currEdge.w))
+                if (!visited.get(currEdge.getW()))
                 {
-                    if (!q.contains(currEdge.w))
-                        q.add(currEdge.w);
+                    if (!q.contains(currEdge.getW()))
+                        q.add(currEdge.getW());
 
-                    int dist = distance.get(currEdge.u) + currEdge.length;
-                    if (dist < distance.get(currEdge.w))
+                    int dist = distance.get(currEdge.getU()) + currEdge.getLength();
+                    if (dist < distance.get(currEdge.getW()))
                     {
-                        distance.put(currEdge.w, dist);
+                        distance.put(currEdge.getW(), dist);
 
-                        previous.get(currEdge.w).append(previous.get(currEdge.u)).append(" ").append(currEdge.u);
+                        previous.get(currEdge.getW()).append(previous.get(currEdge.getU())).append(" ").append(currEdge.getU());
                     }
                 }
-                currEdge = currEdge.next;
+                currEdge = currEdge.getNext();
             }
         }
 
-        EdgePQ pq = new EdgePQ();
+        EdgePQ pq = new EdgePQ(numberOfEdges);
         for (String end : endList)
         {
             String[] hmm = end.split(",");
@@ -601,7 +608,7 @@ public class GraphOfTheGrid
                 if (isle != null)
                 {
                     ArrayList<String> listOfEnds = new ArrayList<>();
-                    Isle.IsleCellList.IsleCellNode curr = isle.getIsleCellList().getFirst();
+                    CellList.CellNode curr = isle.getIsleCellList().getFirst();
                     while (curr != null)
                     {
                         //System.out.println("Finding path for: "+curr.getrNode().getX()+","+curr.getrNode().getY());
@@ -615,7 +622,7 @@ public class GraphOfTheGrid
                         curr = curr.getNext();
                     }
 
-                    EdgePQ possiblePathsPQ = new EdgePQ();
+                    EdgePQ possiblePathsPQ = new EdgePQ(numberOfEdges);
                     for (String irregularEnd : listOfEnds)
                     {
                         Coords endCoords = new Coords(irregularEnd);
@@ -651,7 +658,7 @@ public class GraphOfTheGrid
         {
             try
             {
-                GridData3.RNode rnode = grid.getRNode(x-1, y);
+                RNode rnode = grid.getRNode(x-1, y);
                 if (!rnode.isNulled() && !rnode.isIsle())
                 {
                     newCoords = (x-1)+","+y;
@@ -661,7 +668,7 @@ public class GraphOfTheGrid
             catch (ArrayIndexOutOfBoundsException ignored) {}
             try
             {
-                GridData3.RNode rnode = grid.getRNode(x, y+1);
+                RNode rnode = grid.getRNode(x, y+1);
                 if (!rnode.isNulled() && !rnode.isIsle())
                 {
                     newCoords = x+","+(y+1);
@@ -671,7 +678,7 @@ public class GraphOfTheGrid
             catch (ArrayIndexOutOfBoundsException ignored) {}
             try
             {
-                GridData3.RNode rnode = grid.getRNode(x+1, y);
+                RNode rnode = grid.getRNode(x+1, y);
                 if (!rnode.isNulled() && !rnode.isIsle())
                 {
                     newCoords = (x+1)+","+y;
@@ -681,7 +688,7 @@ public class GraphOfTheGrid
             catch (ArrayIndexOutOfBoundsException ignored) {}
             try
             {
-                GridData3.RNode rnode = grid.getRNode(x, y-1);
+                RNode rnode = grid.getRNode(x, y-1);
                 if (!rnode.isNulled() && !rnode.isIsle())
                 {
                     newCoords = x+","+(y-1);
@@ -710,7 +717,7 @@ public class GraphOfTheGrid
 
         ArrayList<String> listOfEnds = new ArrayList<>();
 
-        Isle.IsleCellList.IsleCellNode curr = isle.getIsleCellList().getFirst();
+        CellList.CellNode curr = isle.getIsleCellList().getFirst();
         while (curr != null)
         {
             //System.out.println("Finding path for: "+curr.getrNode().getX()+","+curr.getrNode().getY());
@@ -746,20 +753,20 @@ public class GraphOfTheGrid
             Edge currEdge = graph.get(currNode);
             while (currEdge != null)
             {
-                if (!visited.get(currEdge.w))
+                if (!visited.get(currEdge.getW()))
                 {
-                    if (!q.contains(currEdge.w))
-                        q.add(currEdge.w);
+                    if (!q.contains(currEdge.getW()))
+                        q.add(currEdge.getW());
 
-                    int dist = distance.get(currEdge.u) + currEdge.length;
-                    if (dist < distance.get(currEdge.w))
+                    int dist = distance.get(currEdge.getU()) + currEdge.getLength();
+                    if (dist < distance.get(currEdge.getW()))
                     {
-                        distance.put(currEdge.w, dist);
+                        distance.put(currEdge.getW(), dist);
 
-                        previous.get(currEdge.w).append(previous.get(currEdge.u)).append(" ").append(currEdge.u);
+                        previous.get(currEdge.getW()).append(previous.get(currEdge.getU())).append(" ").append(currEdge.getU());
                     }
                 }
-                currEdge = currEdge.next;
+                currEdge = currEdge.getNext();
             }
         }
 
@@ -817,11 +824,11 @@ public class GraphOfTheGrid
         int x = coords.getX();
         int y = coords.getY();
 
-        if (x < grid.colSize/2 && y < grid.rowSize/2)
+        if (x < grid.getColSize()/2 && y < grid.getRowSize()/2)
             return 0;
-        else if (x < grid.colSize && y < grid.rowSize/2)
+        else if (x < grid.getColSize() && y < grid.getRowSize()/2)
             return 1;
-        else if (x < grid.colSize/2 && y < grid.rowSize)
+        else if (x < grid.getColSize()/2 && y < grid.getRowSize())
             return 2;
         else
             return 3;
@@ -879,7 +886,7 @@ public class GraphOfTheGrid
         String closestVertex = listOfVerticesInCurrSector.get(0);
         if (currentSector == 0 && nextSector == 2)
         {
-            int y = grid.rowSize/2;
+            int y = grid.getRowSize()/2;
             //System.out.println("Target Coord: y = "+y);
             for (String vertex : listOfVerticesInCurrSector)
             {
@@ -891,7 +898,7 @@ public class GraphOfTheGrid
         }
         else if (currentSector == 2 && nextSector == 3)
         {
-            int x = grid.colSize/2;
+            int x = grid.getColSize()/2;
             //System.out.println("Target Coord: x = "+x);
             for (String vertex : listOfVerticesInCurrSector)
             {
@@ -903,7 +910,7 @@ public class GraphOfTheGrid
         }
         else if (currentSector == 3 && nextSector == 1)
         {
-            int y = grid.rowSize/2;
+            int y = grid.getRowSize()/2;
             //System.out.println("Target Coord: y = "+y);
             for (String vertex : listOfVerticesInCurrSector)
             {
@@ -915,7 +922,7 @@ public class GraphOfTheGrid
         }
         else if (currentSector == 1 && nextSector == 0)
         {
-            int x = grid.colSize/2;
+            int x = grid.getColSize()/2;
             //System.out.println("Target Coord: x = "+x);
             for (String vertex : listOfVerticesInCurrSector)
             {
@@ -939,320 +946,4 @@ public class GraphOfTheGrid
 
         return newPath.toString();
     }
-
-    protected static class Edge
-    {
-        protected String u;
-        protected String w;
-        protected int length;
-        protected String cellPath;
-        protected DistanceReturn dr;
-        protected Edge next;
-
-        public Edge(String v1, String v2)
-        {
-            u = v1;
-            w = v2;
-            length = 1;
-        }
-
-        public Edge(String v1, String v2, int l, String cp)
-        {
-            u = v1;
-            w = v2;
-            length = l;
-            cellPath = cp;
-        }
-
-        public Edge(String v1, String v2, DistanceReturn distanceReturn)
-        {
-            u = v1;
-            w = v2;
-            length = distanceReturn.distance;
-            cellPath = distanceReturn.path;
-            dr = distanceReturn;
-        }
-
-        public String getU()
-        {
-            return u;
-        }
-
-        public String getW()
-        {
-            return w;
-        }
-
-        public Edge getNext()
-        {
-            return next;
-        }
-    }
-
-    private static class VertexQ
-    {
-        private final String[] array;
-        private int size;
-
-        public VertexQ(int size)
-        {
-            array = new String[size];
-            size = 0;
-        }
-
-
-        public void add(String vertex)
-        {
-            array[size] = vertex;
-            size++;
-        }
-
-        public String getRoot()
-        {
-            String temp = array[0];
-
-            for (int i=0; i<size-1; i++)
-            {
-                array[i] = array[i+1];
-            }
-            size--;
-
-            return temp;
-        }
-
-        public boolean contains(String v)
-        {
-            for (int i=0; i<size-1; i++)
-            {
-                if (array[i].compareTo(v) == 0)
-                    return true;
-            }
-            return false;
-        }
-
-        public boolean hasStuff()
-        {
-            return size > 0;
-        }
-
-        public void print()
-        {
-            for (int i=0; i<size; i++)
-            {
-                System.out.println(array[i]);
-            }
-        }
-    }
-
-    private class EdgePQ
-    {
-        private final Edge[] edgeArray;
-        private int size;
-
-        public EdgePQ()
-        {
-            edgeArray = new Edge[numberOfEdges];
-            size = 0;
-        }
-
-        public void add(Edge e)
-        {
-            edgeArray[size] = e;
-
-            int index = size;
-            while (index > 0)
-            {
-                if (index % 2 == 1)
-                {
-                    index = (index-1)/2;
-                    Edge parent = edgeArray[index];
-                    if (e.length < parent.length)
-                    {
-                        edgeArray[(2*index)+1] = parent;
-                    }
-                    else
-                    {
-                        edgeArray[(2*index)+1] = e;
-                        break;
-                    }
-                }
-                else
-                {
-                    index = (index-2)/2;
-                    Edge parent = edgeArray[index];
-                    if (e.length < parent.length)
-                    {
-                        edgeArray[(2*index)+2] = parent;
-                    }
-                    else
-                    {
-                        edgeArray[(2*index)+2] = e;
-                        break;
-                    }
-                }
-
-                if (index == 0)
-                {
-                    edgeArray[index] = e;
-                }
-            }
-            size++;
-        }
-
-        public Edge getRoot()
-        {
-            Edge root = edgeArray[0];
-
-            Edge last = edgeArray[size-1];
-            edgeArray[size-1] = null;
-
-            edgeArray[0] = last;
-
-            Edge edgeToSwap = edgeArray[0];
-            int index = 0;
-            try
-            {
-                while (edgeArray[(2*index)+1] != null)
-                {
-                    if (edgeArray[(2*index)+2] != null)
-                    {
-                        if (edgeArray[index].length < edgeArray[(2*index)+1].length && edgeArray[index].length < edgeArray[(2*index)+2].length)
-                            break;
-
-                        if (edgeArray[(2*index)+1].length < edgeArray[(2*index)+2].length)
-                        {
-                            Edge tempEdge = edgeArray[(2*index)+1];
-                            edgeArray[(2*index)+1] = edgeToSwap;
-                            edgeArray[index] = tempEdge;
-
-                            index = (2*index)+1;
-                            edgeToSwap = edgeArray[index];
-                        }
-                        else
-                        {
-                            Edge tempEdge = edgeArray[(2*index)+2];
-                            edgeArray[(2*index)+2] = edgeToSwap;
-                            edgeArray[index] = tempEdge;
-
-                            index = (2*index)+2;
-                            edgeToSwap = edgeArray[index];
-                        }
-                    }
-                    else
-                    {
-                        if (edgeArray[index].length > edgeArray[(2*index)+1].length)
-                        {
-                            Edge tempEdge = edgeArray[(2*index)+1];
-                            edgeArray[(2*index)+1] = edgeToSwap;
-                            edgeArray[index] = tempEdge;
-
-                            index = (2*index)+1;
-                            edgeToSwap = edgeArray[index];
-                        }
-                        else
-                            break;
-                    }
-                }
-            }
-            catch (ArrayIndexOutOfBoundsException ignored) {}
-            size--;
-
-            return root;
-        }
-
-        public boolean hasStuff()
-        {
-            return size > 0;
-        }
-
-        public void print()
-        {
-            for (int i=0; i<size; i++)
-            {
-                System.out.println(edgeArray[i].u+"->"+edgeArray[i].w+" : "+edgeArray[i].length);
-            }
-        }
-    }
-
-    public static class DistanceReturn
-    {
-        private final int distance;
-        private final String path;
-        private final String end;
-
-        private DistanceReturn(int d, String p, String e)
-        {
-            distance = d;
-            path = p;
-            end = e;
-        }
-
-        public int getDistance()
-        {
-            return distance;
-        }
-
-        public String getPath()
-        {
-            return path;
-        }
-
-        public String getEnd()
-        {
-            return end;
-        }
-
-        private static class DistanceComparator implements Comparator<DistanceReturn>
-        {
-            public int compare(DistanceReturn dr1, DistanceReturn dr2)
-            {
-                return Integer.compare(dr1.distance, dr2.distance);
-            }
-        }
-    }
-
-    public static class FindingPathReturn
-    {
-        private final ArrayList<String> locationPath;
-        private final ArrayList<String> vertexPath;
-        private final String cellPath;
-
-        private FindingPathReturn(ArrayList<String> a1, ArrayList<String> a2, String s)
-        {
-            locationPath = a1;
-            vertexPath = a2;
-            cellPath = s;
-        }
-
-        public ArrayList<String> getLocationPath()
-        {
-            return locationPath;
-        }
-
-        public ArrayList<String> getVertexPath()
-        {
-            return vertexPath;
-        }
-
-        public String getCellPath()
-        {
-            return cellPath;
-        }
-    }
-
-    private static class Sector
-    {
-        private final ArrayList<String> verticesInSectorList;
-
-        private Sector()
-        {
-            verticesInSectorList = new ArrayList<>();
-        }
-
-        private void addVertex(String vertex)
-        {
-            verticesInSectorList.add(vertex);
-        }
-    }
 }
-
