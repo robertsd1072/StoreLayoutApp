@@ -20,17 +20,21 @@ public class MyPopup
         stage = st;
     }
 
-    public Stage getStage()
+    public Stage getStage(boolean okButton)
     {
         Stage popupStage = new Stage();
-        popupStage.initModality(Modality.APPLICATION_MODAL);
         popupStage.initOwner(stage);
         VBox popupStageVbox = new VBox();
         popupStageVbox.setSpacing(5);
         popupStageVbox.setAlignment(Pos.CENTER);
-        Button ok = new Button("Ok");
-        ok.setOnAction(actionEvent -> popupStage.hide());
-        listOfNodes.add(ok);
+        if (okButton)
+        {
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+
+            Button ok = new Button("Ok");
+            ok.setOnAction(actionEvent -> popupStage.hide());
+            listOfNodes.add(ok);
+        }
         for (Node thing : listOfNodes)
             popupStageVbox.getChildren().add(thing);
         Scene popupScene = new Scene(popupStageVbox);

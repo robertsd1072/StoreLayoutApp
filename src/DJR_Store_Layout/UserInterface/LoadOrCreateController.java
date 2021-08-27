@@ -10,9 +10,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -29,6 +32,8 @@ public class LoadOrCreateController {
      * Base javafx controller for the scene
      */
     public BorderPane bP;
+    public Button createButton;
+    public VBox theV;
 
     /**
      * Constructor loads fxml and connects this controller
@@ -93,7 +98,7 @@ public class LoadOrCreateController {
         if (returnVal == JFileChooser.APPROVE_OPTION)
         {
             File file = fc.getSelectedFile();
-            new IsleLayoutController(file, x, y).launchScene(stage, true);
+            new IsleLayoutController(file, x, y-63).launchScene(stage, true);
         }
     }
 }

@@ -8,11 +8,17 @@
 
 package DJR_Store_Layout.GridData;
 
+import DJR_Store_Layout.HelperClasses.Coords;
+import DJR_Store_Layout.HelperClasses.InfoToMakeIsleFromFile;
+import com.sun.javafx.geom.Path2D;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
-import java.util.Hashtable;
-import java.util.Set;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class GridData3 {
 
@@ -23,7 +29,7 @@ public class GridData3 {
     /**
      * grid dimensions
      */
-    private final int colSize, rowSize;
+    private int colSize, rowSize;
     /**
      * limit values used for adding correct amount of cells in rows/cols
      */
@@ -33,15 +39,15 @@ public class GridData3 {
      * cell dimensions
      */
     private double boxSize;
-    private final int cellSize;
+    private int cellSize;
     /**
      * screen dimensions
      */
-    private final double screenX, screenY;
+    private double screenX, screenY;
     /**
      * grids of cells and of pluses
      */
-    private final RNode[][] grid;
+    private RNode[][] grid;
     private final PNode[][] plusGrid;
     /**
      * plus dimensions
@@ -67,7 +73,6 @@ public class GridData3 {
      * List of cells for moving an isle
      */
     private CellList toMoveList;
-    private boolean moving;
     /**
      * Cell coordinate corresponding to mouse on screen
      */
@@ -108,6 +113,151 @@ public class GridData3 {
         highlightingXLength = 1;
         highlightingYLength = 1;
         highlightedNullList = new CellList();
+    }
+
+    public GridData3(String fileName)
+    {
+        File file = new File(fileName);
+
+        int cols, rows;
+        plusGrid = null;
+        try
+        {
+            Scanner scanner = new Scanner(file);
+
+            cols = scanner.nextInt();
+            rows = scanner.nextInt();
+            float dontNeedWasCellSize = (int) scanner.nextFloat();
+            String idk = scanner.nextLine();
+
+            grid = new RNode[cols][rows];
+            size = 0;
+            colSize = cols;
+            rowSize = rows;
+            isleGroupList = new Hashtable<>();
+            nullList = new Hashtable<>();
+            highlightedList = new CellList();
+
+            for (int i=0; i<cols; i++)
+            {
+                for (int j=0; j<rows; j++)
+                {
+                    grid[i][j] = new RNode(new Rectangle(), i, j, -1, -1, this);
+                }
+            }
+
+            while(scanner.hasNext())
+            {
+                String groupName = scanner.nextLine();
+                if (groupName.compareTo("Nulls") != 0)
+                {
+                    String dontNeedWasColor = scanner.nextLine();
+                    String backOrFloor = scanner.nextLine();
+
+                    String nextLine = scanner.nextLine();
+                    int numberOfIsles = Integer.parseInt(nextLine);
+                    //System.out.println("numberOfIsles: "+numberOfIsles);
+                    for (int i=0; i<numberOfIsles; i++)
+                    {
+                        String isleID = scanner.nextLine();
+                        //System.out.println("isleID: "+isleID);
+                        String isleInfo = scanner.nextLine();
+                        InfoToMakeIsleFromFile isleToMake = null;
+                        if (isleInfo.compareTo("Has Setup Info") == 0)
+                        {
+                            String s = scanner.nextLine();
+                            int numberOfIsleSections = Integer.parseInt(s);
+                            //System.out.println(numberOfIsleSections);
+                            String subsectionsPerSection = scanner.nextLine();
+                            //System.out.println(subsectionsPerSection);
+                            String endCap = scanner.nextLine();
+                            //System.out.println(endCap);
+                            String direction = scanner.nextLine();
+                            //System.out.println(direction);
+                            isleToMake = new InfoToMakeIsleFromFile(numberOfIsleSections, subsectionsPerSection, endCap, direction);
+                        }
+
+                        String cells = scanner.nextLine();
+                        //System.out.println("cells: "+cells);
+                        String[] cellCoords = cells.split(",");
+                        for (int j=0; j<cellCoords.length; j=j+2)
+                        {
+                            Coords coords = new Coords(cellCoords[j]+","+cellCoords[j+1]);
+                            grid[coords.getX()][coords.getY()].setHighlighted(true);
+                        }
+
+                        if (isleGroupExists(groupName))
+                        {
+                            makeIsle(isleID, groupName, null, isleGroupList.get(groupName), true, backOrFloor);
+                            //System.out.println("Made isle: "+isleID+" w/ addingToExisting: true");
+                        }
+                        else
+                        {
+                            makeIsle(isleID, groupName, null, null, false, backOrFloor);
+                            //System.out.println("Made isle: "+isleID+" w/ addingToExisting: false");
+                        }
+
+                        if (isleToMake != null)
+                        {
+                            String[] sections = isleToMake.getNumberOfSubsectionsForEachSection().split(",");
+                            Hashtable<Integer, Integer> table = new Hashtable<>();
+                            Arrays.stream(sections).forEach(e -> table.put(Integer.parseInt(e.split("-")[0]), Integer.parseInt(e.split("-")[1])));
+
+                            getIsle(isleID, groupName).setupIsleInfo(isleToMake.getNumberOfIsleSections(), table, isleToMake.getEndCapLocation(),
+                                    isleToMake.getDirectionOfIncreasingIsleSections());
+                        }
+                    }
+                }
+                else
+                {
+                    String cellsToNull = scanner.nextLine();
+                    try
+                    {
+                        int hmm = Integer.parseInt(cellsToNull.charAt(0)+"");
+                        String[] cellCoords = cellsToNull.split(",");
+                        for (int j=0; j<cellCoords.length; j=j+2)
+                        {
+                            Coords coords = new Coords(cellCoords[j]+","+cellCoords[j+1]);
+                            setCelltoNull(coords.getX(), coords.getY(), false);
+                        }
+                    }
+                    catch (NumberFormatException ignored) {}
+
+                    String string1 = scanner.nextLine();
+                    String[] regOpuStartEnd = string1.split(":");
+                    try
+                    {
+                        Coords coords = new Coords(regOpuStartEnd[1]);
+                        setRegOPUstartEndNode(grid[coords.getX()][coords.getY()], true);
+                    }
+                    catch (ArrayIndexOutOfBoundsException ignored) {}
+
+                    String string2 = scanner.nextLine();
+                    String[] groOpuStartEnd = string2.split(":");
+                    try
+                    {
+                        Coords coords = new Coords(groOpuStartEnd[1]);
+                        setGroOpuStartEndNode(grid[coords.getX()][coords.getY()], true);
+                    }
+                    catch (ArrayIndexOutOfBoundsException ignored) {}
+                    String string3 = scanner.nextLine();
+                    String[] regStartEnd = string3.split(":");
+                    try
+                    {
+                        Coords coords = new Coords(regStartEnd[1]);
+                        setRegStartEndNode(grid[coords.getX()][coords.getY()], true);
+                    }
+                    catch (ArrayIndexOutOfBoundsException ignored) {}
+
+                    break;
+                }
+            }
+            scanner.close();
+        }
+        catch (FileNotFoundException e)
+        {
+            System.out.println("File not found");
+        }
     }
 
     /**
@@ -355,8 +505,18 @@ public class GridData3 {
         else
             curr = highlightedNullList.getFirst();
 
-        int biggestX = curr.getrNode().getX();
-        int biggestY = curr.getrNode().getY();
+        int biggestX = -1;
+        int biggestY = -1;
+
+        try
+        {
+            biggestX = curr.getrNode().getX();
+            biggestY = curr.getrNode().getY();
+        }
+        catch (NullPointerException e)
+        {
+            return null;
+        }
 
         while (curr != null)
         {
@@ -468,7 +628,7 @@ public class GridData3 {
             Isle newIsle = new Isle(isleID, igNew, this);
 
             CellList.CellNode curr = highlightedList.getFirst();
-            for (int i=0; i<highlightedList.size(); i++)
+            while (curr != null)
             {
                 grid[curr.getrNode().getX()][curr.getrNode().getY()].setIsled(true, newIsle, c, igNew);
                 isleGroupCellList.add(grid[curr.getrNode().getX()][curr.getrNode().getY()]);
@@ -494,7 +654,7 @@ public class GridData3 {
             Isle newIsle = new Isle(isleID, isleGroup, this);
 
             CellList.CellNode curr = highlightedList.getFirst();
-            for (int i=0; i<highlightedList.size(); i++)
+            while (curr != null)
             {
                 grid[curr.getrNode().getX()][curr.getrNode().getY()].setIsled(true, newIsle, c, isleGroup);
                 isleGroupCellList.add(grid[curr.getrNode().getX()][curr.getrNode().getY()]);
@@ -524,7 +684,7 @@ public class GridData3 {
         CellList isleCellList = isleGroup.getIsleIDList().get(isleID).getIsleCellList();
 
         CellList.CellNode curr = highlightedList.getFirst();
-        for (int i=0; i<highlightedList.size(); i++)
+        while (curr != null)
         {
             grid[curr.getrNode().getX()][curr.getrNode().getY()].setIsled(true, isleGroup.getIsleIDList().get(isleID), c, isleGroup);
             isleGroupCellList.add(grid[curr.getrNode().getX()][curr.getrNode().getY()]);
@@ -564,19 +724,26 @@ public class GridData3 {
      * @param x coord of cell
      * @param y coord of cell
      */
-    public void setCelltoNull(int x, int y)
+    public void setCelltoNull(int x, int y, boolean careAboutPluses)
     {
         grid[x][y].setNulled(true);
         nullList.put(x+","+y, grid[x][y]);
-        for (int i=1; i>-1; i--)
+        if (careAboutPluses)
         {
-            for (int j=1; j>-1; j--)
+            for (int i=1; i>-1; i--)
             {
-                try
+                for (int j=1; j>-1; j--)
                 {
-                    plusGrid[x-i][y-j].setNulled(true);
+                    try
+                    {
+                        plusGrid[x-i][y-j].setNulled(true);
+                    }
+                    catch (ArrayIndexOutOfBoundsException ignored) {}
+                    catch (NullPointerException e)
+                    {
+                        System.out.println("Error at plus coords: "+(x-i)+","+(y-j));
+                    }
                 }
-                catch (ArrayIndexOutOfBoundsException ignored) {}
             }
         }
     }
@@ -641,8 +808,6 @@ public class GridData3 {
         makeIsle(isleID, igName, c, isleGroup, true, null);
         isleGroupList.get(igName).getIsleIDList().get(isleID).setupIsleInfo(isle.getNumberOfIsleSections(), isle.getNumberOfSubsectionsForEachSection(), isle.getEndCapLocation(), isle.getDirectionOfIncreasingIsleSections());
         toMoveList.clear();
-
-        moving = false;
     }
 
     /**
@@ -709,17 +874,7 @@ public class GridData3 {
      * @param s name of isle group
      * @return boolean true if found false if not
      */
-    public boolean isleGroupExists(String s)
-    {
-        Set<String> groups = isleGroupList.keySet();
-
-        for (String key : groups)
-        {
-            if (isleGroupList.get(key).getName().compareTo(s) == 0)
-                return true;
-        }
-        return false;
-    }
+    public boolean isleGroupExists(String s) {return isleGroupList.get(s) != null;}
 
     /**
      * Highlights area of cells that are null
@@ -991,23 +1146,15 @@ public class GridData3 {
      * @param y coord
      * @return cell given coords
      */
-    public RNode getRNode(int x, int y)
-    {
-        return grid[x][y];
-    }
+    public RNode getRNode(int x, int y) {return grid[x][y];}
 
-    public Isle getIsle(String id, String ig)
-    {
-        return isleGroupList.get(ig).getIsleIDList().get(id);
-    }
+    public Isle getIsle(String id, String ig) {return isleGroupList.get(ig).getIsleIDList().get(id);}
 
     public Isle getIsleWithUnknownIG(String id)
     {
-        Set<String> groups = isleGroupList.keySet();
-        for (String ig : groups)
+        for (String ig : isleGroupList.keySet())
         {
-            Set<String> isles = isleGroupList.get(ig).getIsleIDList().keySet();
-            for (String i : isles)
+            for (String i : isleGroupList.get(ig).getIsleIDList().keySet())
             {
                 if (i.compareTo(id) == 0)
                     return isleGroupList.get(ig).getIsleIDList().get(i);
@@ -1042,10 +1189,12 @@ public class GridData3 {
         {
             //System.out.println("Isle on the floor");
             String[] loc1 = location.split("\\(");
+            String isleGroup = location.charAt(0)+"";
             //System.out.println("IsleID: "+loc1[0]);
             if (loc1.length > 1)
             {
-                isle = getIsle(loc1[0], location.charAt(0)+"");
+                isle = getIsle(loc1[0], isleGroup);
+
                 if (isle.hasSetupInfo())
                 {
                     String[] loc2 = loc1[1].split("\\) ");
@@ -1094,4 +1243,8 @@ public class GridData3 {
     public RNode getGroOpuStartEndNode() {return groOpuStartEndNode;}
 
     public RNode getRegStartEndNode() {return regStartEndNode;}
+
+    public RNode[][] getGrid() {return grid;}
+
+    public PNode[][] getPlusGrid() {return plusGrid;}
 }

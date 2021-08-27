@@ -9,14 +9,14 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="theV" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="theV" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <MenuBar fx:id="menuBar">
         <menus>
           <Menu fx:id="file" mnemonicParsing="false" text="File">
             <items>
-              <MenuItem fx:id="resize" mnemonicParsing="false" text="Resize" />
                   <MenuItem fx:id="back" mnemonicParsing="false" text="Back" />
+                  <MenuItem fx:id="load" mnemonicParsing="false" text="Load" />
                   <MenuItem fx:id="saveLayout" mnemonicParsing="false" text="Save Layout" />
                   <MenuItem fx:id="testLocation" mnemonicParsing="false" text="Test Location" />
                   <MenuItem fx:id="testPath" mnemonicParsing="false" text="Test Path" />
@@ -32,16 +32,11 @@
           </Menu>
           <Menu mnemonicParsing="false" text="Help">
             <items>
+                  <MenuItem fx:id="displayCoords" mnemonicParsing="false" text="Display Coordinates" />
               <MenuItem fx:id="layoutInstructionsMenu" mnemonicParsing="false" text="Show layout instructions" />
                   <MenuItem fx:id="isleInfoInstructionsMenu" mnemonicParsing="false" text="Show isle info instructions" />
             </items>
           </Menu>
-            <Menu fx:id="m1" mnemonicParsing="false" text="MouseX:" />
-            <Menu fx:id="m2" mnemonicParsing="false" text="MouseY:" />
-            <Menu fx:id="m3" mnemonicParsing="false" text="ScreenY:" />
-            <Menu fx:id="m4" mnemonicParsing="false" text="ScreenY:" />
-            <Menu fx:id="m5" mnemonicParsing="false" text="X Coord:" />
-            <Menu fx:id="m6" mnemonicParsing="false" text="Y Coord:" />
         </menus>
       </MenuBar>
       <BorderPane prefHeight="425.0" prefWidth="800.0" VBox.vgrow="ALWAYS">

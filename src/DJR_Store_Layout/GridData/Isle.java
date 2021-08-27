@@ -8,7 +8,6 @@
 
 package DJR_Store_Layout.GridData;
 
-import DJR_Store_Layout.GridData.GridData3;
 import DJR_Store_Layout.HelperClasses.Coords;
 
 import java.util.ArrayList;
@@ -87,8 +86,7 @@ public class Isle
             System.out.println("EndCap Location: "+endCapLocation);
             System.out.println("Direction: "+directionOfIncreasingIsleSections);
             System.out.println("Number Of Isle Sections: "+numberOfIsleSections);
-            for (int i : numberOfSubsectionsForEachSection.keySet())
-                System.out.println("Isle Section "+i+" has "+numberOfSubsectionsForEachSection.get(i)+" subsections");
+            numberOfSubsectionsForEachSection.keySet().forEach(i -> System.out.println("Isle Section "+i+" has "+numberOfSubsectionsForEachSection.get(i)+" subsections"));
         }
         else
             System.out.println("Isle Info has not been setup");

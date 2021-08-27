@@ -137,7 +137,7 @@ public class SetupIsleInfoController
                 ArrayList<Node> list = new ArrayList<>();
                 Label label = new Label("Enter Valid Numbers for Each Isle Section Field");
                 list.add(label);
-                new MyPopup(list, stage).getStage().show();
+                new MyPopup(list, stage).getStage(true).show();
             }
 
             for (int i=2; i<subsectionTextfields.size(); i++)
@@ -152,7 +152,7 @@ public class SetupIsleInfoController
                     ArrayList<Node> list = new ArrayList<>();
                     Label label = new Label("Enter Valid Numbers for Each Isle Section Field");
                     list.add(label);
-                    new MyPopup(list, stage).getStage().show();
+                    new MyPopup(list, stage).getStage(true).show();
                 }
             }
         }

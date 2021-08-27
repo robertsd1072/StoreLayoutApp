@@ -143,13 +143,12 @@ public class GraphOfTheGrid
         Hashtable<String, StringBuilder> previous = new Hashtable<>();
         Hashtable<String, Boolean> visited = new Hashtable<>();
 
-        Set<String> vertices = graph.keySet();
-        for (String s : vertices)
+        graph.keySet().forEach(s ->
         {
             distance.put(s, Integer.MAX_VALUE);
             previous.put(s, new StringBuilder(""));
             visited.put(s, false);
-        }
+        });
 
         distance.put(start, 0);
         visited.put(start, true);
@@ -301,17 +300,14 @@ public class GraphOfTheGrid
 
         Hashtable<String, Boolean> visited = new Hashtable<>();
         Hashtable<String, Integer> vertexSectorIds = new Hashtable<>();
-        for (String vertex : list.keySet())
+        list.keySet().forEach(vertex ->
         {
             visited.put(vertex, false);
             vertexSectorIds.put(vertex, getSectorOfCoordinate(vertex));
-        }
+        });
 
         System.out.println("Sector List:");
-        for (String vertex : list.keySet())
-        {
-            System.out.println(vertex+" in sector: "+vertexSectorIds.get(vertex));
-        }
+        list.keySet().forEach(vertex -> System.out.println(vertex+" in sector: "+vertexSectorIds.get(vertex)));
 
         Sector[] sectorMap = mapVerticesToSectors(list.keySet(), vertexSectorIds);
 
@@ -389,8 +385,7 @@ public class GraphOfTheGrid
         edgePath.add(new Edge(curr, startAndEnd, dr.getDistance(), dr.getPath()));
 
         StringBuilder cellPath = new StringBuilder();
-        for (Edge e : edgePath)
-            cellPath.append(e.getCellPath());
+        edgePath.forEach(e -> cellPath.append(e.getCellPath()));
 
         return new FindingPathReturn(locationPath, vertexPath, cellPath.toString());
     }
@@ -539,13 +534,12 @@ public class GraphOfTheGrid
         Hashtable<String, StringBuilder> previous = new Hashtable<>();
         Hashtable<String, Boolean> visited = new Hashtable<>();
 
-        Set<String> vertices = graph.keySet();
-        for (String s : vertices)
+        graph.keySet().forEach(s ->
         {
             distance.put(s, Integer.MAX_VALUE);
             previous.put(s, new StringBuilder(""));
             visited.put(s, false);
-        }
+        });
 
         distance.put(start, 0);
         visited.put(start, true);
@@ -580,7 +574,7 @@ public class GraphOfTheGrid
         }
 
         EdgePQ pq = new EdgePQ(numberOfEdges);
-        for (String end : endList)
+        endList.forEach(end ->
         {
             String[] hmm = end.split(",");
             if (hmm.length > 1)
@@ -623,7 +617,7 @@ public class GraphOfTheGrid
                     }
 
                     EdgePQ possiblePathsPQ = new EdgePQ(numberOfEdges);
-                    for (String irregularEnd : listOfEnds)
+                    listOfEnds.forEach(irregularEnd ->
                     {
                         Coords endCoords = new Coords(irregularEnd);
 
@@ -638,14 +632,14 @@ public class GraphOfTheGrid
                             possiblePathsPQ.add(new Edge(startingLocation, dr.getEnd(), dr));
                         }
                         catch (NullPointerException ignored) {}
-                    }
+                    });
 
                     pq.add(possiblePathsPQ.getRoot());
                 }
                 else
                     System.out.println("Isle not found");
             }
-        }
+        });
 
         return pq.getRoot();
     }
@@ -730,13 +724,12 @@ public class GraphOfTheGrid
         Hashtable<String, StringBuilder> previous = new Hashtable<>();
         Hashtable<String, Boolean> visited = new Hashtable<>();
 
-        Set<String> vertices = graph.keySet();
-        for (String s : vertices)
+        graph.keySet().forEach(s ->
         {
             distance.put(s, Integer.MAX_VALUE);
             previous.put(s, new StringBuilder(""));
             visited.put(s, false);
-        }
+        });
 
         distance.put(start, 0);
         visited.put(start, true);
@@ -771,7 +764,7 @@ public class GraphOfTheGrid
         }
 
         ArrayList<DistanceReturn> listOfPaths = new ArrayList<>();
-        for (String end : listOfEnds)
+        listOfEnds.forEach(end ->
         {
             Coords endCoords = new Coords(end);
 
@@ -785,7 +778,7 @@ public class GraphOfTheGrid
                 listOfPaths.add(new DistanceReturn(pathArr.length-2, path.toString(), end));
             }
             catch (NullPointerException ignored) {}
-        }
+        });
 
         listOfPaths.sort(new DistanceReturn.DistanceComparator());
 
@@ -795,15 +788,10 @@ public class GraphOfTheGrid
     private Sector[] mapVerticesToSectors(Set<String> set, Hashtable<String, Integer> vertexSectorIds)
     {
         Sector[] sectorMap = new Sector[4];
-        for (int i=0; i<sectorMap.length; i++)
-        {
+        for (int i=0; i<4; i++)
             sectorMap[i] = new Sector();
-        }
 
-        for (String coords : set)
-        {
-            sectorMap[vertexSectorIds.get(coords)].addVertex(coords);
-        }
+        set.forEach(coords -> sectorMap[vertexSectorIds.get(coords)].addVertex(coords));
 
         return sectorMap;
     }

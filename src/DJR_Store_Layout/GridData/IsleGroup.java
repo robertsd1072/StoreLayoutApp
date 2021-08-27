@@ -2,7 +2,6 @@ package DJR_Store_Layout.GridData;
 
 import javafx.scene.paint.Color;
 import java.util.Hashtable;
-import java.util.Set;
 
 public class IsleGroup
 {
@@ -19,51 +18,21 @@ public class IsleGroup
         isleIDList = new Hashtable<>();
     }
 
-    public String getName()
-    {
-        return name;
-    }
+    public String getName() {return name;}
 
-    public Color getColor()
-    {
-        return color;
-    }
+    public Color getColor() {return color;}
 
-    public CellList getIsleGroupCellList()
-    {
-        return isleGroupCellList;
-    }
+    public CellList getIsleGroupCellList() {return isleGroupCellList;}
 
-    public void addNewID(String newID, Isle i)
-    {
-        isleIDList.put(newID, i);
-    }
+    public void addNewID(String newID, Isle i) {isleIDList.put(newID, i);}
 
-    public Hashtable<String, Isle> getIsleIDList()
-    {
-        return isleIDList;
-    }
+    public Hashtable<String, Isle> getIsleIDList() {return isleIDList;}
 
-    public void setBackOrFloor(String s)
-    {
-        backOrFloor = s;
-    }
+    public void setBackOrFloor(String s) {backOrFloor = s;}
 
-    public String getBackOrFloor()
-    {
-        return backOrFloor;
-    }
+    public String getBackOrFloor() {return backOrFloor;}
 
-    public boolean containsIsle(String id)
-    {
-        Set<String> isleIDs = isleIDList.keySet();
-        for (String s : isleIDs)
-        {
-            if (s.compareTo(id) == 0)
-                return true;
-        }
-        return false;
-    }
+    public boolean containsIsle(String id) {return isleIDList.get(id) != null;}
 
     public void setIsleGroupCellList(CellList cl) {isleGroupCellList = cl;}
 }
