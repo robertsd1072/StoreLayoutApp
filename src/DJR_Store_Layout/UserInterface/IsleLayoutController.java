@@ -1,6 +1,6 @@
 /**
  * IsleLayoutController class for project DJR_Store_Layout
- * Controls store layout and all accompanying functionality
+ * Controls store layout and all accompanying functionality of UI
  * @author David Roberts
  */
 
@@ -30,6 +30,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.robot.Robot;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
@@ -44,20 +45,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class IsleLayoutController {
-    /**
-     * Launching variables
-     */
+    /** Launching variables */
     private final Parent parent;
     private Stage stage;
     private final Scene scene;
 
-    /**
-     * FXML variables
-     */
+    /** FXML variables */
     public HBox hboxWithThePluses, hboxWithTheCells;
     public MenuItem back, load, saveLayout, testLocation, testPath, testPickingPath, setupInfoMenu, setupRegOPUstartEnd,
-            setupGroOPUstartEnd, setupRegularPickStartEnd, layoutInstructionsMenu, isleInfoInstructionsMenu, displayCoords;
-    public MenuBar menuBar;
+            setupGroOPUstartEnd, setupStandardPickStartEnd, layoutInstructionsMenu, isleInfoInstructionsMenu, displayCoords;
+    public Menu fileMenu;
     public Pane topPthatHelpsPluses, botPthatHelpsPluses, leftPthatHelpsPluses, rightPthatHelpsPluses, topPthatHelpsCells,
             botPthatHelpsCells, leftPthatHelpsCells, rightPthatHelpsCells;
     public VBox theV;
@@ -65,9 +62,7 @@ public class IsleLayoutController {
     public ContextMenu rightClick, rightClick2, rightClick3;
     public Label xCoordText, yCoordText, isleText;
 
-    /**
-     * Variables involved with backing data structures and control
-     */
+    /** Variables involved with backing data structures and control */
     private GridData3 g;
     private int floors, length, width;
     private final int cols, rows;
@@ -84,7 +79,6 @@ public class IsleLayoutController {
     /**
      * Basic Constructor
      * Calculates dimensions for displaying of grid when creating new layout
-     *
      * @param f floors
      * @param l length of floor
      * @param w width of floor
@@ -144,8 +138,7 @@ public class IsleLayoutController {
 
     /**
      * Constructor used when loading layout from file
-     * Reads file and stores info in data structures then passed onto initializer
-     *
+     * Passes file onward until the data can be read and implemented directly
      * @param file saved layout
      * @param x screen horizontal dimension
      * @param y screen vertical dimension
@@ -210,10 +203,7 @@ public class IsleLayoutController {
         initializeFromFile(file);
     }
 
-    /**
-     * Launches scene
-     * Also sets mouse/screen dimensions for debugging
-     */
+    /** Launches scene, also sets mouse/screen dimensions for debugging */
     public void launchScene(Stage stage, boolean fromFile)
     {
         this.stage = stage;
@@ -241,10 +231,7 @@ public class IsleLayoutController {
         displayCoordsOnScreen();
     }
 
-    /**
-     * Initializer
-     * Also setups functionality of some menu buttons
-     */
+    /** Initializer, also setups functionality of some menu buttons */
     private void actualInitialize()
     {
         theV.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
@@ -261,9 +248,12 @@ public class IsleLayoutController {
 
         drawCells(finalSizeOfCells, hboxWithTheCells);
 
-        //System.out.println("sp Dimension: "+sP.getWidth()+", "+sP.getHeight());
+        fileMenu.getItems().remove(testLocation);
+        fileMenu.getItems().remove(testPath);
+        fileMenu.getItems().remove(testPickingPath);
     }
 
+    /** Initializer from file */
     private void initializeFromFile(File file)
     {
         Long start = System.nanoTime();
@@ -288,11 +278,15 @@ public class IsleLayoutController {
         System.out.println("Init From File Time: "+(end-start));
 
         loadCellsFromFile(finalSizeOfCells, hboxWithTheCells, file);
+
+        fileMenu.getItems().remove(testLocation);
+        fileMenu.getItems().remove(testPath);
+        fileMenu.getItems().remove(testPickingPath);
     }
 
     /**
-     * Initializes some right click menus for grouping/ungrouping and other
-     * related functions
+     * Initializes some right click menus for grouping/ungrouping and other related functions
+     * Is AtomicBoolean because is called in new thread
      */
     private AtomicBoolean initMenus()
     {
@@ -340,13 +334,16 @@ public class IsleLayoutController {
                 CellList.CellNode curr = editGroupNode.getIsle().getIsleCellList().getFirst();
                 while (curr != null)
                 {
+                    System.out.println("Ungrouping curr");
                     g.getRNode(curr.getrNode().getX(), curr.getrNode().getY()).setIsled(false, null, null, null);
                     toMoveList.add(g.getRNode(curr.getrNode().getX(), curr.getrNode().getY()));
                     g.getRNode(curr.getrNode().getX(), curr.getrNode().getY()).setIsleIsBeingMoved(true, editGroupNode.getColor());
                     curr = curr.getNext();
                 }
+                System.out.println("Done ungrouping");
             }
             moving = true;
+            new Robot().mouseMove(editGroupNode.getsXMinCoord(), editGroupNode.getsYMinCoord());
         });
         rightClick2.getItems().add(moveIsle);
         setupInfoMenu = new MenuItem("Setup Isle Info");
@@ -404,45 +401,47 @@ public class IsleLayoutController {
             }
         });
 
-        saveLayout.setOnAction(actionEvent ->
+        if (fileMenu.getItems().contains(testLocation))
         {
-            final JFileChooser fc = new JFileChooser();
-
-            File f = new File("src\\Saves");
-
-            fc.setCurrentDirectory(f);
-
-            int returnVal = fc.showSaveDialog(fc.getParent());
-
-            if (returnVal == JFileChooser.APPROVE_OPTION)
+            saveLayout.setOnAction(actionEvent ->
             {
-                File file = fc.getSelectedFile();
-                saveFile(file);
-            }
-        });
+                final JFileChooser fc = new JFileChooser();
 
-        testLocation.setOnAction(actionEvent ->
-        {
-            Stage testStage = new Stage();
-            testStage.setTitle("Test Location");
-            testStage.initModality(Modality.APPLICATION_MODAL);
-            testStage.initOwner(stage);
-            VBox testVBox = testLocationSetup(testStage, g);
-            Scene testScene = new Scene(testVBox);
-            testStage.setScene(testScene);
-            testStage.show();
-        });
+                File f = new File("src\\Saves");
 
-        testPath.setOnAction(actionEvent ->
-        {
-            Stage testStage = new Stage();
-            testStage.setTitle("Test Path");
-            testStage.initOwner(stage);
-            VBox testVBox = testPathSetup(testStage, g, graph);
-            Scene testScene = new Scene(testVBox);
-            testStage.setScene(testScene);
-            testStage.show();
-        });
+                fc.setCurrentDirectory(f);
+
+                int returnVal = fc.showSaveDialog(fc.getParent());
+
+                if (returnVal == JFileChooser.APPROVE_OPTION)
+                {
+                    File file = fc.getSelectedFile();
+                    saveFile(file);
+                }
+            });
+
+            testLocation.setOnAction(actionEvent ->
+            {
+                Stage testStage = new Stage();
+                testStage.setTitle("Test Location");
+                testStage.initOwner(stage);
+                VBox testVBox = testLocationSetup(testStage, g);
+                Scene testScene = new Scene(testVBox);
+                testStage.setScene(testScene);
+                testStage.show();
+            });
+
+            testPath.setOnAction(actionEvent ->
+            {
+                Stage testStage = new Stage();
+                testStage.setTitle("Test Path");
+                testStage.initOwner(stage);
+                VBox testVBox = testPathSetup(testStage, g, graph);
+                Scene testScene = new Scene(testVBox);
+                testStage.setScene(testScene);
+                testStage.show();
+            });
+        }
 
         testPickingPath.setOnAction(actionEvent ->
         {
@@ -497,10 +496,10 @@ public class IsleLayoutController {
 
             settingGroOpuStartEnd = true;
         });
-        setupRegularPickStartEnd.setOnAction(actionEvent ->
+        setupStandardPickStartEnd.setOnAction(actionEvent ->
         {
-            if (g.getRegStartEndNode() != null)
-                g.setRegStartEndNode(g.getRegStartEndNode(), false);
+            if (g.getStandardStartEndNode() != null)
+                g.setStandardStartEndNode(g.getStandardStartEndNode(), false);
 
             g.resetHighlighted();
 
@@ -534,7 +533,6 @@ public class IsleLayoutController {
 
     /**
      * Initializes padding panes on outside of grid based on screen coords
-     *
      * @param x screen x dimension
      * @param y screen y dimension
      */
@@ -561,8 +559,7 @@ public class IsleLayoutController {
     }
 
     /**
-     * Initializes padding panes on inside of outside panes based on screen coords
-     *
+     * Initializes padding panes on inside of outside panes based on screen coordinates
      * @param x screen x dimension
      */
     private void initInsidePanes(double x)
@@ -586,7 +583,6 @@ public class IsleLayoutController {
 
     /**
      * Creates and draws pluses that separate cells
-     *
      * @param z size of pluses
      * @param hbox1 hbox that pluses are added to
      */
@@ -623,7 +619,6 @@ public class IsleLayoutController {
 
     /**
      * Creates and draws cells
-     *
      * @param z size of cells
      * @param hbox2 hbox cells are added to
      */
@@ -660,7 +655,6 @@ public class IsleLayoutController {
 
     /**
      * Draws cells, inputting all info from file
-     *
      * @param z pixel size of each cell
      * @param hbox2 container to put cells into
      * @param file from which the info is loaded
@@ -803,7 +797,7 @@ public class IsleLayoutController {
                     try
                     {
                         Coords coords = new Coords(regStartEnd[1]);
-                        g.setRegStartEndNode(g.getRNode(coords.getX(), coords.getY()), true);
+                        g.setStandardStartEndNode(g.getRNode(coords.getX(), coords.getY()), true);
                     }
                     catch (ArrayIndexOutOfBoundsException ignored) {}
 
@@ -825,7 +819,6 @@ public class IsleLayoutController {
 
     /**
      * Setups cell and functions associated with creating groups
-     *
      * @param r rectangle that is the cell on display
      * @param node node of drawn cell in data
      * @param z size of cells
@@ -841,10 +834,9 @@ public class IsleLayoutController {
             setMouseCoordsOnScreen(node.getX(), node.getY());
             if (moving)
             {
-                //System.out.println("Moving Isle");
-
+                System.out.println("Moving Isle");
                 g.moveIsle(editGroupNode, isleToMove);
-                //System.out.println("Done method call");
+                System.out.println("Done method call");
             }
             if (node.isIsle())
             {
@@ -939,7 +931,7 @@ public class IsleLayoutController {
                             }
                             else if (settingRegStartEnd)
                             {
-                                g.setRegStartEndNode(node, true);
+                                g.setStandardStartEndNode(node, true);
 
                                 settingRegStartEnd = false;
                             }
@@ -1053,7 +1045,6 @@ public class IsleLayoutController {
 
     /**
      * Sets up popup window for creating an isle for a highlighted are
-     *
      * @param s stage
      * @param g data used to create and implement new group
      * @return vbox with all necessary elements
@@ -1136,7 +1127,6 @@ public class IsleLayoutController {
 
     /**
      * Sets up popup window for isle group creation
-     *
      * @param s stage
      * @param g data used to create and implement new group
      * @return vbox with all necessary elements
@@ -1193,7 +1183,6 @@ public class IsleLayoutController {
 
     /**
      * Sets up popup window for adding new isle to existing isle group
-     *
      * @param s stage
      * @param g data used to create and implement new group
      * @param isleID of new isle
@@ -1256,7 +1245,6 @@ public class IsleLayoutController {
 
     /**
      * Writes all necessary info to file for saving/loading
-     *
      * @param file file to write to
      */
     private void saveFile(File file)
@@ -1329,10 +1317,10 @@ public class IsleLayoutController {
             else
                 fileStream.println("Gro OPU start/end:"+g.getGroOpuStartEndNode().getX()+","+g.getGroOpuStartEndNode().getY());
 
-            if (g.getRegStartEndNode() == null)
-                fileStream.println("No Regular start/end");
+            if (g.getStandardStartEndNode() == null)
+                fileStream.println("No Standard start/end");
             else
-                fileStream.println("Regular start/end:"+g.getRegStartEndNode().getX()+","+g.getRegStartEndNode().getY());
+                fileStream.println("Standard start/end:"+g.getStandardStartEndNode().getX()+","+g.getStandardStartEndNode().getY());
 
             fileStream.close();
         }
@@ -1344,9 +1332,7 @@ public class IsleLayoutController {
         System.out.println("Saved new layout to "+file);
     }
 
-    /**
-     * Used for testing cell finding given location
-     */
+    /** Used for testing cell finding given location */
     private VBox testLocationSetup(Stage s, GridData3 g)
     {
         VBox v = new VBox();
@@ -1455,6 +1441,7 @@ public class IsleLayoutController {
         return v;
     }
 
+    /** Used for testing path between two cells */
     private VBox testPathSetup(Stage s, GridData3 g, GraphOfTheGrid graph)
     {
         VBox v = new VBox();
@@ -1505,6 +1492,7 @@ public class IsleLayoutController {
         return v;
     }
 
+    /** Displays helpful info about making the layout */
     private void displayLayoutInstructions()
     {
         ArrayList<Node> list = new ArrayList<>();
@@ -1527,6 +1515,7 @@ public class IsleLayoutController {
         new MyPopup(list, stage).getStage(true).show();
     }
 
+    /** Displays helpful info about setting isle info */
     public void displayIsleInfoInstructions()
     {
         ArrayList<Node> list = new ArrayList<>();
@@ -1541,6 +1530,7 @@ public class IsleLayoutController {
         new MyPopup(list, stage).getStage(true).show();
     }
 
+    /** Little window that displays grid coordinates of the mouse and isle if so */
     public void displayCoordsOnScreen()
     {
         xCoordText = new Label("X Coordinate: 0");
@@ -1566,7 +1556,6 @@ public class IsleLayoutController {
 
     /**
      * Displays cell coordinates corresponding to mouse on screen
-     *
      * @param x mouse x coord
      * @param y mouse y coord
      */
@@ -1586,7 +1575,6 @@ public class IsleLayoutController {
 
     /**
      * Adjusts size of elements on display for a change in window size
-     *
      * @param x screen x dimension
      * @param y screen y dimension
      */
@@ -1601,14 +1589,12 @@ public class IsleLayoutController {
 
     /**
      * Displays screen x dimension for debugging
-     *
      * @param x screen x dimension
      */
     public void sendScreenX(double x) {sX = x;}
 
     /**
      * Displays screen y dimension for debugging
-     *
      * @param y screen y dimension
      */
     public void sendScreenY(double y) {sY = y;}

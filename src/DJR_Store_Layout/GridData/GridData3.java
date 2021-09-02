@@ -1,8 +1,7 @@
 /**
  * GridData3 class for project DJR_Store_Layout
- * Is where all the data is stored and processed and manipulated
+ * Where all the data is stored and processed and manipulated
  * BACKEND
- *
  * @author David Roberts
  */
 
@@ -22,69 +21,40 @@ import java.util.stream.Collectors;
 
 public class GridData3 {
 
-    /**
-     * number of cells
-     */
+    /** number of cells */
     private int size;
-    /**
-     * grid dimensions
-     */
+    /** grid dimensions */
     private int colSize, rowSize;
-    /**
-     * limit values used for adding correct amount of cells in rows/cols
-     */
+    /** limit values used for adding correct amount of cells in rows/cols */
     private int limit;
     private double limitOfPluses;
-    /**
-     * cell dimensions
-     */
+    /** cell dimensions */
     private double boxSize;
     private int cellSize;
-    /**
-     * screen dimensions
-     */
+    /** screen dimensions */
     private double screenX, screenY;
-    /**
-     * grids of cells and of pluses
-     */
+    /** grids of cells and of pluses */
     private RNode[][] grid;
     private final PNode[][] plusGrid;
-    /**
-     * plus dimensions
-     */
+    /** plus dimensions */
     private int sizeOfPluses;
-    /**
-     * list of Isle Groups
-     */
+    /** list of Isle Groups */
     private Hashtable<String, IsleGroup> isleGroupList;
-    /**
-     * LinkedList of highlighted cells in grid
-     */
+    /** LinkedLists of highlighted cells in grid */
     private CellList highlightedList, highlightedNullList;
-    /**
-     * Hastable of null cells
-     */
+    /** Hashtable of null cells */
     private Hashtable<String, RNode> nullList;
-    /**
-     * Length of highlighted area on x and y axis
-     */
+    /** Length of highlighted area on x and y axis */
     private int highlightingXLength, highlightingYLength;
-    /**
-     * List of cells for moving an isle
-     */
+    /** List of cells for moving an isle */
     private CellList toMoveList;
-    /**
-     * Cell coordinate corresponding to mouse on screen
-     */
+    /** Cell coordinate corresponding to mouse on screen */
     private int xCoordOfMouseOnGrid, yCoordOfMouseOnGrid;
-    /**
-     * Nodes of start/end points of picking: useful for determining quickest path
-     */
-    private RNode regOpuStartEndNode, groOpuStartEndNode, regStartEndNode;
+    /** Nodes of start/end points of picking: useful for determining quickest path*/
+    private RNode regOpuStartEndNode, groOpuStartEndNode, standardStartEndNode;
 
     /**
      * Basic constructor
-     *
      * @param cols columns in grid
      * @param rows rows in grid
      * @param bS boxSize
@@ -115,6 +85,10 @@ public class GridData3 {
         highlightedNullList = new CellList();
     }
 
+    /**
+     * Constructor to load data from cell, no UI involved
+     * @param fileName name of file
+     */
     public GridData3(String fileName)
     {
         File file = new File(fileName);
@@ -245,7 +219,7 @@ public class GridData3 {
                     try
                     {
                         Coords coords = new Coords(regStartEnd[1]);
-                        setRegStartEndNode(grid[coords.getX()][coords.getY()], true);
+                        setStandardStartEndNode(grid[coords.getX()][coords.getY()], true);
                     }
                     catch (ArrayIndexOutOfBoundsException ignored) {}
 
@@ -260,9 +234,7 @@ public class GridData3 {
         }
     }
 
-    /**
-     * Print method
-     */
+    /** Print method */
     public void print()
     {
         for (int i=0; i<rowSize; i++)
@@ -280,7 +252,6 @@ public class GridData3 {
 
     /**
      * Adds pluses to plusGrid
-     *
      * @param hLine horizontal line of new plus
      * @param vLine vertical line of new plus
      * @param x coord of new plus
@@ -319,7 +290,6 @@ public class GridData3 {
 
     /**
      * Adds new rectangle for grid
-     *
      * @param r rectangle to add
      * @param x coord of new rectangle
      * @param y coord of new rectangle
@@ -360,9 +330,7 @@ public class GridData3 {
         return node;
     }
 
-    /**
-     * Clears highlighted nodes in grid
-     */
+    /** Clears highlighted nodes in grid */
     public void resetHighlighted()
     {
         CellList.CellNode curr = highlightedList.getFirst();
@@ -376,10 +344,7 @@ public class GridData3 {
         highlightedList.clear();
     }
 
-    /**
-     * Clears all highlighted and grouped nodes in grid
-     * Is factory reset
-     */
+    /** Clears all highlighted and grouped nodes in grid, is factory reset */
     public void resetGrid()
     {
         CellList.CellNode curr = highlightedList.getFirst();
@@ -403,7 +368,6 @@ public class GridData3 {
 
     /**
      * Highlights a square are on the grid
-     *
      * @param xCoord of cell where highlighting started
      * @param yCoord of cell where highlighting started
      * @param a length in number of cells to highlight in the West direction
@@ -487,9 +451,7 @@ public class GridData3 {
         }
     }
 
-    /**
-     * Resets highlighting length distances to 1
-     */
+    /** Resets highlighting length distances to 1 */
     public void resetHighlighted2()
     {
         //System.out.println("Reset Highlight 2");
@@ -497,6 +459,10 @@ public class GridData3 {
         highlightingYLength = 1;
     }
 
+    /**
+     * @param which highlighted list or highlighted null list
+     * @return southeastmost RNode
+     */
     public RNode getSoutheastMostHighlightedCell(String which)
     {
         CellList.CellNode curr;
@@ -531,6 +497,10 @@ public class GridData3 {
         return grid[biggestX][biggestY];
     }
 
+    /**
+     * @param isle of interest
+     * @return southeastmost RNode
+     */
     public RNode getSoutheastMostIsleCell(Isle isle)
     {
         CellList.CellNode curr = isle.getIsleCellList().getFirst();
@@ -553,7 +523,6 @@ public class GridData3 {
 
     /**
      * Adjusts size of cells and pluses for a window resize
-     *
      * @param z new size of cells/pluses
      * @param xR1 remaining horizontal distance of panes
      * @param yR1 remianing vertical distance of panes
@@ -609,7 +578,6 @@ public class GridData3 {
 
     /**
      * Creates new isle given highlighted area
-     *
      * @param isleID id of isle
      * @param igName isle group name
      * @param c color
@@ -673,7 +641,6 @@ public class GridData3 {
 
     /**
      * Adds new highlighted area to existing isle
-     *
      * @param isleID id of isle
      * @param c color
      * @param isleGroup isle group
@@ -698,7 +665,6 @@ public class GridData3 {
 
     /**
      * Deletes isle from gird
-     *
      * @param i isle
      */
     public void removeIsle(Isle i)
@@ -719,8 +685,8 @@ public class GridData3 {
     }
 
     /**
+     * "Fill In" Option
      * Sets cell to background color and makes it unselectable
-     *
      * @param x coord of cell
      * @param y coord of cell
      */
@@ -750,7 +716,6 @@ public class GridData3 {
 
     /**
      * Moves isle keeping size and all info
-     *
      * @param node selected node
      * @param cellIsle isle of interest
      */
@@ -783,13 +748,15 @@ public class GridData3 {
                 }
                 curr = curr.getNext();
             }
-            catch (ArrayIndexOutOfBoundsException ignored) {}
+            catch (ArrayIndexOutOfBoundsException e)
+            {
+                curr = curr.getNext();
+            }
         }
     }
 
     /**
      * Remakes isle after it was moved
-     *
      * @param isleID id of isle
      * @param igName name of isle group
      * @param c color
@@ -812,7 +779,6 @@ public class GridData3 {
 
     /**
      * Sets display of cell coordinates on screen
-     *
      * @param x coord
      * @param y coord
      */
@@ -824,53 +790,7 @@ public class GridData3 {
     }
 
     /**
-     * Prints out groups and data for each group
-     */
-    public void printGroups()
-    {
-        if (isleGroupList.isEmpty())
-        {
-            System.out.println("There are no groups");
-        }
-
-        Set<String> groups = isleGroupList.keySet();
-        for (String key : groups)
-        {
-            System.out.println("Group Name: "+isleGroupList.get(key).getName()+" Color: "+isleGroupList.get(key).getColor().toString());
-            Set<String> isleIDs = isleGroupList.get(key).getIsleIDList().keySet();
-            System.out.println("Isle ID's: ");
-            for (String id : isleIDs)
-            {
-                System.out.print(id+", ");
-            }
-            System.out.print("\n");
-        }
-    }
-
-    /**
-     * Prints LinkedList of highlight nodes
-     */
-    public void printHighlighted()
-    {
-        if (highlightedList.size() == 0)
-        {
-            System.out.println("Nothing is highlighted");
-        }
-        else
-        {
-            CellList.CellNode curr = highlightedList.getFirst();
-
-            for (int i=0; i<highlightedList.size(); i++)
-            {
-                System.out.println(curr.getrNode().getCoords());
-                curr = curr.getNext();
-            }
-        }
-    }
-
-    /**
      * Determines if isle group exists in grid
-     *
      * @param s name of isle group
      * @return boolean true if found false if not
      */
@@ -879,7 +799,6 @@ public class GridData3 {
     /**
      * Highlights area of cells that are null
      * Used for removing cells from null
-     *
      * @param xCoord of cell where highlighting started
      * @param yCoord of cell where highlighting started
      * @param a length in number of cells to highlight in the West direction
@@ -963,9 +882,7 @@ public class GridData3 {
         }
     }
 
-    /**
-     * Resets currently highlighted nulls
-     */
+    /** Resets currently highlighted nulls */
     public void resetHighlightedNulls()
     {
         CellList.CellNode curr = highlightedNullList.getFirst();
@@ -979,9 +896,7 @@ public class GridData3 {
         highlightedNullList.clear();
     }
 
-    /**
-     * Given highlighted area of nulls, removes them from null
-     */
+    /** Given highlighted area of nulls, removes them from null */
     public void removeNull()
     {
         CellList.CellNode curr = highlightedNullList.getFirst();
@@ -997,7 +912,6 @@ public class GridData3 {
 
     /**
      * Removes cell form null, returning it to interactable status
-     *
      * @param x cell x coord
      * @param y cell y coord
      */
@@ -1040,6 +954,10 @@ public class GridData3 {
         catch (ArrayIndexOutOfBoundsException ignored) {}
     }
 
+    /**
+     * @param rNode of interest
+     * @param hmm true or false
+     */
     public void setRegOPUstartEndNode(RNode rNode, boolean hmm)
     {
         resetHighlighted();
@@ -1059,6 +977,10 @@ public class GridData3 {
         }
     }
 
+    /**
+     * @param rNode of interest
+     * @param hmm true or false
+     */
     public void setGroOpuStartEndNode(RNode rNode, boolean hmm)
     {
         resetHighlighted();
@@ -1078,25 +1000,35 @@ public class GridData3 {
         }
     }
 
-    public void setRegStartEndNode(RNode rNode, boolean hmm)
+    /**
+     * @param rNode of interest
+     * @param hmm true or false
+     */
+    public void setStandardStartEndNode(RNode rNode, boolean hmm)
     {
         resetHighlighted();
         if (hmm)
         {
-            regStartEndNode = rNode;
+            standardStartEndNode = rNode;
             rNode.getR().setFill(Color.RED);
             rNode.getR().setStroke(Color.RED);
             rNode.getR().setOpacity(1.0);
         }
         else
         {
-            regStartEndNode = null;
+            standardStartEndNode = null;
             rNode.getR().setFill(Color.TRANSPARENT);
             rNode.getR().setStroke(Color.TRANSPARENT);
             rNode.getR().setOpacity(0.5);
         }
     }
 
+    /**
+     * Checks to see if coordinates in pick point
+     * @param x coordinate
+     * @param y coordinate
+     * @return true or false
+     */
     public boolean nodeIsPickPoint(int x, int y)
     {
         try
@@ -1127,8 +1059,8 @@ public class GridData3 {
 
         try
         {
-            int regX = regStartEndNode.getX();
-            int regY = regStartEndNode.getY();
+            int regX = standardStartEndNode.getX();
+            int regY = standardStartEndNode.getY();
 
             if (x == regX && y == regY)
                 return true;
@@ -1142,14 +1074,18 @@ public class GridData3 {
     }
 
     /**
-     * @param x coord
-     * @param y coord
-     * @return cell given coords
+     * @param x coordinate
+     * @param y coordinate
+     * @return cell given coordinates
      */
     public RNode getRNode(int x, int y) {return grid[x][y];}
 
     public Isle getIsle(String id, String ig) {return isleGroupList.get(ig).getIsleIDList().get(id);}
 
+    /**
+     * @param id isleID of isle in question
+     * @return isle that matches, null if no isle
+     */
     public Isle getIsleWithUnknownIG(String id)
     {
         for (String ig : isleGroupList.keySet())
@@ -1163,6 +1099,11 @@ public class GridData3 {
         return null;
     }
 
+    /**
+     * Find coordinates on grid that correlate to given location (ex: D23(1) 1-1-1)
+     * @param location inputted
+     * @return correlating coordinates
+     */
     public String getCoordsGivenLocation(String location)
     {
         Isle isle;
@@ -1242,7 +1183,7 @@ public class GridData3 {
 
     public RNode getGroOpuStartEndNode() {return groOpuStartEndNode;}
 
-    public RNode getRegStartEndNode() {return regStartEndNode;}
+    public RNode getStandardStartEndNode() {return standardStartEndNode;}
 
     public RNode[][] getGrid() {return grid;}
 

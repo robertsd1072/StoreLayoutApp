@@ -1,3 +1,8 @@
+/**
+ * Rectangle Node class for GridData3
+ * @author David Roberts
+ */
+
 package DJR_Store_Layout.GridData;
 
 import DJR_Store_Layout.HelperClasses.Coords;
@@ -9,12 +14,13 @@ public class RNode
     private final Rectangle r;
     private final int xCoord, yCoord;
     private final Coords coords;
+    /** Screen bounds of rectangle */
     private double sXMinCoord, sYMinCoord, sXMaxCoord, sYMaxCoord;
-    private boolean highlighted, isIsle, nulled, beingMoved, highlightedNull;
+    private boolean highlighted, isIsle, nulled, beingMoved;
     private Isle isle;
     private IsleGroup isleGroup;
     private Color color;
-    private GridData3 grid;
+    private final GridData3 grid;
 
     public RNode(Rectangle rect, int x, int y, double x1, double y1, GridData3 g)
     {
@@ -77,8 +83,6 @@ public class RNode
     }
 
     public Rectangle getR() {return r;}
-
-    public IsleGroup getIsleGroup() {return isleGroup;}
 
     public Isle getIsle() {return isle;}
 
@@ -145,7 +149,6 @@ public class RNode
 
     public void setHighlightedNull(boolean hmm)
     {
-        highlightedNull = hmm;
         if (hmm)
         {
             r.setOpacity(0.5);
@@ -156,6 +159,4 @@ public class RNode
             r.setOpacity(1.0);
         }
     }
-
-    public boolean isHighlightedNull() {return highlightedNull;}
 }

@@ -13,7 +13,7 @@
    <children>
       <MenuBar fx:id="menuBar">
         <menus>
-          <Menu fx:id="file" mnemonicParsing="false" text="File">
+          <Menu fx:id="fileMenu" mnemonicParsing="false" text="File">
             <items>
                   <MenuItem fx:id="back" mnemonicParsing="false" text="Back" />
                   <MenuItem fx:id="load" mnemonicParsing="false" text="Load" />
@@ -25,7 +25,7 @@
           </Menu>
           <Menu mnemonicParsing="false" text="Set Start/End">
             <items>
-                  <MenuItem fx:id="setupRegularPickStartEnd" mnemonicParsing="false" text="Set Regular Pick Start/End" />
+                  <MenuItem fx:id="setupStandardPickStartEnd" mnemonicParsing="false" text="Set Standard Pick Start/End" />
               <MenuItem fx:id="setupRegOPUstartEnd" mnemonicParsing="false" text="Set Regular OPU Pick Start/End" />
                   <MenuItem fx:id="setupGroOPUstartEnd" mnemonicParsing="false" text="Set Grocery OPU Pick Start/End" />
             </items>

@@ -1,7 +1,13 @@
+/**
+ * Edge Priority Queue with shortest edge at top
+ * @author David Roberts
+ */
+
 package DJR_Store_Layout.GraphsAndHelpers;
 
 public class EdgePQ
 {
+    /** Nodes in array but sorted like a binary tree */
     private final Edge[] edgeArray;
     private int size;
 
@@ -115,18 +121,5 @@ public class EdgePQ
         size--;
 
         return root;
-    }
-
-    public boolean hasStuff()
-    {
-        return size > 0;
-    }
-
-    public void print()
-    {
-        for (int i=0; i<size; i++)
-        {
-            System.out.println(edgeArray[i].getU()+"->"+edgeArray[i].getW()+" : "+edgeArray[i].getLength());
-        }
     }
 }

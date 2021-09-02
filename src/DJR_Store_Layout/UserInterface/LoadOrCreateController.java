@@ -23,21 +23,15 @@ import javax.swing.*;
 import java.io.File;
 
 public class LoadOrCreateController {
-    /**
-     * Launching variables
-     */
+    /** Launching variables */
     private Stage stage;
     private final Scene scene;
-    /**
-     * Base javafx controller for the scene
-     */
+    /** Base javafx controller for the scene */
     public BorderPane bP;
     public Button createButton;
     public VBox theV;
 
-    /**
-     * Constructor loads fxml and connects this controller
-     */
+    /** Constructor loads fxml and connects this controller */
     public LoadOrCreateController() throws RuntimeException
     {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("loadOrCreate.fxml"));
@@ -55,9 +49,7 @@ public class LoadOrCreateController {
         }
     }
 
-    /**
-     * Actually launches the scene
-     */
+    /** Actually launches the scene */
     public void launchScene(Stage stage)
     {
         this.stage = stage;
@@ -68,19 +60,13 @@ public class LoadOrCreateController {
         stage.show();
     }
 
-    /**
-     * Basic initializer
-     */
+    /** Basic initializer */
     public void initialize() {bP.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));}
 
-    /**
-     * Launches new scene for the creation of a new layout
-     */
+    /** Launches new scene for the creation of a new layout */
     public void create() {new CreateNewLayoutController().launchScene(stage);}
 
-    /**
-     * Launches new scene for the loading of an existing layout
-     */
+    /** Launches new scene for the loading of an existing layout */
     public void load()
     {
         Rectangle2D screenBounds = Screen.getPrimary().getBounds();

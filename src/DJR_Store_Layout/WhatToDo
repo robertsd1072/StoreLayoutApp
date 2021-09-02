@@ -2,13 +2,11 @@ Cosas Para Hacer en Cualquier Momento:
 
 Item Location:
 D39(1) 1-1-1.90
-99B 103 B04
-
-- Finding cell from location is now different with different isle section/subsection system (simple version still works)
-
-- Finding cell from location of isle that ends and starts again in a different location
+99B 103B04
 
 - Algorithm for Grocery OPU
+
+- Port to Web app
 
 Optimization:
 - Multithreading

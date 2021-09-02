@@ -1,3 +1,8 @@
+/**
+ * Controller for inputting list of locations and getting those locations back in the correct order
+ * @author
+ */
+
 package DJR_Store_Layout.UserInterface;
 
 import DJR_Store_Layout.GraphsAndHelpers.FindingPathReturn;
@@ -8,9 +13,6 @@ import DJR_Store_Layout.GridData.RNode;
 import DJR_Store_Layout.HelperClasses.Coords;
 import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
@@ -20,24 +22,20 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class SetupPickingPathController
 {
+    /** Launching/FXML variable */
     private Stage stage;
-
     public TextField text1, text2, text3, text4, text5, text6, text7, text8, text9, text10, text11, text12, text13, text14, text15, text16, text17, text18, text19, text20;
     public Button button1, button2, button3, button4, button5, button6, button7, button8, button9, button10, button11, button12, button13, button14, button15, button16, button17, button18, button19, button20, done, clearPath;
     public ChoiceBox choice1, choiceA;
     public VBox theV;
-
+    /** Data variables */
     private TextField[] textArr;
     private Button[] buttonArr;
     private GridData3 grid;
@@ -45,8 +43,15 @@ public class SetupPickingPathController
     private String[] cellPath;
     private ArrayList<String> vertexPath;
 
+    /** I can't put anything in the Constructor cuz i'll get errors so it's empty */
     public SetupPickingPathController() {}
 
+    /**
+     * Connects various info that is important for functionality
+     * @param g GridData3
+     * @param g1 GraphOfTheGrid
+     * @param s Stage
+     */
     public void setInfo(GridData3 g, GraphOfTheGrid g1, Stage s)
     {
         grid = g;
@@ -54,17 +59,21 @@ public class SetupPickingPathController
         stage = s;
     }
 
+    /** For finding picking path without UI of store layout */
     public void setInfoWithFile(String file, Stage s)
     {
         stage = s;
         grid = new GridData3(file);
         graph = new GraphOfTheGrid(grid);
+        theV.getChildren().remove(clearPath);
+        stage.setHeight(stage.getHeight()-25);
     }
 
+    /** Basic Initializer */
     public void initialize()
     {
         choiceA.setItems(FXCollections.observableArrayList("Coordinates", "Locations"));
-        choice1.setItems(FXCollections.observableArrayList("OPU Regular", "OPU Grocery", "Regular"));
+        choice1.setItems(FXCollections.observableArrayList("OPU Regular", "OPU Grocery", "Standard"));
         textArr = new TextField[]{text1, text2, text3, text4, text5, text6, text7, text8, text9, text10, text11, text12, text13, text14, text15, text16, text17, text18, text19, text20};
         buttonArr = new Button[]{button1, button2, button3, button4, button5, button6, button7, button8, button9, button10, button11, button12, button13, button14, button15, button16, button17, button18, button19, button20};
 
@@ -87,6 +96,7 @@ public class SetupPickingPathController
         }
     }
 
+    /** Gets relevant info from inputted strings, finds picking path, and reorganizes locations based on order of picking path */
     public void done()
     {
         Long start = System.nanoTime();
@@ -194,7 +204,9 @@ public class SetupPickingPathController
         }
         else
         {
-            //Make grocery OPU algorithm
+            /**
+             * I should make a grocery OPU algorithm but the one that is current implemented I found no problems with
+             */
         }
 
         for (int i=0; i<finalLocationList.size(); i++)
@@ -206,6 +218,7 @@ public class SetupPickingPathController
         stage.setHeight(stage.getHeight()+20);
     }
 
+    /** Resets cellPath that was drawn on story layout UI */
     public void clearCellPath()
     {
         for (int i=1; i<cellPath.length; i++)

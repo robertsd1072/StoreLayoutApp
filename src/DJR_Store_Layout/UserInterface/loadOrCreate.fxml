@@ -23,7 +23,7 @@
    <center>
       <VBox fx:id="theV" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" BorderPane.alignment="CENTER">
          <children>
-            <Label text="Welcome to Target's ePick Store Layout">
+            <Label text="Welcome to David Robert's Store Layout">
                <font>
                   <Font size="20.0" />
                </font>

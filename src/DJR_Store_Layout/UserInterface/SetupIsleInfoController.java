@@ -1,10 +1,18 @@
+/**
+ * UI menu for setting up isle info
+ * @author David Roberts
+ */
+
 package DJR_Store_Layout.UserInterface;
 
 import DJR_Store_Layout.GridData.CellList;
 import DJR_Store_Layout.GridData.GridData3;
 import DJR_Store_Layout.GridData.Isle;
 import DJR_Store_Layout.HelperClasses.MyPopup;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -18,20 +26,25 @@ import java.util.*;
 
 public class SetupIsleInfoController
 {
+    /** Launching/FXML variable */
     private Stage stage;
     public VBox theV, vboxOfTexts;
-    public Button addSection, done, help;
+    public Button addSection, done, help, removeSection;
     public HBox hbox0, hboxEnd;
     public TextField text0, text1;
     public ChoiceBox choiceA, choiceB;
+    public HBox addAndRemoveHBox;
     public Label endLabel;
+    /** Data variables */
     private GridData3 g;
     private Isle isle;
     private int numberOfIsleSections;
     private final Hashtable<Integer, Integer> numberOfSubsectionsForEachSection;
     private final ArrayList<TextField> subsectionTextfields, sectionNumberTextfields;
-    private IsleLayoutController ac;
+    private final ArrayList<HBox> hboxArr;
+    private IsleLayoutController ilc;
 
+    /** Basic Constructor */
     public SetupIsleInfoController()
     {
         g = null;
@@ -39,23 +52,33 @@ public class SetupIsleInfoController
         numberOfSubsectionsForEachSection = new Hashtable<>();
         subsectionTextfields = new ArrayList<>();
         sectionNumberTextfields = new ArrayList<>();
+        hboxArr = new ArrayList<>();
     }
 
+    /** Basic Initializer */
     public void initialize()
     {
         subsectionTextfields.add(text0);
         subsectionTextfields.add(text1);
         choiceA.setItems(FXCollections.observableArrayList("north", "south", "east", "west"));
         choiceB.setItems(FXCollections.observableArrayList("up", "down", "left", "right", "diagonal right", "diagonal left"));
-        help.setOnAction(actionEvent -> ac.displayIsleInfoInstructions());
+        help.setOnAction(actionEvent -> ilc.displayIsleInfoInstructions());
+        addAndRemoveHBox.getChildren().remove(removeSection);
     }
 
-    public void setImportantInfo(GridData3 grid, Isle i, Stage s, IsleLayoutController actualController3)
+    /**
+     * Connects various info that is important for functionality
+     * @param grid GridData3
+     * @param i isle
+     * @param s stage
+     * @param isleLayoutController IsleLayoutController
+     */
+    public void setImportantInfo(GridData3 grid, Isle i, Stage s, IsleLayoutController isleLayoutController)
     {
         g = grid;
         isle = i;
         stage = s;
-        ac = actualController3;
+        ilc = isleLayoutController;
 
         text0.setText(1+"");
         text1.setText((isle.getNumberOfCellsInIsle()-1)+"");
@@ -64,8 +87,8 @@ public class SetupIsleInfoController
         {
             vboxOfTexts.getChildren().removeAll(hbox0);
             vboxOfTexts.setPrefHeight(25);
-            theV.getChildren().removeAll(addSection, hboxEnd, endLabel);
-            stage.setHeight(146);
+            theV.getChildren().removeAll(addAndRemoveHBox, hboxEnd, endLabel);
+            stage.setHeight(160);
         }
 
         stage.setOnCloseRequest(windowEvent ->
@@ -79,6 +102,7 @@ public class SetupIsleInfoController
         });
     }
 
+    /** Adds necesarry UI elements to input another section */
     public void addSection()
     {
         HBox hbox = new HBox();
@@ -96,8 +120,26 @@ public class SetupIsleInfoController
         stage.setHeight(stage.getHeight()+25);
         subsectionTextfields.add(textFieldNew);
         sectionNumberTextfields.add(numOfSection);
+        hboxArr.add(hbox);
+
+        if (subsectionTextfields.size() == 3)
+            addAndRemoveHBox.getChildren().add(removeSection);
     }
 
+    /** Removes necesarry UI elements to remove section */
+    public void removeSection()
+    {
+        vboxOfTexts.getChildren().remove(hboxArr.get(hboxArr.size()-1));
+        stage.setHeight(stage.getHeight()-25);
+        subsectionTextfields.remove(subsectionTextfields.get(subsectionTextfields.size()-1));
+        sectionNumberTextfields.remove(sectionNumberTextfields.get(sectionNumberTextfields.size()-1));
+        hboxArr.remove(hboxArr.get(hboxArr.size()-1));
+
+        if (subsectionTextfields.size() <= 2)
+            addAndRemoveHBox.getChildren().remove(removeSection);
+    }
+
+    /** Called if isle info is already setup and someone wants to edit that info */
     public void editingInfo()
     {
         ArrayList<Integer> isleSectionsInOrder = new ArrayList<>(isle.getNumberOfSubsectionsForEachSection().keySet());
@@ -118,6 +160,7 @@ public class SetupIsleInfoController
         choiceB.setValue(isle.getDirectionOfIncreasingIsleSections());
     }
 
+    /** Sets info of isle based on inputted info */
     public void done()
     {
         if (isle.getIsleGroup().getBackOrFloor().compareTo("back") == 0)

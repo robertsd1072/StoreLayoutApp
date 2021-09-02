@@ -1,3 +1,8 @@
+/**
+ * Vertex Queue (non-priority) for GraphOfTheGrid.findDistanceBetween()
+ * @author David Roberts
+ */
+
 package DJR_Store_Layout.GraphsAndHelpers;
 
 public class VertexQ
@@ -41,12 +46,4 @@ public class VertexQ
     }
 
     public boolean hasStuff() {return size > 0;}
-
-    public void print()
-    {
-        for (int i=0; i<size; i++)
-        {
-            System.out.println(array[i]);
-        }
-    }
 }

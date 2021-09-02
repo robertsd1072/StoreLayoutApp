@@ -1,3 +1,10 @@
+/**
+ * Graph class for DJR_Store_Layout
+ * Creates a graph of all non-isle, non-null cells on the grid
+ * Here is where the quickest path between points on the grid and for a list of locations is found
+ * @author David Roberts
+ */
+
 package DJR_Store_Layout.GraphsAndHelpers;
 
 import DJR_Store_Layout.GridData.CellList;
@@ -10,14 +17,27 @@ import java.util.*;
 
 public class GraphOfTheGrid
 {
+    /**
+     * Hashtable of edges
+     * Put in string representing the coordinates of a cell,
+     * getting a linked list of all cells that connect to the inputted cell.
+     */
     public Hashtable<String, Edge> graph;
 
     private int numberOfVertices;
     private int numberOfEdges;
 
     private final GridData3 grid;
+    /**
+     * The start and endpoint for finding picking path
+     * Chances based on what kind of pick (Standard, OPU, ...)
+     */
     private String startAndEnd;
 
+    /**
+     * Constructor builds a graph based on
+     * @param g GridData3
+     */
     public GraphOfTheGrid(GridData3 g)
     {
         graph = new Hashtable<>();
@@ -123,6 +143,12 @@ public class GraphOfTheGrid
         System.out.println("Number of Edges: "+numberOfEdges);
     }
 
+    /**
+     * Dijkstra's algorithm for finding shortest path between two points
+     * @param start1 starting point
+     * @param end1 ending point
+     * @return DistanceReturn with length of path, coordinate path in string form, and ending point
+     */
     public DistanceReturn findDistanceBetween(String start1, String end1)
     {
         //Making sure start is on a valid vertex
@@ -186,6 +212,13 @@ public class GraphOfTheGrid
         String[] pathArr = path.toString().split(" ");
         return new DistanceReturn(pathArr.length-2, path.toString(), end1);
     }
+
+    /**
+     * NOT BEING USED
+     * Standard nearest neighbor algorithm of finding quickest route for a list of locations
+     * @param list of locations
+     * @param which type of pick (Standard, OPU, ...)
+     * @return FindingPathReturn with list of locations in correct order, list of coordinate points in order, and cell path in string form
 
     public FindingPathReturn findPickingPath(Hashtable<String, String> list, String which)
     {
@@ -281,7 +314,17 @@ public class GraphOfTheGrid
 
         return new FindingPathReturn(locationPath, vertexPath, cellPath.toString());
     }
+     */
 
+    /**
+     * Primary method
+     * This algorithm is also nearest neighbor, however it splits the store into 4 sectors in a specific order based on the starting location and
+     * every location in the current sector (starting in the sector with the start/end point) has to be visited before moving to the next sector
+     * Thus, the picker starts with locations close to them, and ends on the same side of the store where they started
+     * @param list of locations
+     * @param which type of pick (Standard, OPU, ...)
+     * @return FindingPathReturn with list of locations in correct order, list of coordinate points in order, and cell path in string form
+     */
     public FindingPathReturn findPickingPath2(Hashtable<String, String> list, String which)
     {
         int x;
@@ -293,8 +336,8 @@ public class GraphOfTheGrid
         }
         else
         {
-            x = grid.getRegStartEndNode().getX();
-            y = grid.getRegStartEndNode().getY();
+            x = grid.getStandardStartEndNode().getX();
+            y = grid.getStandardStartEndNode().getY();
         }
         startAndEnd = x+","+y;
 
@@ -390,137 +433,14 @@ public class GraphOfTheGrid
         return new FindingPathReturn(locationPath, vertexPath, cellPath.toString());
     }
 
-    public FindingPathReturn findPickingPath3(Hashtable<String, String> list, String which, boolean testing)
-    {
-        int x;
-        int y;
-        if (which.compareTo("OPU Regular") == 0)
-        {
-            x = grid.getRegOpuStartEndNode().getX();
-            y = grid.getRegOpuStartEndNode().getY();
-        }
-        else
-        {
-            x = grid.getRegStartEndNode().getX();
-            y = grid.getRegStartEndNode().getY();
-        }
-        startAndEnd = x+","+y;
-
-        Hashtable<String, Boolean> visited = new Hashtable<>();
-        Hashtable<String, Integer> vertexSectorIds = new Hashtable<>();
-        for (String vertex : list.keySet())
-        {
-            visited.put(vertex, false);
-            vertexSectorIds.put(vertex, getSectorOfCoordinate(vertex));
-        }
-
-        Sector[] sectorMap = mapVerticesToSectors(list.keySet(), vertexSectorIds);
-
-        ArrayList<String> locationPath = new ArrayList<>();
-        ArrayList<String> vertexPath = new ArrayList<>();
-        ArrayList<Edge> edgePath = new ArrayList<>();
-
-        vertexPath.add(startAndEnd);
-
-        int sectorOfStartAndEnd = getSectorOfCoordinate(startAndEnd);
-        vertexSectorIds.put(startAndEnd, sectorOfStartAndEnd);
-        int[] sectorOrder = getSectorOrderGivenStart(sectorOfStartAndEnd);
-
-        String curr = startAndEnd;
-        String previousCell = startAndEnd;
-        for (int i=0; i<sectorOrder.length; i++)
-        {
-            //System.out.println("Going to all vertices in sector: "+sectorOrder[i]);
-
-            if (sectorMap[sectorOrder[i]].getVerticesInSectorList().size() > 0)
-            {
-                String nearestVertexToNextSector = getNearestVertexToNextSector(i, sectorOrder,
-                        sectorMap[sectorOrder[i]].getVerticesInSectorList());
-                //System.out.println("Closest vertex to next sector: "+nearestVertexToNextSector);
-
-                ArrayList<Edge> backwardsVertexPathInSector = new ArrayList<>();
-                String lastSectorEnd = curr;
-                String lastSectorEndEndCoords = previousCell;
-
-                curr = nearestVertexToNextSector;
-                previousCell = nearestVertexToNextSector;
-                visited.put(curr, true);
-                sectorMap[sectorOrder[i]].getVerticesInSectorList().remove(curr);
-
-                while (sectorMap[sectorOrder[i]].getVerticesInSectorList().size() > 0)
-                {
-                    ArrayList<String> unvisitedVertexList = new ArrayList<>();
-                    for (String vertex : sectorMap[sectorOrder[i]].getVerticesInSectorList())
-                    {
-                        if (!visited.get(vertex))
-                        {
-                            //System.out.println("Adding edge to "+vertex+" to pq");
-                            unvisitedVertexList.add(vertex);
-                        }
-                    }
-
-                    Edge closestNeighbor = getClosestNeighborFromNode(curr, previousCell, unvisitedVertexList);
-                    //System.out.println("Root: "+root.u+"->"+root.w);
-                    //System.out.println("Comparing "+ids.get(root.u)+" and "+ids.get(root.w));
-
-                    backwardsVertexPathInSector.add(closestNeighbor);
-                    //System.out.println("Adding "+root.u+" to backwards path in sector: "+sectorOrder[i]);
-
-                    curr = closestNeighbor.getW();
-                    previousCell = closestNeighbor.getDistanceReturn().getEnd();
-                    visited.put(curr, true);
-                    sectorMap[sectorOrder[i]].getVerticesInSectorList().remove(curr);
-                }
-                //System.out.println("Visited all vertices in sector: "+sectorOrder[i]);
-
-                DistanceReturn dr = findDistanceBetween(lastSectorEndEndCoords, previousCell);
-                Edge fromPreviousSector = new Edge(lastSectorEnd, curr, dr);
-                edgePath.add(fromPreviousSector);
-                vertexPath.add(fromPreviousSector.getDistanceReturn().getEnd());
-                locationPath.add(fromPreviousSector.getW());
-                //System.out.println("Adding "+fromPreviousSector.dr.end+" to connect previous sector");
-
-                for (int j=backwardsVertexPathInSector.size()-1; j>-1; j--)
-                {
-                    edgePath.add(backwardsVertexPathInSector.get(j));
-                    vertexPath.add(backwardsVertexPathInSector.get(j).getU());
-                    locationPath.add(list.get(backwardsVertexPathInSector.get(j).getU()));
-                    //System.out.println("Adding "+backwardsVertexPathInSector.get(j).u+" to path in sector: "+i);
-                }
-
-                curr = nearestVertexToNextSector;
-                previousCell = nearestVertexToNextSector;
-            }
-        }
-        //System.out.println("Path Complete, returning to start/end");
-
-        DistanceReturn dr = findDistanceBetween(previousCell, startAndEnd);
-        edgePath.add(new Edge(curr, startAndEnd, dr.getDistance(), dr.getPath()));
-
-        if (testing)
-        {
-            StringBuilder cellPath = new StringBuilder();
-            for (int i=0; i<edgePath.size(); i++)
-            {
-                try
-                {
-                    if (edgePath.get(i).getW().equals(edgePath.get(i-1).getW()))
-                        cellPath.append(reversePath(edgePath.get(i).getCellPath()));
-                    else
-                        cellPath.append(edgePath.get(i).getCellPath());
-                }
-                catch (IndexOutOfBoundsException e)
-                {
-                    cellPath.append(edgePath.get(i).getCellPath());
-                }
-            }
-
-            return new FindingPathReturn(locationPath, vertexPath, cellPath.toString());
-        }
-        else
-            return new FindingPathReturn(locationPath, vertexPath, null);
-    }
-
+    /**
+     * Gets nearest neighboring location from current node, used in findPickingPath2
+     * Sets up Dijkstra's and inputs list of unvisited neighbors at the end of Dijkstra's
+     * @param startingLocation string: D32(1) 1-1-1
+     * @param start1 coordinates
+     * @param endList list of unvisited neighbors
+     * @return nearest edge of unvisited neighbors in sector
+     */
     private Edge getClosestNeighborFromNode(String startingLocation, String start1, ArrayList<String> endList)
     {
         //Making sure start is on a valid vertex
@@ -644,6 +564,14 @@ public class GraphOfTheGrid
         return pq.getRoot();
     }
 
+    /**
+     * If given coordinates are an isle, they are not part of the graph
+     * This method finds the nearest cell in the graph to use so no exceptions are found.
+     * @param old coordinates
+     * @param x coordinate
+     * @param y coordinate
+     * @return nearest non-isle, non-null cell, only 1 cell away from old
+     */
     private String findNearestNonIsleCell(String old, int x, int y)
     {
         String newCoords = old;
@@ -697,6 +625,14 @@ public class GraphOfTheGrid
         return newCoords;
     }
 
+    /**
+     * FOR TESTING PURPOSES ONLY
+     * Finds nearest cell of area isle (Ex: Clothes), used in IsleLayoutController
+     * Uses Dijkstra's and inputs a list of possible ending cells at the end
+     * @param start1 coordinates
+     * @param isleID isle of interest
+     * @return sorted arrayList of all possible connections to that isle, gets first element in list
+     */
     public ArrayList<DistanceReturn> findClosestCellAndComputeDistanceIfIsleShapeIsArea(String start1, String isleID)
     {
         Isle isle = grid.getIsleWithUnknownIG(isleID);
@@ -785,6 +721,12 @@ public class GraphOfTheGrid
         return listOfPaths;
     }
 
+    /**
+     * Sets up array of sectors that contain lists of each location at that sector
+     * @param set of all locations
+     * @param vertexSectorIds table that maps location to its proper sector
+     * @return array of sectors in correct order with list of each location in each sector
+     */
     private Sector[] mapVerticesToSectors(Set<String> set, Hashtable<String, Integer> vertexSectorIds)
     {
         Sector[] sectorMap = new Sector[4];
@@ -796,6 +738,10 @@ public class GraphOfTheGrid
         return sectorMap;
     }
 
+    /**
+     * @param coords1 coordinates of interest
+     * @return which sector it belongs to
+     */
     private Integer getSectorOfCoordinate(String coords1)
     {
         Coords coords;
@@ -822,6 +768,10 @@ public class GraphOfTheGrid
             return 3;
     }
 
+    /**
+     * @param startSector starting sector
+     * @return array of ints that represent the sector order (0, 2, 3, 1) ...
+     */
     private int[] getSectorOrderGivenStart(int startSector)
     {
         int[] order = new int[4];
@@ -851,79 +801,16 @@ public class GraphOfTheGrid
             order[2] = 1;
             order[3] = 0;
         }
-
-
         return order;
     }
 
-    private String getNearestVertexToNextSector(int sectorOrderCounter, int[] sectorOrder, ArrayList<String> listOfVerticesInCurrSector)
-    {
-        int currentSector = sectorOrder[sectorOrderCounter];
-        int nextSector;
-        try
-        {
-            nextSector = sectorOrder[sectorOrderCounter+1];
-        }
-        catch (ArrayIndexOutOfBoundsException e)
-        {
-            nextSector = sectorOrder[0];
-        }
-        //System.out.println("Current Sector: "+currentSector);
-        //System.out.println("Next Sector: "+nextSector);
-
-        String closestVertex = listOfVerticesInCurrSector.get(0);
-        if (currentSector == 0 && nextSector == 2)
-        {
-            int y = grid.getRowSize()/2;
-            //System.out.println("Target Coord: y = "+y);
-            for (String vertex : listOfVerticesInCurrSector)
-            {
-                int currY = new Coords(vertex).getY();
-
-                if (y - currY < (y - new Coords(closestVertex).getY()))
-                    closestVertex = vertex;
-            }
-        }
-        else if (currentSector == 2 && nextSector == 3)
-        {
-            int x = grid.getColSize()/2;
-            //System.out.println("Target Coord: x = "+x);
-            for (String vertex : listOfVerticesInCurrSector)
-            {
-                int currX = new Coords(vertex).getX();
-
-                if (x - currX < (x - new Coords(closestVertex).getX()))
-                    closestVertex = vertex;
-            }
-        }
-        else if (currentSector == 3 && nextSector == 1)
-        {
-            int y = grid.getRowSize()/2;
-            //System.out.println("Target Coord: y = "+y);
-            for (String vertex : listOfVerticesInCurrSector)
-            {
-                int currY = new Coords(vertex).getY();
-
-                if (currY - y < (new Coords(closestVertex).getY() - y))
-                    closestVertex = vertex;
-            }
-        }
-        else if (currentSector == 1 && nextSector == 0)
-        {
-            int x = grid.getColSize()/2;
-            //System.out.println("Target Coord: x = "+x);
-            for (String vertex : listOfVerticesInCurrSector)
-            {
-                int currX = new Coords(vertex).getX();
-
-                if (currX - x < (new Coords(closestVertex).getX() - x))
-                    closestVertex = vertex;
-            }
-        }
-
-        return closestVertex;
-    }
-
+    /**
+     * FOR TESTING PURPOSES ONLY
+     * There was a case where the cell path would be reversed so this was used to reverse it
+     * Cell path is only used for testing to show path of picking on UI
+     * @param originalPath path to be reversed
+     * @return path in correct order
+     */
     private String reversePath(String originalPath)
     {
         StringBuilder newPath = new StringBuilder();

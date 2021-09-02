@@ -1,3 +1,9 @@
+/**
+ * Custom screen popup
+ * Used for warnings about wrong inputs, general helpful info, and more
+ * @author David Roberts
+ */
+
 package DJR_Store_Layout.HelperClasses;
 
 import javafx.geometry.Pos;
@@ -14,6 +20,7 @@ public class MyPopup
     private final ArrayList<Node> listOfNodes;
     private final Stage stage;
 
+    /** Basic Constructor takes a list of nodes to put in popup */
     public MyPopup(ArrayList<Node> list, Stage st)
     {
         listOfNodes = list;

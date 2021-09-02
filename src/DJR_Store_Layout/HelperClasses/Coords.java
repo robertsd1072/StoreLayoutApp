@@ -1,3 +1,10 @@
+/**
+ * Coordinate Class
+ * Input string of x,y
+ * For easy conversion between x and y and overall x,y
+ * @author David Roberts
+ */
+
 package DJR_Store_Layout.HelperClasses;
 
 public class Coords
@@ -13,18 +20,9 @@ public class Coords
         y = Integer.parseInt(s.split(",")[1]);
     }
 
-    public int getX()
-    {
-        return x;
-    }
+    public int getX() {return x;}
 
-    public int getY()
-    {
-        return y;
-    }
+    public int getY() {return y;}
 
-    public String toString()
-    {
-        return coordinates;
-    }
+    public String toString() {return coordinates;}
 }

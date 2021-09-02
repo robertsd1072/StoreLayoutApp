@@ -1,3 +1,9 @@
+/**
+ * Isle Group class
+ * Contains table of isles, color and name of group
+ * @author David Roberts
+ */
+
 package DJR_Store_Layout.GridData;
 
 import javafx.scene.paint.Color;

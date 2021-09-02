@@ -106,7 +106,7 @@
               <menus>
                 <Menu mnemonicParsing="false" text="File">
                   <items>
-                    <MenuItem mnemonicParsing="false" text="Close" />
+                    <MenuItem fx:id="back" mnemonicParsing="false" text="Back" />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Edit">
@@ -119,26 +119,6 @@
                     <MenuItem mnemonicParsing="false" text="About" />
                   </items>
                 </Menu>
-                  <Menu fx:id="m1" mnemonicParsing="false" text="MouseX: ">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="About" />
-                     </items>
-                  </Menu>
-                  <Menu fx:id="m2" mnemonicParsing="false" text="MouseY: ">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="About" />
-                     </items>
-                  </Menu>
-                  <Menu fx:id="m3" mnemonicParsing="false" text="ScreenX:">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="About" />
-                     </items>
-                  </Menu>
-                  <Menu fx:id="m4" mnemonicParsing="false" text="ScreenY:">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="About" />
-                     </items>
-                  </Menu>
               </menus>
             </MenuBar>
             <Pane fx:id="topP" prefHeight="88.0" prefWidth="200.0" />

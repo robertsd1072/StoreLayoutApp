@@ -1,3 +1,9 @@
+/**
+ * Linked List of cells for many different lists
+ * IsleCellList, HighlightedCellList, IsleGroupCellList
+ * @author David Roberts
+ */
+
 package DJR_Store_Layout.GridData;
 
 public class CellList
@@ -15,11 +21,7 @@ public class CellList
 
     public CellNode getFirst() {return first;}
 
-    /**
-     * Adds new rectangle to LinkedList
-     *
-     * @param node new rectangle to add
-     */
+    /**  Adds new cell to LinkedList */
     public void add(RNode node)
     {
         if (size == 0)
@@ -36,9 +38,7 @@ public class CellList
         }
     }
 
-    /**
-     * Resets LinkedList
-     */
+    /** Resets LinkedList */
     public void clear()
     {
         first = null;
@@ -48,7 +48,7 @@ public class CellList
 
     public int size() {return size;}
 
-    public class CellNode
+    public static class CellNode
     {
         private final RNode rNode;
         private CellNode next;

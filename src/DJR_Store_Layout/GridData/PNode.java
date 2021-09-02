@@ -1,3 +1,9 @@
+/**
+ * Plus Node class
+ * These are the pluses on the UI
+ * @author David Roberts
+ */
+
 package DJR_Store_Layout.GridData;
 
 import javafx.scene.shape.Line;
