@@ -1,3 +1,4 @@
+
 # Store Layout App
 
 As of September 3rd, 2021, I work and have worked at **Target©** since December of 2020. There, my job is to roam the store, locating and collecting various items for guest orders. I would get a list of locations in the store in a certain order, and it would be my job to go to each of those locations to collect each item until I had every item. In my time there, I have encountered three problems that directly affected the rate at which I could traverse the store and pick each item.
@@ -35,6 +36,15 @@ The locations of the isles on the 2-D array and their `Sector` and `Subsection` 
 Finally a modified version of a nearest neighbor algorithm is used to generate a sorted list of locations that would be returned to someone like me working in the store. The algorithm splits up the store into four sectors. Given the starting location (problem #2) as the first sector, an order of sectors is determined. Every location given is sorted into these sectors. Then, a nearest neighbor algorithm is applied to visit each location in the current sector until all locations in that sector have been visited. Dijkstra's is used for finding the quickest path between locations. Then the algorithm moves onto the next sector. The cycle continues until all locations in the last sector have been visited, where this final location will always be somewhat close to the start/end location. It's basically a big circle that returns to start. 
 
 Finally, the user can save and load files from disc to easily change the layout, or to save their work to come back to it later.
+
+# Code Structure
+
+I have split up my code into packages.
+
+ - **GraphsAndHelpers** contains code for creating a graph of the 2-D array and finding the quickest path. The main code can be found in GraphOfTheGrid.java and all other classes within this package are helper classes that are called from GraphOfTheGrid.java.
+ - **GridData** holds the backing 2-D array. The main file is GridData3.java, and all other sub classes are helpers that contain more information for each isle, isle group, and cell.
+ - **HelperClasses** are a few helpful classes for small improvements in coding and readability across all packages.
+ - **UserInterface** contains fxml files for every UI and controllers associated with each fxml. In addition, there are pictures that are shown with instructions and other helpful information.
 
 # Final Notes
 
