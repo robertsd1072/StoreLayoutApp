@@ -16,7 +16,7 @@ In order of severity:
 
 So, being a computer science student at Pitt, I spent some time thinking and imagining and I thought of a solution that could solve all three of these problems. Introducing, the **Store Layout App**.
 
-**Picture**
+![](StoreLayoutAppScreenshot.jpg)
 
 ## Revisiting the Problems
 
