@@ -54,7 +54,7 @@ All of this work is 100% my own. The idea, the UI, and the code are all mine. I 
 
 I have fully tested this app on one store's layout and aim to test it on another before I give it the all clear. 
 
-I realize that this java app may not be compatible with **Target's©** systems, of which I have no knowledge of. This app is simply an idea and implemented solution to a real life problem that I encountered, and I believe it would not be hard for me to import to another format so that it could be used.
+I realize that this java app may not be compatible with **Target's©** systems, of which I have no knowledge. This app is simply an idea and implemented solution to a real life problem that I encountered, and I believe it would not be hard for me to import this to another format so that it could be used.
 
 Finally, there are some minor performance issues, but all of them come from javafx's implementation of the node class and accessing multiple nodes at once.
 
