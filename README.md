@@ -9,7 +9,7 @@ In order of severity:
 
  1. In the store's database, some isles were in a vastly different location from reality.
 	* For example one isle, D99, was in one corner of the store in the store's system when in reality it was in the opposite corner. Thus, I was directed away from that isle only to return to that location when I was originally very close.
- 2. The starting point of batch of items is often nowhere near where near the location I actually started.
+ 2. The starting point of a batch of items is often nowhere near the first location in the batch.
 	 * I often had to traverse the entire store just to get to the first location in the batch, passing many other locations in the process.
  3. The overall path of locations through the store did not make sense to me, and I often manipulated the list to save time.
 
