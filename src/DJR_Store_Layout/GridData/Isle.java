@@ -95,6 +95,12 @@ public class Isle
      */
     public String getCoordsGivenLocationInBack(String isleSubsection)
     {
+        if (getNumberOfCellsInIsle() == 1)
+        {
+            System.out.println("Returning only cell in isle");
+            return isleCellList.getFirst().getrNode().getX()+","+isleCellList.getFirst().getrNode().getY();
+        }
+
         //"A" numeric value is 10 so if subsection is A then whatSubection = 1.
         //If subsection is B then whatSubsection = 2, and so on.
         int whatSubsection = Character.getNumericValue(isleSubsection.charAt(0))-9;
@@ -165,24 +171,34 @@ public class Isle
      */
     public String getCoordsGivenLocationOnFloor(int isleSection, String isleSubsection)
     {
-        if (isleSection == 0)
+        if (getNumberOfCellsInIsle() == 1)
+        {
+            System.out.println("Returning only cell in isle");
+            return isleCellList.getFirst().getrNode().getX()+","+isleCellList.getFirst().getrNode().getY();
+        }
+        else if (isleSection == 0)
         {
             System.out.println("Returning cuz at endcap");
+            return getIsleCoordsGivenEndcap(endCapLocation);
+        }
+        else if (isleSection > 50)
+        {
+            System.out.println("Returning cuz at opposite endcap");
             if (endCapLocation.compareTo("west") == 0)
-            {
-                return getIsleCoordsGivenEndcap("west");
-            }
-            if (endCapLocation.compareTo("south") == 0)
-            {
-                return getIsleCoordsGivenEndcap("south");
-            }
-            if (endCapLocation.compareTo("east") == 0)
             {
                 return getIsleCoordsGivenEndcap("east");
             }
-            if (endCapLocation.compareTo("north") == 0)
+            if (endCapLocation.compareTo("south") == 0)
             {
                 return getIsleCoordsGivenEndcap("north");
+            }
+            if (endCapLocation.compareTo("east") == 0)
+            {
+                return getIsleCoordsGivenEndcap("west");
+            }
+            if (endCapLocation.compareTo("north") == 0)
+            {
+                return getIsleCoordsGivenEndcap("south");
             }
         }
         else

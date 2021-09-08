@@ -9,15 +9,12 @@ package DJR_Store_Layout.GridData;
 
 import DJR_Store_Layout.HelperClasses.Coords;
 import DJR_Store_Layout.HelperClasses.InfoToMakeIsleFromFile;
-import com.sun.javafx.geom.Path2D;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class GridData3 {
 
