@@ -1,7 +1,7 @@
 
 # Store Layout App
 
-As of September 3rd, 2021, I work and have worked at **Target©** since December of 2020. There, my job is to roam the store, locating and collecting various items for guest orders. I would get a list of locations in the store in a certain order, and it would be my job to go to each of those locations to collect each item until I had every item. In my time there, I have encountered three problems that directly affected the rate at which I could traverse the store and pick each item.
+As of September 3rd, 2021, I work and have worked at a certain department store of a certain company since December of 2020. There, my job is to roam the store, locating and collecting various items for guest orders. I would get a list of locations in the store in a certain order, and it would be my job to go to each of those locations to collect each item until I had every item. In my time there, I have encountered three problems that directly affected the rate at which I could traverse the store and pick each item.
 
 # Problems
 
@@ -48,13 +48,13 @@ I have split up my code into packages.
 
 # Final Notes
 
-There are a couple of things that I cannot do simply because I do not have access to **Target's©** database. Thus, this app is as complete as it can possibly be without these pieces of information.
+There are a couple of things that I cannot do simply because I do not have access to the company's database. Thus, this app is as complete as it can possibly be without that information.
 
-All of this work is 100% my own. The idea, the UI, and the code are all mine. I use some of **Target's©** terminology because this is designed for a **Target©** store.
+All of this work is 100% my own. The idea, the UI, and the code are all mine. I use some of the company's terminology because this is designed for one of their stores.
 
 I have fully tested this app on one store's layout and aim to test it on another before I give it the all clear. 
 
-I realize that this java app may not be compatible with **Target's©** systems, of which I have no knowledge. This app is simply an idea and implemented solution to a real life problem that I encountered, and I believe it would not be hard for me to import this to another format so that it could be used.
+I realize that this java app may not be compatible with the company's systems, of which I have no knowledge. This app is simply an idea and implemented solution to a real life problem that I encountered, and I believe it would not be hard for me to import this to another format so that it could be used.
 
 Finally, there are some minor performance issues, but all of them come from javafx's implementation of the node class and accessing multiple nodes at once.
 
