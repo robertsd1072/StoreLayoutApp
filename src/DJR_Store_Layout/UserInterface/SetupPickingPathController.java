@@ -8,7 +8,7 @@ package DJR_Store_Layout.UserInterface;
 import DJR_Store_Layout.GraphsAndHelpers.FindingPathReturn;
 import DJR_Store_Layout.GraphsAndHelpers.GraphOfTheGrid;
 import DJR_Store_Layout.GridData.GridData3;
-import DJR_Store_Layout.GridData.Isle;
+import DJR_Store_Layout.GridData.Aisle;
 import DJR_Store_Layout.GridData.RNode;
 import DJR_Store_Layout.HelperClasses.Coords;
 import javafx.animation.PauseTransition;
@@ -87,7 +87,7 @@ public class SetupPickingPathController
                 String[] arr = string.split("\\(");
                 String isleID = arr[0];
                 int isleSection = Integer.parseInt(arr[1].charAt(0)+"");
-                Isle isle = grid.getIsleGroupList().get(isleGroup).getIsleIDList().get(isleID);
+                Aisle isle = grid.getAisleGroupList().get(isleGroup).getAisleIDList().get(isleID);
                 if (isle == null || !isle.hasSetupInfo())
                     buttonArr[finalI].setText("Any");
                 else
@@ -238,7 +238,7 @@ public class SetupPickingPathController
             int x = Integer.parseInt(coord[0]);
             int y = Integer.parseInt(coord[1]);
             RNode rNode = grid.getRNode(x, y);
-            if (rNode.isIsle())
+            if (rNode.isAisle())
                 rNode.getR().setFill(rNode.getColor());
             else
             {

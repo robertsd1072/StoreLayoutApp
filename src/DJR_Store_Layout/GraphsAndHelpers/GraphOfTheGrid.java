@@ -7,11 +7,11 @@
 
 package DJR_Store_Layout.GraphsAndHelpers;
 
+import DJR_Store_Layout.GridData.Aisle;
 import DJR_Store_Layout.GridData.CellList;
 import DJR_Store_Layout.GridData.GridData3;
 import DJR_Store_Layout.GridData.RNode;
 import DJR_Store_Layout.HelperClasses.Coords;
-import DJR_Store_Layout.GridData.Isle;
 
 import java.util.*;
 
@@ -53,13 +53,13 @@ public class GraphOfTheGrid
         {
             for (int j=0; j<rows; j++)
             {
-                if (!g.getRNode(i, j).isNulled() && !g.getRNode(i, j).isIsle())
+                if (!g.getRNode(i, j).isNulled() && !g.getRNode(i, j).isAisle())
                 {
                     numberOfVertices++;
                     try
                     {
                         //Add edge to west
-                        if (!g.getRNode(i-1, j).isNulled() && !g.getRNode(i-1, j).isIsle())
+                        if (!g.getRNode(i-1, j).isNulled() && !g.getRNode(i-1, j).isAisle())
                         {
                             //At index (i+","+j).hashCode(), add edge between i,j and i-1,j
                             if (graph.get(i+","+j) == null)
@@ -79,7 +79,7 @@ public class GraphOfTheGrid
                     try
                     {
                         //Add edge to north
-                        if (!g.getRNode(i, j-1).isNulled() && !g.getRNode(i, j-1).isIsle())
+                        if (!g.getRNode(i, j-1).isNulled() && !g.getRNode(i, j-1).isAisle())
                         {
                             //At index (i+","+j).hashCode(), add edge between i,j and i,j-1
                             if (graph.get(i+","+j) == null)
@@ -99,7 +99,7 @@ public class GraphOfTheGrid
                     try
                     {
                         //Add edge to east
-                        if (!g.getRNode(i+1, j).isNulled() && !g.getRNode(i+1, j).isIsle())
+                        if (!g.getRNode(i+1, j).isNulled() && !g.getRNode(i+1, j).isAisle())
                         {
                             //At index (i+","+j).hashCode(), add edge between i,j and i+1,j
                             if (graph.get(i+","+j) == null)
@@ -119,7 +119,7 @@ public class GraphOfTheGrid
                     try
                     {
                         //Add edge to north
-                        if (!g.getRNode(i, j+1).isNulled() && !g.getRNode(i, j+1).isIsle())
+                        if (!g.getRNode(i, j+1).isNulled() && !g.getRNode(i, j+1).isAisle())
                         {
                             //At index (i+","+j).hashCode(), add edge between i,j and i,j+1
                             if (graph.get(i+","+j) == null)
@@ -155,14 +155,14 @@ public class GraphOfTheGrid
         Coords startCoords = new Coords(start1);
 
         String start = start1;
-        if (grid.getRNode(startCoords.getX(), startCoords.getY()).isIsle())
+        if (grid.getRNode(startCoords.getX(), startCoords.getY()).isAisle())
             start = findNearestNonIsleCell(start1, startCoords.getX() ,startCoords.getY());
 
         //Making sure end is on a valid vertex
         Coords endCoords = new Coords(end1);
 
         String end = end1;
-        if (grid.getRNode(endCoords.getX(), endCoords.getY()).isIsle())
+        if (grid.getRNode(endCoords.getX(), endCoords.getY()).isAisle())
             end = findNearestNonIsleCell(end1, endCoords.getX(), endCoords.getY());
 
         Hashtable<String, Integer> distance = new Hashtable<>();
@@ -396,7 +396,7 @@ public class GraphOfTheGrid
                 if (loc == null)
                 {
                     Coords coords = new Coords(closestNeighbor.getW());
-                    loc = grid.getRNode(coords.getX(), coords.getY()).getIsle().getIsleID();
+                    loc = grid.getRNode(coords.getX(), coords.getY()).getAisle().getAisleID();
                     locationPath.add(list.get(loc));
                 }
                 else
@@ -447,7 +447,7 @@ public class GraphOfTheGrid
         Coords startCoords = new Coords(start1);
 
         String start = start1;
-        if (grid.getRNode(startCoords.getX(), startCoords.getY()).isIsle())
+        if (grid.getRNode(startCoords.getX(), startCoords.getY()).isAisle())
             start = findNearestNonIsleCell(start1, startCoords.getX() ,startCoords.getY());
 
         Hashtable<String, Integer> distance = new Hashtable<>();
@@ -503,7 +503,7 @@ public class GraphOfTheGrid
                 Coords endCoords = new Coords(end);
 
                 String newEnd = null;
-                if (grid.getRNode(endCoords.getX(), endCoords.getY()).isIsle())
+                if (grid.getRNode(endCoords.getX(), endCoords.getY()).isAisle())
                     newEnd = findNearestNonIsleCell(start1, endCoords.getX() ,endCoords.getY());
                 try
                 {
@@ -517,12 +517,12 @@ public class GraphOfTheGrid
             else
             {
                 //Irregular coords: Mens' Jeans
-                Isle isle = grid.getIsleWithUnknownIG(end);
+                Aisle isle = grid.getAisleWithUnknownIG(end);
                 System.out.println("Irregular ending for isle: "+end);
                 if (isle != null)
                 {
                     ArrayList<String> listOfEnds = new ArrayList<>();
-                    CellList.CellNode curr = isle.getIsleCellList().getFirst();
+                    CellList.CellNode curr = isle.getAisleCellList().getFirst();
                     while (curr != null)
                     {
                         //System.out.println("Finding path for: "+curr.getrNode().getX()+","+curr.getrNode().getY());
@@ -542,7 +542,7 @@ public class GraphOfTheGrid
                         Coords endCoords = new Coords(irregularEnd);
 
                         String newEnd = null;
-                        if (grid.getRNode(endCoords.getX(), endCoords.getY()).isIsle())
+                        if (grid.getRNode(endCoords.getX(), endCoords.getY()).isAisle())
                             newEnd = findNearestNonIsleCell(start1, endCoords.getX() ,endCoords.getY());
                         try
                         {
@@ -581,7 +581,7 @@ public class GraphOfTheGrid
             try
             {
                 RNode rnode = grid.getRNode(x-1, y);
-                if (!rnode.isNulled() && !rnode.isIsle())
+                if (!rnode.isNulled() && !rnode.isAisle())
                 {
                     newCoords = (x-1)+","+y;
                     break;
@@ -591,7 +591,7 @@ public class GraphOfTheGrid
             try
             {
                 RNode rnode = grid.getRNode(x, y+1);
-                if (!rnode.isNulled() && !rnode.isIsle())
+                if (!rnode.isNulled() && !rnode.isAisle())
                 {
                     newCoords = x+","+(y+1);
                     break;
@@ -601,7 +601,7 @@ public class GraphOfTheGrid
             try
             {
                 RNode rnode = grid.getRNode(x+1, y);
-                if (!rnode.isNulled() && !rnode.isIsle())
+                if (!rnode.isNulled() && !rnode.isAisle())
                 {
                     newCoords = (x+1)+","+y;
                     break;
@@ -611,7 +611,7 @@ public class GraphOfTheGrid
             try
             {
                 RNode rnode = grid.getRNode(x, y-1);
-                if (!rnode.isNulled() && !rnode.isIsle())
+                if (!rnode.isNulled() && !rnode.isAisle())
                 {
                     newCoords = x+","+(y-1);
                     break;
@@ -635,19 +635,19 @@ public class GraphOfTheGrid
      */
     public ArrayList<DistanceReturn> findClosestCellAndComputeDistanceIfIsleShapeIsArea(String start1, String isleID)
     {
-        Isle isle = grid.getIsleWithUnknownIG(isleID);
+        Aisle isle = grid.getAisleWithUnknownIG(isleID);
         if (isle == null)
             System.out.println("Isle not found");
 
         Coords startCoords = new Coords(start1);
 
         String start = start1;
-        if (grid.getRNode(startCoords.getX(), startCoords.getY()).isIsle())
+        if (grid.getRNode(startCoords.getX(), startCoords.getY()).isAisle())
             start = findNearestNonIsleCell(start1, startCoords.getX() ,startCoords.getY());
 
         ArrayList<String> listOfEnds = new ArrayList<>();
 
-        CellList.CellNode curr = isle.getIsleCellList().getFirst();
+        CellList.CellNode curr = isle.getAisleCellList().getFirst();
         while (curr != null)
         {
             //System.out.println("Finding path for: "+curr.getrNode().getX()+","+curr.getrNode().getY());
@@ -705,7 +705,7 @@ public class GraphOfTheGrid
             Coords endCoords = new Coords(end);
 
             String newEnd = null;
-            if (grid.getRNode(endCoords.getX(), endCoords.getY()).isIsle())
+            if (grid.getRNode(endCoords.getX(), endCoords.getY()).isAisle())
                 newEnd = findNearestNonIsleCell(start1, endCoords.getX() ,endCoords.getY());
             try
             {
@@ -751,7 +751,7 @@ public class GraphOfTheGrid
         }
         catch (NumberFormatException e)
         {
-            coords = grid.getIsleWithUnknownIG(coords1).getIsleCellList().getFirst().getrNode().getCoords();
+            coords = grid.getAisleWithUnknownIG(coords1).getAisleCellList().getFirst().getrNode().getCoords();
             System.out.println("Irregular coords for getting sector ("+coords1+"). Coords to use: "+coords.toString());
         }
 

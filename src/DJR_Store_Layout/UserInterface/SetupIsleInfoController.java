@@ -5,14 +5,11 @@
 
 package DJR_Store_Layout.UserInterface;
 
+import DJR_Store_Layout.GridData.Aisle;
 import DJR_Store_Layout.GridData.CellList;
 import DJR_Store_Layout.GridData.GridData3;
-import DJR_Store_Layout.GridData.Isle;
 import DJR_Store_Layout.HelperClasses.MyPopup;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -37,7 +34,7 @@ public class SetupIsleInfoController
     public Label endLabel;
     /** Data variables */
     private GridData3 g;
-    private Isle isle;
+    private Aisle aisle;
     private int numberOfIsleSections;
     private final Hashtable<Integer, Integer> numberOfSubsectionsForEachSection;
     private final ArrayList<TextField> subsectionTextfields, sectionNumberTextfields;
@@ -73,17 +70,17 @@ public class SetupIsleInfoController
      * @param s stage
      * @param isleLayoutController IsleLayoutController
      */
-    public void setImportantInfo(GridData3 grid, Isle i, Stage s, IsleLayoutController isleLayoutController)
+    public void setImportantInfo(GridData3 grid, Aisle i, Stage s, IsleLayoutController isleLayoutController)
     {
         g = grid;
-        isle = i;
+        aisle = i;
         stage = s;
         ilc = isleLayoutController;
 
         text0.setText(1+"");
-        text1.setText((isle.getNumberOfCellsInIsle()-1)+"");
+        text1.setText((aisle.getNumberOfCellsInAisle()-1)+"");
 
-        if (isle.getIsleGroup().getBackOrFloor().compareTo("back") == 0)
+        if (aisle.getAisleGroup().getBackOrFloor().compareTo("back") == 0)
         {
             vboxOfTexts.getChildren().removeAll(hbox0);
             vboxOfTexts.setPrefHeight(25);
@@ -93,10 +90,10 @@ public class SetupIsleInfoController
 
         stage.setOnCloseRequest(windowEvent ->
         {
-            CellList.CellNode curr = isle.getIsleCellList().getFirst();
+            CellList.CellNode curr = aisle.getAisleCellList().getFirst();
             while (curr != null)
             {
-                curr.getrNode().getR().setFill(isle.getIsleGroup().getColor());
+                curr.getrNode().getR().setFill(aisle.getAisleGroup().getColor());
                 curr = curr.getNext();
             }
         });
@@ -142,28 +139,28 @@ public class SetupIsleInfoController
     /** Called if isle info is already setup and someone wants to edit that info */
     public void editingInfo()
     {
-        ArrayList<Integer> isleSectionsInOrder = new ArrayList<>(isle.getNumberOfSubsectionsForEachSection().keySet());
+        ArrayList<Integer> isleSectionsInOrder = new ArrayList<>(aisle.getNumberOfSubsectionsForEachSection().keySet());
         Collections.sort(isleSectionsInOrder);
 
-        text0.setText(isle.getNumberOfSubsectionsForEachSection().get(0)+"");
-        text1.setText(isle.getNumberOfSubsectionsForEachSection().get(1)+"");
+        text0.setText(aisle.getNumberOfSubsectionsForEachSection().get(0)+"");
+        text1.setText(aisle.getNumberOfSubsectionsForEachSection().get(1)+"");
 
-        int numberOfAdditionalIsleSections = isle.getNumberOfIsleSections()-2;
+        int numberOfAdditionalIsleSections = aisle.getNumberOfAisleSections()-2;
         for (int i=0; i<numberOfAdditionalIsleSections; i++)
         {
             addSection();
             sectionNumberTextfields.get(i).setText(isleSectionsInOrder.get(i+2)+"");
-            subsectionTextfields.get(i+2).setText(isle.getNumberOfSubsectionsForEachSection().get(isleSectionsInOrder.get(i+2))+"");
+            subsectionTextfields.get(i+2).setText(aisle.getNumberOfSubsectionsForEachSection().get(isleSectionsInOrder.get(i+2))+"");
         }
 
-        choiceA.setValue(isle.getEndCapLocation());
-        choiceB.setValue(isle.getDirectionOfIncreasingIsleSections());
+        choiceA.setValue(aisle.getEndCapLocation());
+        choiceB.setValue(aisle.getDirectionOfIncreasingAisleSections());
     }
 
     /** Sets info of isle based on inputted info */
     public void done()
     {
-        if (isle.getIsleGroup().getBackOrFloor().compareTo("back") == 0)
+        if (aisle.getAisleGroup().getBackOrFloor().compareTo("back") == 0)
         {
             numberOfSubsectionsForEachSection.put(0, 1);
             numberOfSubsectionsForEachSection.put(1, Integer.parseInt(text1.getText()));
@@ -200,16 +197,16 @@ public class SetupIsleInfoController
             }
         }
 
-        if (isle.getIsleGroup().getBackOrFloor().compareTo("back") == 0)
+        if (aisle.getAisleGroup().getBackOrFloor().compareTo("back") == 0)
 
-            isle.setupIsleInfo(numberOfIsleSections, numberOfSubsectionsForEachSection, "none", choiceB.getValue().toString());
+            aisle.setupAisleInfo(numberOfIsleSections, numberOfSubsectionsForEachSection, "none", choiceB.getValue().toString());
         else
-            isle.setupIsleInfo(numberOfIsleSections, numberOfSubsectionsForEachSection, choiceA.getValue().toString(), choiceB.getValue().toString());
+            aisle.setupAisleInfo(numberOfIsleSections, numberOfSubsectionsForEachSection, choiceA.getValue().toString(), choiceB.getValue().toString());
 
-        CellList.CellNode curr = isle.getIsleCellList().getFirst();
+        CellList.CellNode curr = aisle.getAisleCellList().getFirst();
         while (curr != null)
         {
-            curr.getrNode().getR().setFill(isle.getIsleGroup().getColor());
+            curr.getrNode().getR().setFill(aisle.getAisleGroup().getColor());
             curr = curr.getNext();
         }
         stage.hide();

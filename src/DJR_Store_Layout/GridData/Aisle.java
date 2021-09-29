@@ -1,7 +1,7 @@
 /**
- * Isle class for retaining all information for an isle
- * This includes isle info pertaining to: isle sections and isle subsections
- * Also retrieves cell within isle corresponding to location string of an item
+ * Aisle class for retaining all information for an Aisle
+ * This includes Aisle info pertaining to: Aisle sections and Aisle subsections
+ * Also retrieves cell within Aisle corresponding to location string of an item
  * @author David Roberts
  */
 
@@ -14,103 +14,103 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Isle
+public class Aisle
 {
     private final GridData3 g;
-    private final String isleID;
-    private final IsleGroup isleGroup;
-    private CellList isleCellList;
-    private int numberOfIsleSections;
-    /** Input isle section, get number of subsections */
+    private final String AisleID;
+    private final AisleGroup AisleGroup;
+    private CellList AisleCellList;
+    private int numberOfAisleSections;
+    /** Input AAisle section, get number of subsections */
     private Hashtable<Integer, Integer> numberOfSubsectionsForEachSection;
     /** Given by north/south/east/west */
     private String endCapLocation;
     /** Given by up/down/left/right */
-    private String directionOfIncreasingIsleSections;
+    private String directionOfIncreasingAisleSections;
     private String shape;
 
     /**
      * Basic Constructor
-     * @param id id of isle
-     * @param ig isle group
+     * @param id id of Aisle
+     * @param ig Aisle group
      * @param grid grid data class
      */
-    public Isle(String id, IsleGroup ig, GridData3 grid)
+    public Aisle(String id, AisleGroup ig, GridData3 grid)
     {
-        isleID = id;
-        isleGroup = ig;
+        AisleID = id;
+        AisleGroup = ig;
         g = grid;
     }
 
-    public void setIsleCellList(CellList cl)
+    public void setAisleCellList(CellList cl)
     {
-        isleCellList = cl;
+        AisleCellList = cl;
         shape = findShape();
     }
 
-    public String getIsleID() {return isleID;}
+    public String getAisleID() {return AisleID;}
 
-    public IsleGroup getIsleGroup() {return isleGroup;}
+    public AisleGroup getAisleGroup() {return AisleGroup;}
 
-    public CellList getIsleCellList() {return isleCellList;}
+    public CellList getAisleCellList() {return AisleCellList;}
 
     /**
-     * Setups isle info for sections and subsections
-     * @param n number of isle sections
+     * Setups Aisle info for sections and subsections
+     * @param n number of Aisle sections
      * @param hashtable number of subsections for each section
      * @param endCap location
      * @param direction direction of increasing sections
      */
-    public void setupIsleInfo(int n, Hashtable<Integer, Integer> hashtable, String endCap, String direction)
+    public void setupAisleInfo(int n, Hashtable<Integer, Integer> hashtable, String endCap, String direction)
     {
-        numberOfIsleSections = n;
+        numberOfAisleSections = n;
         numberOfSubsectionsForEachSection = hashtable;
         endCapLocation = endCap;
-        directionOfIncreasingIsleSections = direction;
+        directionOfIncreasingAisleSections = direction;
     }
 
-    /** Prints to debug isle info */
+    /** Prints to debug Aisle info */
     public void printInfo()
     {
-        System.out.println("IsleID: "+isleID);
-        System.out.println("IsleGroup: "+isleGroup.getName());
-        System.out.println("Back or FLoor: "+isleGroup.getBackOrFloor());
+        System.out.println("AisleID: "+AisleID);
+        System.out.println("AisleGroup: "+AisleGroup.getName());
+        System.out.println("Back or FLoor: "+AisleGroup.getBackOrFloor());
         if (hasSetupInfo())
         {
             System.out.println("EndCap Location: "+endCapLocation);
-            System.out.println("Direction: "+directionOfIncreasingIsleSections);
-            System.out.println("Number Of Isle Sections: "+numberOfIsleSections);
-            numberOfSubsectionsForEachSection.keySet().forEach(i -> System.out.println("Isle Section "+i+" has "+numberOfSubsectionsForEachSection.get(i)+" subsections"));
+            System.out.println("Direction: "+directionOfIncreasingAisleSections);
+            System.out.println("Number Of Aisle Sections: "+numberOfAisleSections);
+            numberOfSubsectionsForEachSection.keySet().forEach(i -> System.out.println("Aisle Section "+i+" has "+numberOfSubsectionsForEachSection.get(i)+" subsections"));
         }
         else
-            System.out.println("Isle Info has not been setup");
+            System.out.println("Aisle Info has not been setup");
     }
 
-    public int getNumberOfIsleSections() {return numberOfIsleSections;}
+    public int getNumberOfAisleSections() {return numberOfAisleSections;}
 
     /**
-     * Finds cell within isle that corresponds to given item location in back
-     * @param isleSubsection isle subsection
+     * Finds cell within Aisle that corresponds to given item location in back
+     * @param AisleSubsection Aisle subsection
      * @return String of coords for cell
      */
-    public String getCoordsGivenLocationInBack(String isleSubsection)
+    public String getCoordsGivenLocationInBack(String AisleSubsection)
     {
-        if (getNumberOfCellsInIsle() == 1)
+        if (getNumberOfCellsInAisle() == 1)
         {
-            System.out.println("Returning only cell in isle");
-            return isleCellList.getFirst().getrNode().getX()+","+isleCellList.getFirst().getrNode().getY();
+            System.out.println("Returning only cell in Aisle");
+            return AisleCellList.getFirst().getrNode().getX()+","+AisleCellList.getFirst().getrNode().getY();
         }
 
         //"A" numeric value is 10 so if subsection is A then whatSubection = 1.
         //If subsection is B then whatSubsection = 2, and so on.
-        int whatSubsection = Character.getNumericValue(isleSubsection.charAt(0))-9;
+        int whatSubsection = Character.getNumericValue(AisleSubsection.charAt(0))-9;
 
-        //Testing if back isle is split
+        //Testing if back Aisle is split
         boolean split = false;
         String which = null;
-        if (directionOfIncreasingIsleSections.compareTo("up") == 0 || directionOfIncreasingIsleSections.compareTo("down") == 0)
+        if (directionOfIncreasingAisleSections.compareTo("up") == 0 || directionOfIncreasingAisleSections.compareTo("down") == 0)
         {
-            CellList.CellNode curr = isleCellList.getFirst();
+            CellList.CellNode curr = AisleCellList.getFirst();
             int x = curr.getrNode().getX();
             while (curr != null)
             {
@@ -129,9 +129,9 @@ public class Isle
                 curr = curr.getNext();
             }
         }
-        else if (directionOfIncreasingIsleSections.compareTo("right") == 0 || directionOfIncreasingIsleSections.compareTo("left") == 0)
+        else if (directionOfIncreasingAisleSections.compareTo("right") == 0 || directionOfIncreasingAisleSections.compareTo("left") == 0)
         {
-            CellList.CellNode curr = isleCellList.getFirst();
+            CellList.CellNode curr = AisleCellList.getFirst();
             int y = curr.getrNode().getY();
             while (curr != null)
             {
@@ -154,68 +154,68 @@ public class Isle
         if (split)
         {
             System.out.println("Returning from Section and Subsection Split");
-            return getIsleCoordsGivenSectionAndSubsectionSplit(whatSubsection, which);
+            return getAisleCoordsGivenSectionAndSubsectionSplit(whatSubsection, which);
         }
         else
         {
             System.out.println("Returning from Section and Subsection");
-            return getIsleCoordsGivenSectionAndSubsection(1, whatSubsection);
+            return getAisleCoordsGivenSectionAndSubsection(1, whatSubsection);
         }
     }
 
     /**
-     * Finds cell within isle that corresponds to given item location on floor
-     * @param isleSection isle sections
-     * @param isleSubsection isle subsection
+     * Finds cell within Aisle that corresponds to given item location on floor
+     * @param AisleSection Aisle sections
+     * @param AisleSubsection Aisle subsection
      * @return String of coords for cell
      */
-    public String getCoordsGivenLocationOnFloor(int isleSection, String isleSubsection)
+    public String getCoordsGivenLocationOnFloor(int AisleSection, String AisleSubsection)
     {
-        if (getNumberOfCellsInIsle() == 1)
+        if (getNumberOfCellsInAisle() == 1)
         {
-            System.out.println("Returning only cell in isle");
-            return isleCellList.getFirst().getrNode().getX()+","+isleCellList.getFirst().getrNode().getY();
+            System.out.println("Returning only cell in Aisle");
+            return AisleCellList.getFirst().getrNode().getX()+","+AisleCellList.getFirst().getrNode().getY();
         }
-        else if (isleSection == 0)
+        else if (AisleSection == 0)
         {
             System.out.println("Returning cuz at endcap");
-            return getIsleCoordsGivenEndcap(endCapLocation);
+            return getAisleCoordsGivenEndcap(endCapLocation);
         }
-        else if (isleSection > 50)
+        else if (AisleSection > 50)
         {
             System.out.println("Returning cuz at opposite endcap");
             if (endCapLocation.compareTo("west") == 0)
             {
-                return getIsleCoordsGivenEndcap("east");
+                return getAisleCoordsGivenEndcap("east");
             }
             if (endCapLocation.compareTo("south") == 0)
             {
-                return getIsleCoordsGivenEndcap("north");
+                return getAisleCoordsGivenEndcap("north");
             }
             if (endCapLocation.compareTo("east") == 0)
             {
-                return getIsleCoordsGivenEndcap("west");
+                return getAisleCoordsGivenEndcap("west");
             }
             if (endCapLocation.compareTo("north") == 0)
             {
-                return getIsleCoordsGivenEndcap("south");
+                return getAisleCoordsGivenEndcap("south");
             }
         }
         else
         {
             System.out.println("Returning using Section and Subsection");
-            return getIsleCoordsGivenSectionAndSubsection(isleSection, Integer.parseInt(isleSubsection));
+            return getAisleCoordsGivenSectionAndSubsection(AisleSection, Integer.parseInt(AisleSubsection));
         }
 
         return "getCoordsGivenLocationOnFloor didn't work";
     }
 
     /**
-     * Finds cell corresponding to isle end cap
+     * Finds cell corresponding to Aisle end cap
      * @param where location of endcap: north/east/south/west
      * @return String of coords for cell
      */
-    private String getIsleCoordsGivenEndcap(String where)
+    private String getAisleCoordsGivenEndcap(String where)
     {
         //System.out.println("Endcap where: "+where);
         CellList.CellNode nodeToReturnCoords = null;
@@ -224,7 +224,7 @@ public class Isle
         {
             int furthestYCoord = 0;
 
-            CellList.CellNode curr = isleCellList.getFirst();
+            CellList.CellNode curr = AisleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getY() > furthestYCoord)
@@ -234,16 +234,16 @@ public class Isle
                 }
                 curr = curr.getNext();
             }
-            if (cellIsPartOfIsle(nodeToReturnCoords.getrNode().getX()+","+nodeToReturnCoords.getrNode().getY()))
+            if (cellIsPartOfAisle(nodeToReturnCoords.getrNode().getX()+","+nodeToReturnCoords.getrNode().getY()))
                 return nodeToReturnCoords.getrNode().getX()+","+nodeToReturnCoords.getrNode().getY();
             else
-                throw new RuntimeException("getIsleCoordsGivenEndcap returned a cell not belonging to the isle using south");
+                throw new RuntimeException("getAisleCoordsGivenEndcap returned a cell not belonging to the Aisle using south");
         }
         if (where.compareTo("north") == 0)
         {
             int nearestYCoord = 10000000;
 
-            CellList.CellNode curr = isleCellList.getFirst();
+            CellList.CellNode curr = AisleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getY() < nearestYCoord)
@@ -253,16 +253,16 @@ public class Isle
                 }
                 curr = curr.getNext();
             }
-            if (cellIsPartOfIsle(nodeToReturnCoords.getrNode().getX()+","+nodeToReturnCoords.getrNode().getY()))
+            if (cellIsPartOfAisle(nodeToReturnCoords.getrNode().getX()+","+nodeToReturnCoords.getrNode().getY()))
                 return nodeToReturnCoords.getrNode().getX()+","+nodeToReturnCoords.getrNode().getY();
             else
-                throw new RuntimeException("getIsleCoordsGivenEndcap returned a cell not belonging to the isle using north");
+                throw new RuntimeException("getAisleCoordsGivenEndcap returned a cell not belonging to the Aisle using north");
         }
         if (where.compareTo("west") == 0)
         {
             int nearestXCoord = 10000000;
 
-            CellList.CellNode curr = isleCellList.getFirst();
+            CellList.CellNode curr = AisleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getX() < nearestXCoord)
@@ -272,16 +272,16 @@ public class Isle
                 }
                 curr = curr.getNext();
             }
-            if (cellIsPartOfIsle(nodeToReturnCoords.getrNode().getX()+","+nodeToReturnCoords.getrNode().getY()))
+            if (cellIsPartOfAisle(nodeToReturnCoords.getrNode().getX()+","+nodeToReturnCoords.getrNode().getY()))
                 return nodeToReturnCoords.getrNode().getX()+","+nodeToReturnCoords.getrNode().getY();
             else
-                throw new RuntimeException("getIsleCoordsGivenEndcap returned a cell not belonging to the isle using west");
+                throw new RuntimeException("getAisleCoordsGivenEndcap returned a cell not belonging to the Aisle using west");
         }
         if (where.compareTo("east") == 0)
         {
             int furthestXCoord = 0;
 
-            CellList.CellNode curr = isleCellList.getFirst();
+            CellList.CellNode curr = AisleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getX() > furthestXCoord)
@@ -291,18 +291,18 @@ public class Isle
                 }
                 curr = curr.getNext();
             }
-            if (cellIsPartOfIsle(nodeToReturnCoords.getrNode().getX()+","+nodeToReturnCoords.getrNode().getY()))
+            if (cellIsPartOfAisle(nodeToReturnCoords.getrNode().getX()+","+nodeToReturnCoords.getrNode().getY()))
                 return nodeToReturnCoords.getrNode().getX()+","+nodeToReturnCoords.getrNode().getY();
             else
-                throw new RuntimeException("getIsleCoordsGivenEndcap returned a cell not belonging to the isle using east");
+                throw new RuntimeException("getAisleCoordsGivenEndcap returned a cell not belonging to the Aisle using east");
         }
         return "Get Endcap Coord didnt work";
     }
 
-    /** @return total cell count in isle */
-    public int getNumberOfCellsInIsle()
+    /** @return total cell count in Aisle */
+    public int getNumberOfCellsInAisle()
     {
-        CellList.CellNode curr = isleCellList.getFirst();
+        CellList.CellNode curr = AisleCellList.getFirst();
         int numberOfCells = 0;
         while (curr != null)
         {
@@ -313,169 +313,169 @@ public class Isle
     }
 
     /**
-     * Finds cell within isle that corresponds to given item location
-     * This takes into account total subsections of isle and scales accordingly
+     * Finds cell within Aisle that corresponds to given item location
+     * This takes into account total subsections of Aisle and scales accordingly
      * @param whatSection section
      * @param whatSubsection subsection
      * @return String of coordinates for cell
      */
-    private String getIsleCoordsGivenSectionAndSubsection(int whatSection, int whatSubsection)
+    private String getAisleCoordsGivenSectionAndSubsection(int whatSection, int whatSubsection)
     {
-        System.out.println("Direction: "+directionOfIncreasingIsleSections);
+        System.out.println("Direction: "+directionOfIncreasingAisleSections);
 
-        if (directionOfIncreasingIsleSections.compareTo("right") == 0)
+        if (directionOfIncreasingAisleSections.compareTo("right") == 0)
         {
-            Coords coords = new Coords(getIsleCoordsGivenEndcap("west"));
+            Coords coords = new Coords(getAisleCoordsGivenEndcap("west"));
             int x = coords.getX();
             int y = coords.getY();
 
-            coords = new Coords(getIsleCoordsGivenEndcap("east"));
+            coords = new Coords(getAisleCoordsGivenEndcap("east"));
             int lastX = coords.getX();
 
-            int cellsInLineButNotInIsle = 0;
+            int cellsInLineButNotInAisle = 0;
             int tempX = x;
             while (tempX < lastX)
             {
-                if (!cellIsPartOfIsle(tempX+","+y))
-                    cellsInLineButNotInIsle++;
+                if (!cellIsPartOfAisle(tempX+","+y))
+                    cellsInLineButNotInAisle++;
                 tempX++;
             }
-            System.out.println("Cells missing from line: "+cellsInLineButNotInIsle);
+            System.out.println("Cells missing from line: "+cellsInLineButNotInAisle);
 
-            int whichSubsection = getWhichSubsectionInIsle(whatSection, whatSubsection);
+            int whichSubsection = getWhichSubsectionInAisle(whatSection, whatSubsection);
             System.out.println("whichSubsection: "+whichSubsection);
 
             int xToReturn = (int) (x+(getCellsToSubsection()*whichSubsection));
             if (endCapLocation.compareTo("west") != 0  && xToReturn != x)
                 xToReturn--;
 
-            if (cellsInLineButNotInIsle > 0)
-                xToReturn+=cellsInLineButNotInIsle;
+            if (cellsInLineButNotInAisle > 0)
+                xToReturn+=cellsInLineButNotInAisle;
 
-            if (cellIsPartOfIsle(xToReturn+","+y))
+            if (cellIsPartOfAisle(xToReturn+","+y))
                 return xToReturn+","+y;
             else
-                System.out.println("Returned cell "+xToReturn+","+y+" is not in isle "+isleID);
+                System.out.println("Returned cell "+xToReturn+","+y+" is not in Aisle "+AisleID);
         }
-        if (directionOfIncreasingIsleSections.compareTo("up") == 0)
+        if (directionOfIncreasingAisleSections.compareTo("up") == 0)
         {
-            Coords coords = new Coords(getIsleCoordsGivenEndcap("south"));
+            Coords coords = new Coords(getAisleCoordsGivenEndcap("south"));
             int x = coords.getX();
             int y = coords.getY();
 
-            coords = new Coords(getIsleCoordsGivenEndcap("north"));
+            coords = new Coords(getAisleCoordsGivenEndcap("north"));
             int lastY = coords.getY();
 
-            int cellsInLineButNotInIsle = 0;
+            int cellsInLineButNotInAisle = 0;
             int tempY = y;
             while (tempY > lastY)
             {
-                if (!cellIsPartOfIsle(x+","+tempY))
-                    cellsInLineButNotInIsle++;
+                if (!cellIsPartOfAisle(x+","+tempY))
+                    cellsInLineButNotInAisle++;
                 tempY--;
             }
-            System.out.println("Cells missing from line: "+cellsInLineButNotInIsle);
+            System.out.println("Cells missing from line: "+cellsInLineButNotInAisle);
 
-            int whichSubsection = getWhichSubsectionInIsle(whatSection, whatSubsection);
+            int whichSubsection = getWhichSubsectionInAisle(whatSection, whatSubsection);
             System.out.println("whichSubsection: "+whichSubsection);
 
             int yToReturn = (int) (y-(getCellsToSubsection()*whichSubsection));
             if (endCapLocation.compareTo("south") != 0 && yToReturn != y)
                 yToReturn++;
 
-            if (cellsInLineButNotInIsle > 0)
-                yToReturn-=cellsInLineButNotInIsle;
+            if (cellsInLineButNotInAisle > 0)
+                yToReturn-=cellsInLineButNotInAisle;
 
-            if (cellIsPartOfIsle(x+","+yToReturn))
+            if (cellIsPartOfAisle(x+","+yToReturn))
                 return x+","+yToReturn;
             else
-                System.out.println("Returned cell "+x+","+yToReturn+" is not in isle "+isleID);
+                System.out.println("Returned cell "+x+","+yToReturn+" is not in Aisle "+AisleID);
         }
-        if (directionOfIncreasingIsleSections.compareTo("left") == 0)
+        if (directionOfIncreasingAisleSections.compareTo("left") == 0)
         {
-            Coords coords = new Coords(getIsleCoordsGivenEndcap("east"));
+            Coords coords = new Coords(getAisleCoordsGivenEndcap("east"));
             int x = coords.getX();
             int y = coords.getY();
 
-            coords = new Coords(getIsleCoordsGivenEndcap("west"));
+            coords = new Coords(getAisleCoordsGivenEndcap("west"));
             int lastX = coords.getX();
 
-            int cellsInLineButNotInIsle = 0;
+            int cellsInLineButNotInAisle = 0;
             int tempX = x;
             while (tempX > lastX)
             {
-                if (!cellIsPartOfIsle(tempX+","+y))
-                    cellsInLineButNotInIsle++;
+                if (!cellIsPartOfAisle(tempX+","+y))
+                    cellsInLineButNotInAisle++;
                 tempX--;
             }
-            System.out.println("Cells missing from line: "+cellsInLineButNotInIsle);
+            System.out.println("Cells missing from line: "+cellsInLineButNotInAisle);
 
-            int whichSubsection = getWhichSubsectionInIsle(whatSection, whatSubsection);
+            int whichSubsection = getWhichSubsectionInAisle(whatSection, whatSubsection);
             System.out.println("whichSubsection: "+whichSubsection);
 
             int xToReturn = (int) (x-(getCellsToSubsection()*whichSubsection));
             if (endCapLocation.compareTo("east") != 0 && xToReturn != x)
                 xToReturn++;
 
-            if (cellsInLineButNotInIsle > 0)
-                xToReturn-=cellsInLineButNotInIsle;
+            if (cellsInLineButNotInAisle > 0)
+                xToReturn-=cellsInLineButNotInAisle;
 
-            if (cellIsPartOfIsle(xToReturn+","+y))
+            if (cellIsPartOfAisle(xToReturn+","+y))
                 return xToReturn+","+y;
             else
-                System.out.println("Returned cell "+xToReturn+","+y+" is not in isle "+isleID);
+                System.out.println("Returned cell "+xToReturn+","+y+" is not in Aisle "+AisleID);
         }
-        if (directionOfIncreasingIsleSections.compareTo("down") == 0)
+        if (directionOfIncreasingAisleSections.compareTo("down") == 0)
         {
-            Coords coords = new Coords(getIsleCoordsGivenEndcap("north"));
+            Coords coords = new Coords(getAisleCoordsGivenEndcap("north"));
             int x = coords.getX();
             int y = coords.getY();
             
-            coords = new Coords(getIsleCoordsGivenEndcap("south"));
+            coords = new Coords(getAisleCoordsGivenEndcap("south"));
             int lastY = coords.getY();
 
-            int cellsInLineButNotInIsle = 0;
+            int cellsInLineButNotInAisle = 0;
             int tempY = y;
             while (tempY < lastY)
             {
-                if (!cellIsPartOfIsle(x+","+tempY))
-                    cellsInLineButNotInIsle++;
+                if (!cellIsPartOfAisle(x+","+tempY))
+                    cellsInLineButNotInAisle++;
                 tempY++;
             }
-            System.out.println("Cells missing from line: "+cellsInLineButNotInIsle);
+            System.out.println("Cells missing from line: "+cellsInLineButNotInAisle);
 
-            int whichSubsection = getWhichSubsectionInIsle(whatSection, whatSubsection);
+            int whichSubsection = getWhichSubsectionInAisle(whatSection, whatSubsection);
             System.out.println("whichSubsection: "+whichSubsection);
 
             int yToReturn = (int) (y+(getCellsToSubsection()*whichSubsection));
             if (endCapLocation.compareTo("north") != 0 && yToReturn != y)
                 yToReturn--;
 
-            if (cellsInLineButNotInIsle > 0)
-                yToReturn+=cellsInLineButNotInIsle;
+            if (cellsInLineButNotInAisle > 0)
+                yToReturn+=cellsInLineButNotInAisle;
 
-            if (cellIsPartOfIsle(x+","+yToReturn))
+            if (cellIsPartOfAisle(x+","+yToReturn))
                 return x+","+yToReturn;
             else
-                System.out.println("Returned cell "+x+","+yToReturn+" is not in isle "+isleID);
+                System.out.println("Returned cell "+x+","+yToReturn+" is not in Aisle "+AisleID);
         }
 
         return "Get Subsection Coord didnt work";
     }
 
     /**
-     * For isles in back (01A) that are split and have two sides
+     * For Aisles in back (01A) that are split and have two sides
      * @param whatSubsection section
-     * @param which top or bottom or right or left side of isle
+     * @param which top or bottom or right or left side of Aisle
      * @return String of coordinates for cell
      */
-    private String getIsleCoordsGivenSectionAndSubsectionSplit(int whatSubsection, String which)
+    private String getAisleCoordsGivenSectionAndSubsectionSplit(int whatSubsection, String which)
     {
         System.out.println("Which Side of Split: "+which);
 
-        if (directionOfIncreasingIsleSections.compareTo("right") == 0)
+        if (directionOfIncreasingAisleSections.compareTo("right") == 0)
         {
-            Coords coords = new Coords(getIsleCoordsGivenEndcapSplit("west", which));
+            Coords coords = new Coords(getAisleCoordsGivenEndcapSplit("west", which));
             System.out.println("Starting: "+coords);
             int x = coords.getX();
             int y = coords.getY();
@@ -486,9 +486,9 @@ public class Isle
 
             return xToReturn+","+y;
         }
-        if (directionOfIncreasingIsleSections.compareTo("up") == 0)
+        if (directionOfIncreasingAisleSections.compareTo("up") == 0)
         {
-            Coords coords = new Coords(getIsleCoordsGivenEndcapSplit("south", which));
+            Coords coords = new Coords(getAisleCoordsGivenEndcapSplit("south", which));
             int x = coords.getX();
             int y = coords.getY();
 
@@ -498,9 +498,9 @@ public class Isle
 
             return x+","+yToReturn;
         }
-        if (directionOfIncreasingIsleSections.compareTo("left") == 0)
+        if (directionOfIncreasingAisleSections.compareTo("left") == 0)
         {
-            Coords coords = new Coords(getIsleCoordsGivenEndcapSplit("east", which));
+            Coords coords = new Coords(getAisleCoordsGivenEndcapSplit("east", which));
             int x = coords.getX();
             int y = coords.getY();
 
@@ -510,9 +510,9 @@ public class Isle
 
             return xToReturn+","+y;
         }
-        if (directionOfIncreasingIsleSections.compareTo("down") == 0)
+        if (directionOfIncreasingAisleSections.compareTo("down") == 0)
         {
-            Coords coords = new Coords(getIsleCoordsGivenEndcapSplit("north", which));
+            Coords coords = new Coords(getAisleCoordsGivenEndcapSplit("north", which));
             int x = coords.getX();
             int y = coords.getY();
 
@@ -527,12 +527,12 @@ public class Isle
     }
 
     /**
-     * For isles in back (01A) that are split and have two sides
+     * For Aisles in back (01A) that are split and have two sides
      * @param where north/south/east/west
-     * @param which top or bottom or right or left side of isle
+     * @param which top or bottom or right or left side of Aisle
      * @return String of coordinates for cell
      */
-    private String getIsleCoordsGivenEndcapSplit(String where, String which)
+    private String getAisleCoordsGivenEndcapSplit(String where, String which)
     {
         CellList.CellNode nodeToReturnCoords = null;
 
@@ -541,7 +541,7 @@ public class Isle
             int xCoord1 = 0;
             int xCoord2 = 0;
 
-            CellList.CellNode curr = isleCellList.getFirst();
+            CellList.CellNode curr = AisleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getX() != xCoord1)
@@ -551,7 +551,7 @@ public class Isle
                 }
                 curr = curr.getNext();
             }
-            curr = isleCellList.getFirst();
+            curr = AisleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getX() != xCoord2 && curr.getrNode().getX() != xCoord1)
@@ -584,7 +584,7 @@ public class Isle
 
             int furthestYCoord = 0;
 
-            curr = isleCellList.getFirst();
+            curr = AisleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getY() > furthestYCoord)
@@ -601,7 +601,7 @@ public class Isle
             int xCoord1 = 0;
             int xCoord2 = 0;
 
-            CellList.CellNode curr = isleCellList.getFirst();
+            CellList.CellNode curr = AisleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getX() != xCoord1)
@@ -611,7 +611,7 @@ public class Isle
                 }
                 curr = curr.getNext();
             }
-            curr = isleCellList.getFirst();
+            curr = AisleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getX() != xCoord2 && curr.getrNode().getX() != xCoord1)
@@ -644,7 +644,7 @@ public class Isle
 
             int nearestYCoord = 10000000;
 
-            curr = isleCellList.getFirst();
+            curr = AisleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getY() < nearestYCoord)
@@ -661,7 +661,7 @@ public class Isle
             int yCoord1 = 0;
             int yCoord2 = 0;
 
-            CellList.CellNode curr = isleCellList.getFirst();
+            CellList.CellNode curr = AisleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getY() != yCoord1)
@@ -671,7 +671,7 @@ public class Isle
                 }
                 curr = curr.getNext();
             }
-            curr = isleCellList.getFirst();
+            curr = AisleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getY() != yCoord2 && curr.getrNode().getY() != yCoord1)
@@ -704,7 +704,7 @@ public class Isle
 
             int nearestXCoord = 10000000;
 
-            curr = isleCellList.getFirst();
+            curr = AisleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getX() < nearestXCoord)
@@ -721,7 +721,7 @@ public class Isle
             int yCoord1 = 0;
             int yCoord2 = 0;
 
-            CellList.CellNode curr = isleCellList.getFirst();
+            CellList.CellNode curr = AisleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getY() != yCoord1)
@@ -731,7 +731,7 @@ public class Isle
                 }
                 curr = curr.getNext();
             }
-            curr = isleCellList.getFirst();
+            curr = AisleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getY() != yCoord2 && curr.getrNode().getY() != yCoord1)
@@ -764,7 +764,7 @@ public class Isle
 
             int furthestXCoord = 0;
 
-            curr = isleCellList.getFirst();
+            curr = AisleCellList.getFirst();
             while (curr != null)
             {
                 if (curr.getrNode().getX() > furthestXCoord)
@@ -779,7 +779,7 @@ public class Isle
         return "Get Endcap Coord Split didnt work";
     }
 
-    /** @return ratio of cells coorsponding to one isle subsection */
+    /** @return ratio of cells coorsponding to one Aisle subsection */
     public float getCellsToSubsection()
     {
         int totalSubsections = 0;
@@ -791,7 +791,7 @@ public class Isle
             }
         }
 
-        return (float) (getNumberOfCellsInIsle()-1)/totalSubsections;
+        return (float) (getNumberOfCellsInAisle()-1)/totalSubsections;
     }
 
     /**
@@ -800,7 +800,7 @@ public class Isle
      * @param whatSubsection subsection
      * @return which subsection in sequential order
      */
-    public int getWhichSubsectionInIsle(int whatSection, int whatSubsection)
+    public int getWhichSubsectionInAisle(int whatSection, int whatSubsection)
     {
         List<Integer> list = numberOfSubsectionsForEachSection.keySet().stream().sorted().collect(Collectors.toList());
         int whichSubsection = 0;
@@ -819,27 +819,27 @@ public class Isle
 
     public String getEndCapLocation() {return endCapLocation;}
 
-    public String getDirectionOfIncreasingIsleSections() {return directionOfIncreasingIsleSections;}
+    public String getDirectionOfIncreasingAisleSections() {return directionOfIncreasingAisleSections;}
 
-    public boolean hasSetupInfo() {return numberOfIsleSections > 0;}
+    public boolean hasSetupInfo() {return numberOfAisleSections > 0;}
 
     public Hashtable<Integer, Integer> getNumberOfSubsectionsForEachSection() {return numberOfSubsectionsForEachSection;}
 
     public String getShape() {return shape;}
 
     /**
-     * For determining if given item location on floor is valid for isle
-     * @param isleSection section
-     * @param isleSubsection subsection
+     * For determining if given item location on floor is valid for Aisle
+     * @param AisleSection section
+     * @param AisleSubsection subsection
      * @return true if valid, false if invalid
      */
-    public boolean inputingValidIsleLocationOnFloor(int isleSection, String isleSubsection)
+    public boolean inputingValidAisleLocationOnFloor(int AisleSection, String AisleSubsection)
     {
         try
         {
-            int subsectionsInSection = numberOfSubsectionsForEachSection.get(isleSection);
+            int subsectionsInSection = numberOfSubsectionsForEachSection.get(AisleSection);
 
-            return 0 <= Integer.parseInt(isleSubsection) && Integer.parseInt(isleSubsection) <= subsectionsInSection;
+            return 0 <= Integer.parseInt(AisleSubsection) && Integer.parseInt(AisleSubsection) <= subsectionsInSection;
         }
         catch (NullPointerException e)
         {
@@ -848,20 +848,20 @@ public class Isle
     }
 
     /**
-     * For determining if given item location in back is valid for isle
-     * @param isleSubsection letter of subsection
+     * For determining if given item location in back is valid for Aisle
+     * @param AisleSubsection letter of subsection
      * @return true if valid, false if invalid
      */
-    public boolean inputingValidIsleLocationInBack(String isleSubsection)
+    public boolean inputingValidAisleLocationInBack(String AisleSubsection)
     {
-        int whatSubsection = Character.getNumericValue(isleSubsection.charAt(0))-9;
+        int whatSubsection = Character.getNumericValue(AisleSubsection.charAt(0))-9;
 
         return (whatSubsection <= numberOfSubsectionsForEachSection.get(1));
     }
 
     /**
-     * To be honest, idk why this is here. The shape quality of an isle isn't used.
-     * Finds shape of isle given cellList
+     * To be honest, idk why this is here. The shape quality of an Aisle isn't used.
+     * Finds shape of Aisle given cellList
      * @return straight/diagonal/area
      */
     private String findShape()
@@ -870,13 +870,13 @@ public class Isle
         To return:
         "straight"
         "diagonal"
-        "area" - isles that have little to no location differentiation and are not straight or diagonal.
-        Ex: clothes sections where locations change often, island isles that float around the store and are small, produce (bananas) isles where there is no locations
+        "area" - Aisles that have little to no location differentiation and are not straight or diagonal.
+        Ex: clothes sections where locations change often, island Aisles that float around the store and are small, produce (bananas) Aisles where there is no locations
          */
         ArrayList<Integer> xCoords = new ArrayList<>();
         ArrayList<Integer> yCoords = new ArrayList<>();
 
-        CellList.CellNode curr = isleCellList.getFirst();
+        CellList.CellNode curr = AisleCellList.getFirst();
         while (curr != null)
         {
             xCoords.add(curr.getrNode().getX());
@@ -902,26 +902,26 @@ public class Isle
         if (xChange == 0 ^ yChange == 0)
             return "straight";
 
-        if (xChange == 1 && isleGroup.getBackOrFloor().compareTo("back") == 0)
+        if (xChange == 1 && AisleGroup.getBackOrFloor().compareTo("back") == 0)
             return "straight";
 
-        if (yChange == 1 && isleGroup.getBackOrFloor().compareTo("back") == 0)
+        if (yChange == 1 && AisleGroup.getBackOrFloor().compareTo("back") == 0)
             return "straight";
 
-        if (xChange == yChange && yChange == getNumberOfCellsInIsle())
+        if (xChange == yChange && yChange == getNumberOfCellsInAisle())
             return "diagonal";
 
         return "area";
     }
 
-    /** @return true if coordinate are part of isle, false if not */
-    public boolean cellIsPartOfIsle(String s)
+    /** @return true if coordinate are part of Aisle, false if not */
+    public boolean cellIsPartOfAisle(String s)
     {
         Coords coords = new Coords(s);
 
         try
         {
-            return g.getRNode(coords.getX(), coords.getY()).getIsle().getIsleID().compareTo(isleID) == 0;
+            return g.getRNode(coords.getX(), coords.getY()).getAisle().getAisleID().compareTo(AisleID) == 0;
         }
         catch (NullPointerException e)
         {

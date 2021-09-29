@@ -17,8 +17,8 @@ public class RNode
     /** Screen bounds of rectangle */
     private double sXMinCoord, sYMinCoord, sXMaxCoord, sYMaxCoord;
     private boolean highlighted, isIsle, nulled, beingMoved;
-    private Isle isle;
-    private IsleGroup isleGroup;
+    private Aisle aisle;
+    private AisleGroup aisleGroup;
     private Color color;
     private final GridData3 grid;
 
@@ -52,18 +52,18 @@ public class RNode
         }
     }
 
-    public boolean isIsle() {return isIsle;}
+    public boolean isAisle() {return isIsle;}
 
     public Color getColor() {return color;}
 
-    public void setIsled(boolean hmm, Isle i, Color c, IsleGroup ig)
+    public void setAisled(boolean hmm, Aisle a, Color c, AisleGroup ig)
     {
         if (hmm)
         {
             color = c;
             isIsle = hmm;
-            isle = i;
-            isleGroup = ig;
+            aisle = a;
+            aisleGroup = ig;
             setHighlighted(false);
             r.setFill(c);
             r.setStroke(c);
@@ -73,8 +73,8 @@ public class RNode
         {
             color = null;
             isIsle = hmm;
-            isle = null;
-            isleGroup = null;
+            aisle = null;
+            aisleGroup = null;
             setHighlighted(false);
             r.setFill(Color.TRANSPARENT);
             r.setStroke(Color.TRANSPARENT);
@@ -84,7 +84,7 @@ public class RNode
 
     public Rectangle getR() {return r;}
 
-    public Isle getIsle() {return isle;}
+    public Aisle getAisle() {return aisle;}
 
     public int getX() {return xCoord;}
 
@@ -111,7 +111,7 @@ public class RNode
 
     public boolean isNulled() {return nulled;}
 
-    public void setIsleIsBeingMoved(boolean hmm, Color c)
+    public void setAisleIsBeingMoved(boolean hmm, Color c)
     {
         if (hmm)
         {

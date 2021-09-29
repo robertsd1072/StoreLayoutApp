@@ -8,7 +8,7 @@
 package DJR_Store_Layout.GridData;
 
 import DJR_Store_Layout.HelperClasses.Coords;
-import DJR_Store_Layout.HelperClasses.InfoToMakeIsleFromFile;
+import DJR_Store_Layout.HelperClasses.InfoToMakeAisleFromFile;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
@@ -35,15 +35,15 @@ public class GridData3 {
     private final PNode[][] plusGrid;
     /** plus dimensions */
     private int sizeOfPluses;
-    /** list of Isle Groups */
-    private Hashtable<String, IsleGroup> isleGroupList;
+    /** list of Aisle Groups */
+    private Hashtable<String, AisleGroup> aisleGroupList;
     /** LinkedLists of highlighted cells in grid */
     private CellList highlightedList, highlightedNullList;
     /** Hashtable of null cells */
     private Hashtable<String, RNode> nullList;
     /** Length of highlighted area on x and y axis */
     private int highlightingXLength, highlightingYLength;
-    /** List of cells for moving an isle */
+    /** List of cells for moving an Aisle */
     private CellList toMoveList;
     /** Cell coordinate corresponding to mouse on screen */
     private int xCoordOfMouseOnGrid, yCoordOfMouseOnGrid;
@@ -70,7 +70,7 @@ public class GridData3 {
         plusGrid = new PNode[cols-1][rows-1];
         sizeOfPluses = 0;
         limitOfPluses = 0;
-        isleGroupList = new Hashtable<>();
+        aisleGroupList = new Hashtable<>();
         highlightedList = new CellList();
         screenX = x;
         screenY = y;
@@ -105,7 +105,7 @@ public class GridData3 {
             size = 0;
             colSize = cols;
             rowSize = rows;
-            isleGroupList = new Hashtable<>();
+            aisleGroupList = new Hashtable<>();
             nullList = new Hashtable<>();
             highlightedList = new CellList();
 
@@ -126,26 +126,26 @@ public class GridData3 {
                     String backOrFloor = scanner.nextLine();
 
                     String nextLine = scanner.nextLine();
-                    int numberOfIsles = Integer.parseInt(nextLine);
-                    //System.out.println("numberOfIsles: "+numberOfIsles);
-                    for (int i=0; i<numberOfIsles; i++)
+                    int numberOfAisles = Integer.parseInt(nextLine);
+                    //System.out.println("numberOfAisles: "+numberOfAisles);
+                    for (int i=0; i<numberOfAisles; i++)
                     {
-                        String isleID = scanner.nextLine();
-                        //System.out.println("isleID: "+isleID);
-                        String isleInfo = scanner.nextLine();
-                        InfoToMakeIsleFromFile isleToMake = null;
-                        if (isleInfo.compareTo("Has Setup Info") == 0)
+                        String AisleID = scanner.nextLine();
+                        //System.out.println("AisleID: "+AisleID);
+                        String AisleInfo = scanner.nextLine();
+                        InfoToMakeAisleFromFile aisleToMake = null;
+                        if (AisleInfo.compareTo("Has Setup Info") == 0)
                         {
                             String s = scanner.nextLine();
-                            int numberOfIsleSections = Integer.parseInt(s);
-                            //System.out.println(numberOfIsleSections);
+                            int numberOfAisleSections = Integer.parseInt(s);
+                            //System.out.println(numberOfAisleSections);
                             String subsectionsPerSection = scanner.nextLine();
                             //System.out.println(subsectionsPerSection);
                             String endCap = scanner.nextLine();
                             //System.out.println(endCap);
                             String direction = scanner.nextLine();
                             //System.out.println(direction);
-                            isleToMake = new InfoToMakeIsleFromFile(numberOfIsleSections, subsectionsPerSection, endCap, direction);
+                            aisleToMake = new InfoToMakeAisleFromFile(numberOfAisleSections, subsectionsPerSection, endCap, direction);
                         }
 
                         String cells = scanner.nextLine();
@@ -157,25 +157,25 @@ public class GridData3 {
                             grid[coords.getX()][coords.getY()].setHighlighted(true);
                         }
 
-                        if (isleGroupExists(groupName))
+                        if (aisleGroupExists(groupName))
                         {
-                            makeIsle(isleID, groupName, null, isleGroupList.get(groupName), true, backOrFloor);
-                            //System.out.println("Made isle: "+isleID+" w/ addingToExisting: true");
+                            makeAisle(AisleID, groupName, null, aisleGroupList.get(groupName), true, backOrFloor);
+                            //System.out.println("Made Aisle: "+AisleID+" w/ addingToExisting: true");
                         }
                         else
                         {
-                            makeIsle(isleID, groupName, null, null, false, backOrFloor);
-                            //System.out.println("Made isle: "+isleID+" w/ addingToExisting: false");
+                            makeAisle(AisleID, groupName, null, null, false, backOrFloor);
+                            //System.out.println("Made Aisle: "+AisleID+" w/ addingToExisting: false");
                         }
 
-                        if (isleToMake != null)
+                        if (aisleToMake != null)
                         {
-                            String[] sections = isleToMake.getNumberOfSubsectionsForEachSection().split(",");
+                            String[] sections = aisleToMake.getNumberOfSubsectionsForEachSection().split(",");
                             Hashtable<Integer, Integer> table = new Hashtable<>();
                             Arrays.stream(sections).forEach(e -> table.put(Integer.parseInt(e.split("-")[0]), Integer.parseInt(e.split("-")[1])));
 
-                            getIsle(isleID, groupName).setupIsleInfo(isleToMake.getNumberOfIsleSections(), table, isleToMake.getEndCapLocation(),
-                                    isleToMake.getDirectionOfIncreasingIsleSections());
+                            getAisle(AisleID, groupName).setupAisleInfo(aisleToMake.getNumberOfAisleSections(), table, aisleToMake.getEndCapLocation(),
+                                    aisleToMake.getDirectionOfIncreasingAisleSections());
                         }
                     }
                 }
@@ -357,10 +357,10 @@ public class GridData3 {
         {
             for (int j=0; j<colSize; j++)
             {
-                grid[j][i].setIsled(false, null, null, null);
+                grid[j][i].setAisled(false, null, null, null);
             }
         }
-        isleGroupList.clear();
+        aisleGroupList.clear();
     }
 
     /**
@@ -383,7 +383,7 @@ public class GridData3 {
                 {
                     try
                     {
-                        if (!grid[xCoord-i][yCoord-j].isIsle() && !grid[xCoord-i][yCoord-j].isNulled() && !nodeIsPickPoint(xCoord-i, yCoord-j))
+                        if (!grid[xCoord-i][yCoord-j].isAisle() && !grid[xCoord-i][yCoord-j].isNulled() && !nodeIsPickPoint(xCoord-i, yCoord-j))
                             grid[xCoord-i][yCoord-j].setHighlighted(true);
                     }
                     catch (IndexOutOfBoundsException ignored) {}
@@ -401,7 +401,7 @@ public class GridData3 {
                 {
                     try
                     {
-                        if (!grid[xCoord-i][yCoord+j].isIsle() && !grid[xCoord-i][yCoord+j].isNulled() && !nodeIsPickPoint(xCoord-i, yCoord+j))
+                        if (!grid[xCoord-i][yCoord+j].isAisle() && !grid[xCoord-i][yCoord+j].isNulled() && !nodeIsPickPoint(xCoord-i, yCoord+j))
                             grid[xCoord-i][yCoord+j].setHighlighted(true);
                     }
                     catch (IndexOutOfBoundsException ignored) {}
@@ -419,7 +419,7 @@ public class GridData3 {
                 {
                     try
                     {
-                        if (!grid[xCoord+i][yCoord-j].isIsle() && !grid[xCoord+i][yCoord-j].isNulled() && !nodeIsPickPoint(xCoord+i, yCoord-j))
+                        if (!grid[xCoord+i][yCoord-j].isAisle() && !grid[xCoord+i][yCoord-j].isNulled() && !nodeIsPickPoint(xCoord+i, yCoord-j))
                             grid[xCoord+i][yCoord-j].setHighlighted(true);
                     }
                     catch (IndexOutOfBoundsException ignored) {}
@@ -437,7 +437,7 @@ public class GridData3 {
                 {
                     try
                     {
-                        if (!grid[xCoord+i][yCoord+j].isIsle() && !grid[xCoord+i][yCoord+j].isNulled() && !nodeIsPickPoint(xCoord+i, yCoord+j))
+                        if (!grid[xCoord+i][yCoord+j].isAisle() && !grid[xCoord+i][yCoord+j].isNulled() && !nodeIsPickPoint(xCoord+i, yCoord+j))
                             grid[xCoord+i][yCoord+j].setHighlighted(true);
                     }
                     catch (IndexOutOfBoundsException ignored) {}
@@ -495,12 +495,12 @@ public class GridData3 {
     }
 
     /**
-     * @param isle of interest
+     * @param Aisle of interest
      * @return southeastmost RNode
      */
-    public RNode getSoutheastMostIsleCell(Isle isle)
+    public RNode getSoutheastMostAisleCell(Aisle Aisle)
     {
-        CellList.CellNode curr = isle.getIsleCellList().getFirst();
+        CellList.CellNode curr = Aisle.getAisleCellList().getFirst();
 
         int biggestX = curr.getrNode().getX();
         int biggestY = curr.getrNode().getY();
@@ -574,85 +574,85 @@ public class GridData3 {
     }
 
     /**
-     * Creates new isle given highlighted area
-     * @param isleID id of isle
-     * @param igName isle group name
+     * Creates new Aisle given highlighted area
+     * @param AisleID id of Aisle
+     * @param igName Aisle group name
      * @param c color
-     * @param isleGroup isle group
-     * @param addToIsleGroup true: adding to existing isle group, false: creating new isle group
-     * @param backOrFloor if isle is in back or on the floor
+     * @param aisleGroup Aisle group
+     * @param addToAisleGroup true: adding to existing Aisle group, false: creating new Aisle group
+     * @param backOrFloor if Aisle is in back or on the floor
      */
-    public void makeIsle(String isleID, String igName, Color c, IsleGroup isleGroup, boolean addToIsleGroup, String backOrFloor)
+    public void makeAisle(String AisleID, String igName, Color c, AisleGroup aisleGroup, boolean addToAisleGroup, String backOrFloor)
     {
-        if (!addToIsleGroup)
+        if (!addToAisleGroup)
         {
-            CellList isleGroupCellList = new CellList();
-            IsleGroup igNew = new IsleGroup(igName, c);
+            CellList AisleGroupCellList = new CellList();
+            AisleGroup igNew = new AisleGroup(igName, c);
 
-            CellList isleCellList = new CellList();
-            Isle newIsle = new Isle(isleID, igNew, this);
+            CellList AisleCellList = new CellList();
+            Aisle newAisle = new Aisle(AisleID, igNew, this);
 
             CellList.CellNode curr = highlightedList.getFirst();
             while (curr != null)
             {
-                grid[curr.getrNode().getX()][curr.getrNode().getY()].setIsled(true, newIsle, c, igNew);
-                isleGroupCellList.add(grid[curr.getrNode().getX()][curr.getrNode().getY()]);
-                isleCellList.add(grid[curr.getrNode().getX()][curr.getrNode().getY()]);
+                grid[curr.getrNode().getX()][curr.getrNode().getY()].setAisled(true, newAisle, c, igNew);
+                AisleGroupCellList.add(grid[curr.getrNode().getX()][curr.getrNode().getY()]);
+                AisleCellList.add(grid[curr.getrNode().getX()][curr.getrNode().getY()]);
 
                 curr = curr.getNext();
             }
 
-            igNew.setIsleGroupCellList(isleGroupCellList);
-            newIsle.setIsleCellList(isleCellList);
+            igNew.setAisleGroupCellList(AisleGroupCellList);
+            newAisle.setAisleCellList(AisleCellList);
 
-            igNew.addNewID(isleID, newIsle);
+            igNew.addNewID(AisleID, newAisle);
             igNew.setBackOrFloor(backOrFloor);
 
-            isleGroupList.put(igName, igNew);
+            aisleGroupList.put(igName, igNew);
             highlightedList.clear();
         }
         else
         {
-            CellList isleGroupCellList = isleGroup.getIsleGroupCellList();
+            CellList AisleGroupCellList = aisleGroup.getAisleGroupCellList();
 
-            CellList isleCellList = new CellList();
-            Isle newIsle = new Isle(isleID, isleGroup, this);
+            CellList AisleCellList = new CellList();
+            Aisle newAisle = new Aisle(AisleID, aisleGroup, this);
 
             CellList.CellNode curr = highlightedList.getFirst();
             while (curr != null)
             {
-                grid[curr.getrNode().getX()][curr.getrNode().getY()].setIsled(true, newIsle, c, isleGroup);
-                isleGroupCellList.add(grid[curr.getrNode().getX()][curr.getrNode().getY()]);
-                isleCellList.add(grid[curr.getrNode().getX()][curr.getrNode().getY()]);
+                grid[curr.getrNode().getX()][curr.getrNode().getY()].setAisled(true, newAisle, c, aisleGroup);
+                AisleGroupCellList.add(grid[curr.getrNode().getX()][curr.getrNode().getY()]);
+                AisleCellList.add(grid[curr.getrNode().getX()][curr.getrNode().getY()]);
 
                 curr = curr.getNext();
             }
 
-            newIsle.setIsleCellList(isleCellList);
+            newAisle.setAisleCellList(AisleCellList);
 
-            isleGroup.addNewID(isleID, newIsle);
+            aisleGroup.addNewID(AisleID, newAisle);
 
             highlightedList.clear();
         }
     }
 
     /**
-     * Adds new highlighted area to existing isle
-     * @param isleID id of isle
+     * Adds new highlighted area to existing Aisle
+     * @param AisleID id of Aisle
      * @param c color
-     * @param isleGroup isle group
+     * @param aisleGroup Aisle group
      */
-    public void addNewToExistingIsle(String isleID, Color c, IsleGroup isleGroup)
+    public void addNewToExistingAisle(String AisleID, Color c, AisleGroup aisleGroup)
     {
-        CellList isleGroupCellList = isleGroup.getIsleGroupCellList();
-        CellList isleCellList = isleGroup.getIsleIDList().get(isleID).getIsleCellList();
+        CellList AisleGroupCellList = aisleGroup.getAisleGroupCellList();
+        CellList AisleCellList = aisleGroup.getAisleIDList().get(AisleID).getAisleCellList();
 
         CellList.CellNode curr = highlightedList.getFirst();
         while (curr != null)
         {
-            grid[curr.getrNode().getX()][curr.getrNode().getY()].setIsled(true, isleGroup.getIsleIDList().get(isleID), c, isleGroup);
-            isleGroupCellList.add(grid[curr.getrNode().getX()][curr.getrNode().getY()]);
-            isleCellList.add(grid[curr.getrNode().getX()][curr.getrNode().getY()]);
+            grid[curr.getrNode().getX()][curr.getrNode().getY()].setAisled(true, aisleGroup.getAisleIDList().get(AisleID), c, aisleGroup);
+            AisleGroupCellList.add(grid[curr.getrNode().getX()][curr.getrNode().getY()]);
+            AisleCellList.add(grid[curr.getrNode().getX()][curr.getrNode().getY()]);
 
             curr = curr.getNext();
         }
@@ -661,23 +661,23 @@ public class GridData3 {
     }
 
     /**
-     * Deletes isle from gird
-     * @param i isle
+     * Deletes Aisle from gird
+     * @param i Aisle
      */
-    public void removeIsle(Isle i)
+    public void removeAisle(Aisle i)
     {
-        CellList.CellNode curr = i.getIsleCellList().getFirst();
+        CellList.CellNode curr = i.getAisleCellList().getFirst();
 
         while (curr != null)
         {
-            grid[curr.getrNode().getX()][curr.getrNode().getY()].setIsled(false, null, null, null);
+            grid[curr.getrNode().getX()][curr.getrNode().getY()].setAisled(false, null, null, null);
             curr = curr.getNext();
         }
 
-        i.getIsleGroup().getIsleIDList().remove(i.getIsleID());
-        if (i.getIsleGroup().getIsleIDList().size() == 0)
+        i.getAisleGroup().getAisleIDList().remove(i.getAisleID());
+        if (i.getAisleGroup().getAisleIDList().size() == 0)
         {
-            isleGroupList.remove(i.getIsleGroup().getName());
+            aisleGroupList.remove(i.getAisleGroup().getName());
         }
     }
 
@@ -712,11 +712,11 @@ public class GridData3 {
     }
 
     /**
-     * Moves isle keeping size and all info
+     * Moves Aisle keeping size and all info
      * @param node selected node
-     * @param cellIsle isle of interest
+     * @param cellAisle Aisle of interest
      */
-    public void moveIsle(RNode node, Isle cellIsle)
+    public void moveAisle(RNode node, Aisle cellAisle)
     {
         int xDif = xCoordOfMouseOnGrid - node.getX();
         int yDif = yCoordOfMouseOnGrid - node.getY();
@@ -727,21 +727,21 @@ public class GridData3 {
         CellList.CellNode curr2 = toMoveList.getFirst();
         while (curr2 != null)
         {
-            grid[curr2.getrNode().getX()][curr2.getrNode().getY()].setIsleIsBeingMoved(false, null);
+            grid[curr2.getrNode().getX()][curr2.getrNode().getY()].setAisleIsBeingMoved(false, null);
             curr2 = curr2.getNext();
         }
         toMoveList.clear();
 
-        CellList.CellNode curr = cellIsle.getIsleCellList().getFirst();
+        CellList.CellNode curr = cellAisle.getAisleCellList().getFirst();
         while (curr != null)
         {
             try
             {
-                if (!grid[curr.getrNode().getX()+xDif][curr.getrNode().getY()+yDif].isIsle()
+                if (!grid[curr.getrNode().getX()+xDif][curr.getrNode().getY()+yDif].isAisle()
                         && !grid[curr.getrNode().getX()+xDif][curr.getrNode().getY()+yDif].isNulled())
                 {
                     toMoveList.add(grid[curr.getrNode().getX()+xDif][curr.getrNode().getY()+yDif]);
-                    grid[curr.getrNode().getX()+xDif][curr.getrNode().getY()+yDif].setIsleIsBeingMoved(true, cellIsle.getIsleGroup().getColor());
+                    grid[curr.getrNode().getX()+xDif][curr.getrNode().getY()+yDif].setAisleIsBeingMoved(true, cellAisle.getAisleGroup().getColor());
                 }
                 curr = curr.getNext();
             }
@@ -753,13 +753,13 @@ public class GridData3 {
     }
 
     /**
-     * Remakes isle after it was moved
-     * @param isleID id of isle
-     * @param igName name of isle group
+     * Remakes Aisle after it was moved
+     * @param AisleID id of Aisle
+     * @param igName name of Aisle group
      * @param c color
-     * @param isleGroup isle group
+     * @param aisleGroup Aisle group
      */
-    public void makeIsleFromToMoveList(String isleID, String igName, Color c, IsleGroup isleGroup, Isle isle)
+    public void makeAisleFromToMoveList(String AisleID, String igName, Color c, AisleGroup aisleGroup, Aisle Aisle)
     {
         CellList.CellNode curr = toMoveList.getFirst();
 
@@ -769,8 +769,8 @@ public class GridData3 {
             curr = curr.getNext();
         }
 
-        makeIsle(isleID, igName, c, isleGroup, true, null);
-        isleGroupList.get(igName).getIsleIDList().get(isleID).setupIsleInfo(isle.getNumberOfIsleSections(), isle.getNumberOfSubsectionsForEachSection(), isle.getEndCapLocation(), isle.getDirectionOfIncreasingIsleSections());
+        makeAisle(AisleID, igName, c, aisleGroup, true, null);
+        aisleGroupList.get(igName).getAisleIDList().get(AisleID).setupAisleInfo(Aisle.getNumberOfAisleSections(), Aisle.getNumberOfSubsectionsForEachSection(), Aisle.getEndCapLocation(), Aisle.getDirectionOfIncreasingAisleSections());
         toMoveList.clear();
     }
 
@@ -787,11 +787,11 @@ public class GridData3 {
     }
 
     /**
-     * Determines if isle group exists in grid
-     * @param s name of isle group
+     * Determines if Aisle group exists in grid
+     * @param s name of Aisle group
      * @return boolean true if found false if not
      */
-    public boolean isleGroupExists(String s) {return isleGroupList.get(s) != null;}
+    public boolean aisleGroupExists(String s) {return aisleGroupList.get(s) != null;}
 
     /**
      * Highlights area of cells that are null
@@ -1077,20 +1077,20 @@ public class GridData3 {
      */
     public RNode getRNode(int x, int y) {return grid[x][y];}
 
-    public Isle getIsle(String id, String ig) {return isleGroupList.get(ig).getIsleIDList().get(id);}
+    public Aisle getAisle(String id, String ig) {return aisleGroupList.get(ig).getAisleIDList().get(id);}
 
     /**
-     * @param id isleID of isle in question
-     * @return isle that matches, null if no isle
+     * @param id AisleID of Aisle in question
+     * @return Aisle that matches, null if no Aisle
      */
-    public Isle getIsleWithUnknownIG(String id)
+    public Aisle getAisleWithUnknownIG(String id)
     {
-        for (String ig : isleGroupList.keySet())
+        for (String ig : aisleGroupList.keySet())
         {
-            for (String i : isleGroupList.get(ig).getIsleIDList().keySet())
+            for (String i : aisleGroupList.get(ig).getAisleIDList().keySet())
             {
                 if (i.compareTo(id) == 0)
-                    return isleGroupList.get(ig).getIsleIDList().get(i);
+                    return aisleGroupList.get(ig).getAisleIDList().get(i);
             }
         }
         return null;
@@ -1103,50 +1103,50 @@ public class GridData3 {
      */
     public String getCoordsGivenLocation(String location)
     {
-        Isle isle;
+        Aisle Aisle;
         try
         {
             int hmm = Integer.parseInt(location.charAt(0)+"");
-            //System.out.println("Isle in the back");
+            //System.out.println("Aisle in the back");
             String[] sArr = location.split(" ");
-            if (isleGroupExists(sArr[0]))
+            if (aisleGroupExists(sArr[0]))
             {
-                isle = getIsle(sArr[0]+sArr[1]+"", sArr[0]);
-                //System.out.println("IsleID: "+isle.getIsleID());
-                if (isle.hasSetupInfo())
+                Aisle = getAisle(sArr[0]+sArr[1]+"", sArr[0]);
+                //System.out.println("AisleID: "+Aisle.getAisleID());
+                if (Aisle.hasSetupInfo())
                 {
                     String subsection = sArr[2].charAt(sArr[2].length()-1)+"";
-                    //System.out.println("isleSubsection: "+subsection);
+                    //System.out.println("AisleSubsection: "+subsection);
 
-                    if (isle.inputingValidIsleLocationInBack(subsection))
-                        return isle.getCoordsGivenLocationInBack(subsection);
+                    if (Aisle.inputingValidAisleLocationInBack(subsection))
+                        return Aisle.getCoordsGivenLocationInBack(subsection);
                 }
             }
         }
         catch (NumberFormatException e)
         {
-            //System.out.println("Isle on the floor");
+            //System.out.println("Aisle on the floor");
             String[] loc1 = location.split("\\(");
-            String isleGroup = location.charAt(0)+"";
-            //System.out.println("IsleID: "+loc1[0]);
+            String AisleGroup = location.charAt(0)+"";
+            //System.out.println("AisleID: "+loc1[0]);
             if (loc1.length > 1)
             {
-                isle = getIsle(loc1[0], isleGroup);
+                Aisle = getAisle(loc1[0], AisleGroup);
 
-                if (isle.hasSetupInfo())
+                if (Aisle.hasSetupInfo())
                 {
                     String[] loc2 = loc1[1].split("\\) ");
-                    int isleSection = Integer.parseInt(loc2[0]);
-                    //System.out.println("isleSection: "+isleSection);
+                    int AisleSection = Integer.parseInt(loc2[0]);
+                    //System.out.println("AisleSection: "+AisleSection);
 
                     String[] loc3 = loc2[1].split("-");
-                    //System.out.println("isleSubsection: "+loc3[0]);
+                    //System.out.println("AisleSubsection: "+loc3[0]);
 
-                    if (isle.inputingValidIsleLocationOnFloor(isleSection, loc3[0]))
-                        return isle.getCoordsGivenLocationOnFloor(isleSection, loc3[0]);
+                    if (Aisle.inputingValidAisleLocationOnFloor(AisleSection, loc3[0]))
+                        return Aisle.getCoordsGivenLocationOnFloor(AisleSection, loc3[0]);
                 }
                 else
-                    return isle.getIsleID();
+                    return Aisle.getAisleID();
             }
             else
                 return location;
@@ -1166,7 +1166,7 @@ public class GridData3 {
 
     public CellList getHighlightedNullList() {return highlightedNullList;}
 
-    public Hashtable<String, IsleGroup> getIsleGroupList() {return isleGroupList;}
+    public Hashtable<String, AisleGroup> getAisleGroupList() {return aisleGroupList;}
 
     public Hashtable<String, RNode> getNullList() {return nullList;}
 
