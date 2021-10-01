@@ -1,14 +1,14 @@
 
 # Store Layout App
 
-As of September 3rd, 2021, I work and have worked at a certain department store of a certain company since December of 2020. There, my job is to roam the store, locating and collecting various items for guest orders. I would get a list of locations in the store in a certain order, and it would be my job to go to each of those locations to collect each item until I had every item. In my time there, I have encountered three problems that directly affected the rate at which I could traverse the store and pick each item.
+As of September 3rd, 2021, I work and have worked at Target®, a department store in the US, since December of 2020. There, my job is to roam the store, locating and collecting various items for guest orders. I would get a list of locations in the store in a certain order, and it would be my job to go to each of those locations to collect each item until I had every item. In my time there, I have encountered three problems that directly affected the rate at which I could traverse the store and pick each item.
 
 # Problems
 
 In order of severity:
 
  1. In the store's database, some aisles were in a vastly different location from reality.
-	* For example one aisle, D99, was in one corner of the store in the store's system when in reality it was in the opposite corner. Thus, I was directed away from that aisle only to return to that location when I was originally very close.
+	* For example one aisle, D99, was in one corner of the store in the store's system when, in reality, it was in the opposite corner. Thus, I was directed away from that aisle only to return to that location when I was originally very close.
  2. The starting point of a batch of items is often nowhere near the first location in the batch.
 	 * I often had to traverse the entire store just to get to the first location in the batch, passing many other locations in the process.
  3. The overall path of locations through the store did not make sense to me, and I often manipulated the list to save time.
@@ -48,13 +48,13 @@ I have split up my code into packages.
 
 # Final Notes
 
-There are a couple of things that I cannot do simply because I do not have access to the company's database. Thus, this app is as complete as it can possibly be without that information.
+There are a couple of things that I cannot do simply because I do not have access to Target®'s database. Thus, this app is as complete as it can possibly be without that information.
 
-All of this work is 100% my own. The idea, the UI, and the code are all mine. I use some of the company's terminology because this is designed for one of their stores.
+All of this work is 100% my own. The idea, the UI, and the code are all mine. I use some of the Target®'s terminology because this is designed for one of their stores.
 
 I have fully tested this app on one store's layout and aim to test it on another before I give it the all clear. 
 
-I realize that this java app may not be compatible with the company's systems, of which I have no knowledge. This app is simply an idea and implemented solution to a real life problem that I encountered, and I believe it would not be hard for me to import this to another format so that it could be used.
+I realize that this java app may not be compatible with the Target®'s systems, of which I have no knowledge. This app is simply an idea and implemented solution to a real life problem that I encountered, and I believe it would not be hard for me to import this to another format so that it could be used.
 
 Finally, there are some minor performance issues, but all of them come from javafx's implementation of the node class and accessing multiple nodes at once.
 
