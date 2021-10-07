@@ -751,6 +751,7 @@ public class GraphOfTheGrid
         }
         catch (NumberFormatException e)
         {
+            System.out.println("Getting sector for irregular coords: "+coords1);
             coords = grid.getAisleWithUnknownIG(coords1).getAisleCellList().getFirst().getrNode().getCoords();
             System.out.println("Irregular coords for getting sector ("+coords1+"). Coords to use: "+coords.toString());
         }

@@ -1128,7 +1128,7 @@ public class GridData3 {
             //System.out.println("Aisle on the floor");
             String[] loc1 = location.split("\\(");
             String AisleGroup = location.charAt(0)+"";
-            //System.out.println("AisleID: "+loc1[0]);
+            System.out.println("AisleID: "+loc1[0]);
             if (loc1.length > 1)
             {
                 Aisle = getAisle(loc1[0], AisleGroup);

@@ -276,9 +276,9 @@ public class IsleLayoutController {
 
         loadCellsFromFile(finalSizeOfCells, hboxWithTheCells, file);
 
-        fileMenu.getItems().remove(testLocation);
-        fileMenu.getItems().remove(testPath);
-        fileMenu.getItems().remove(testPickingPath);
+        //fileMenu.getItems().remove(testLocation);
+        //fileMenu.getItems().remove(testPath);
+        //fileMenu.getItems().remove(testPickingPath);
     }
 
     /**
