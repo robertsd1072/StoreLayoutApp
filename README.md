@@ -1,7 +1,9 @@
 
 # Store Layout App
 
-As of September 3rd, 2021, I work and have worked at Target®, a department store in the US, since December of 2020. There, my job is to roam the store, locating and collecting various items for guest orders. I would get a list of locations in the store in a certain order, and it would be my job to go to each of those locations to collect each item until I had every item. In my time there, I have encountered three problems that directly affected the rate at which I could traverse the store and pick each item.
+Check of the Demo: https://youtu.be/0wLGVzoAl8s
+
+For close to 10 months I worked at Target®, a department store in the US, since December of 2020. There, my job is to roam the store, locating and collecting various items for guest orders. I would get a list of locations in the store in a certain order, and it would be my job to go to each of those locations to collect each item until I had every item. In my time there, I have encountered three problems that directly affected the rate at which I could traverse the store and pick each item.
 
 # Problems
 
